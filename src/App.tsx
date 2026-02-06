@@ -2,74 +2,152 @@ import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Suspense, useEffect, useState } from "react";
-import BaseLayout from "./components/BaseLayout";
-import Unit from "./components/Unit";
-import HUD from "./components/HUD";
+import LevelUnits from "./components/LevelUnits";
+import TimeSlider from "./components/TimeSlider/TimeSlider";
+import HUD from "./components/HUD/HUD";
+
+export type LeaseRow = {
+  unitType: string;
+  description: string;
+  unitArea: number;
+  leaseStartDate: string;
+  leaseEndDate: string;
+  leaseTerm: number;
+  rent: string;
+  psf: string;
+  freeMonths: number;
+  netRent: string;
+  leasingAssociate: string;
+};
+export type LeaseData = Record<string, LeaseRow>;
+
+function parseLeaseDate(s: string): Date | null {
+  if (!s) return null;
+  const t = s.trim();
+
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) {
+    const d = new Date(t + "T00:00:00");
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // M/D/YYYY or MM/DD/YYYY
+  const m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    const month = Number(m[1]);
+    const day = Number(m[2]);
+    const year = Number(m[3]);
+    const d = new Date(year, month - 1, day);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+function daysBetween(a: Date, b: Date): number {
+  const msPerDay = 24 * 60 * 60 * 1000;
+
+  const utcA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utcB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+  return Math.round((utcB - utcA) / msPerDay); // can be negative
+}
+function stringDateFromDayIndex(firstDate: Date, dayIndex: number): string {
+  const d = new Date(firstDate); // copy
+  d.setDate(d.getDate() + dayIndex); // add days (calendar-safe)
+  return d.toDateString(); // "YYYY-MM-DD"
+}
+function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
+  const d = new Date(firstDate); // copy
+  d.setDate(d.getDate() + dayIndex); // add days (calendar-safe)
+  return d;
+}
 
 function App() {
-  const [units, setUnits] = useState<{ unitId: string; file: string }[]>([]);
-  const [hoveredUnitId, setHoveredUnitId] = useState<string | null>(null);
+  const [unitData, setUnitData] = useState<LeaseData | null>(null);
+  const [firstLease, setFirstLease] = useState<Date | null>(null);
+  const [level, setLevel] = useState<string>("1");
+  // const [lastLease, setLastLease] = useState<Date | null>(null);
+  const [days, setDays] = useState<number>(0);
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const [currentDateString, setCurrentDateString] = useState<string>("");
+  const [currentDay, setCurrentDay] = useState<number>(1);
   useEffect(() => {
-    fetch("/units/manifest.json")
-      .then((data) => data.json())
-      .then(setUnits);
+    fetch("/data/lease_data.json")
+      .then((r) => r.json())
+      .then((data) => setUnitData(data));
   }, []);
+  useEffect(() => {
+    if (!firstLease) return;
+    setCurrentDate(dateFromDayIndex(firstLease, currentDay));
+    setCurrentDateString(stringDateFromDayIndex(firstLease, currentDay));
+  }, [firstLease, currentDay]);
+  useEffect(() => {
+    if (!unitData) return;
+    let earliest: Date | null = null;
+    let latest: Date | null = null;
+    for (const row of Object.values(unitData)) {
+      let leaseDate = parseLeaseDate(row.leaseStartDate);
+      if (leaseDate && (!earliest || leaseDate < earliest))
+        earliest = leaseDate;
+      if (leaseDate && (!latest || leaseDate > latest)) latest = leaseDate;
+    }
+    setFirstLease(earliest);
+    // setLastLease(latest);
+    if (earliest && latest) {
+      setDays(daysBetween(earliest, latest));
+    } else {
+      setDays(0);
+    }
+  }, [unitData]);
+
   return (
     <div className="canvas-container">
-      <Canvas
-        shadows
-        dpr={[1, 2]}
-        onCreated={({ camera }) => {
-          camera.up.set(0, 0, 1); // Z-up
-        }}
-      >
+      <Canvas shadows dpr={[1, 2]}>
         <Suspense fallback={null}>
-          <BaseLayout />
-          {units.map((u) => (
-            <Unit
-              key={u.unitId}
-              location={u.file}
-              unitId={u.unitId}
-              isHovered={hoveredUnitId === u.unitId}
-              onHover={(id) => setHoveredUnitId(id)}
-            />
-          ))}
+          <LevelUnits
+            level={level}
+            leaseData={unitData}
+            currentDate={currentDate}
+          />
         </Suspense>
         {/* Soft overall fill */}
         <ambientLight intensity={0.35} />
-
         {/* Key light */}
         <directionalLight
           castShadow
-          position={[300, 400, 700]}
+          position={[40000, -100000, 60000]}
           intensity={1}
           shadow-mapSize-width={4096}
           shadow-mapSize-height={4096}
           shadow-camera-near={10}
-          shadow-camera-far={2000}
-          shadow-camera-left={-400}
-          shadow-camera-right={400}
-          shadow-camera-top={400}
-          shadow-camera-bottom={-400}
+          shadow-camera-far={100000}
+          shadow-camera-left={-400000}
+          shadow-camera-right={400000}
+          shadow-camera-top={400000}
+          shadow-camera-bottom={-400000}
           shadow-bias={-0.0002}
           shadow-normalBias={0.02}
         />
-
         {/* Fill light (opposite side, weaker) */}
-        <directionalLight position={[-600, 400, 600]} intensity={0.35} />
-
+        <directionalLight position={[-60000, 40000, 60000]} intensity={1} />
         {/* Rim/back light (adds edge separation) */}
-        <directionalLight position={[0, -800, 900]} intensity={0.25} />
+        <directionalLight position={[0, -80000, 90000]} intensity={1} />
         <PerspectiveCamera
           makeDefault
-          position={[900, 400, 1900]}
+          position={[100000, -180000, 250000]}
           fov={25} // lower = more “axon-like”
           near={10}
-          far={10000}
+          far={1000000}
+          up={[0, 0, 1]}
         />
-        <OrbitControls target={[0, 0, 0]} />
+        <OrbitControls target={[0, 20000, 0]} />
       </Canvas>
-      <HUD hoveredUnitId={hoveredUnitId} />
+      <HUD date={currentDateString} />
+      <TimeSlider
+        days={days}
+        currentDay={currentDay}
+        setCurrentDay={setCurrentDay}
+      />
     </div>
   );
 }

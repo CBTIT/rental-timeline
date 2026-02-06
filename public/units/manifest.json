@@ -1,8 +1,0 @@
-[
-  { "unitId": "unit_1", "file": "/units/unit_1.3dm" },
-  { "unitId": "unit_2", "file": "/units/unit_2.3dm" },
-  { "unitId": "unit_3", "file": "/units/unit_3.3dm" },
-  { "unitId": "unit_4", "file": "/units/unit_4.3dm" },
-  { "unitId": "unit_5", "file": "/units/unit_5.3dm" },
-  { "unitId": "unit_6", "file": "/units/unit_6.3dm" }
-]

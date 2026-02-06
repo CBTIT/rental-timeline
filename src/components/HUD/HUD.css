@@ -1,0 +1,10 @@
+.HUD {
+  position: absolute;
+  right: 50px;
+  top: 50px;
+}
+.date {
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+}
