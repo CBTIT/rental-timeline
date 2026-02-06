@@ -3,8 +3,8 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Suspense, useEffect, useState } from "react";
 import LevelUnits from "./components/LevelUnits";
-import TimeSlider from "./components/TimeSlider/TimeSlider";
 import HUD from "./components/HUD/HUD";
+import TimeSlider from "./components/TimeSlider/TimeSlider";
 
 export type LeaseRow = {
   unitType: string;
@@ -66,6 +66,7 @@ function App() {
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
   const [firstLease, setFirstLease] = useState<Date | null>(null);
   const [level, setLevel] = useState<string>("1");
+  const [leasedUnits, setLeasedUnits] = useState<string[]>([]);
   // const [lastLease, setLastLease] = useState<Date | null>(null);
   const [days, setDays] = useState<number>(0);
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
@@ -108,6 +109,7 @@ function App() {
             level={level}
             leaseData={unitData}
             currentDate={currentDate}
+            setLeasedUnits={setLeasedUnits}
           />
         </Suspense>
         {/* Soft overall fill */}
@@ -142,7 +144,13 @@ function App() {
         />
         <OrbitControls target={[0, 20000, 0]} />
       </Canvas>
-      <HUD date={currentDateString} />
+      {unitData && (
+        <HUD
+          date={currentDateString}
+          leasedUnits={leasedUnits}
+          unitData={unitData}
+        />
+      )}
       <TimeSlider
         days={days}
         currentDay={currentDay}

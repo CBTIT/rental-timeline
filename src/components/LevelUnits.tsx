@@ -8,6 +8,7 @@ type LevelUnitsProp = {
   level: string;
   leaseData: LeaseData | null;
   currentDate: Date | null;
+  setLeasedUnits: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 function parseLeaseDate(s: string): Date | null {
@@ -33,7 +34,12 @@ function parseLeaseDate(s: string): Date | null {
   return null;
 }
 
-const LevelUnits = ({ level, leaseData, currentDate }: LevelUnitsProp) => {
+const LevelUnits = ({
+  level,
+  leaseData,
+  currentDate,
+  setLeasedUnits,
+}: LevelUnitsProp) => {
   const object = useLoader(Rhino3dmLoader, `/level_${level}.3dm`, (loader) => {
     loader.setLibraryPath("https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/");
   });
@@ -90,6 +96,29 @@ const LevelUnits = ({ level, leaseData, currentDate }: LevelUnitsProp) => {
       }
     });
   }, [object, leaseData, currentDate]);
+  useEffect(() => {
+    if (!leaseData || !currentDate) return;
+
+    const next = new Set<string>();
+
+    object.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
+
+      const unitId = o.name;
+      const row = leaseData[unitId];
+      const start = row ? parseLeaseDate(row.leaseStartDate) : null;
+
+      if (start && start <= currentDate) {
+        o.material = showMaterial;
+        next.add(unitId);
+      } else {
+        o.material = baseMaterial;
+      }
+    });
+
+    setLeasedUnits(Array.from(next));
+  }, [object, leaseData, currentDate, baseMaterial, showMaterial]);
+
   return <primitive object={object} dispose={null} />;
 };
 
