@@ -40,43 +40,83 @@ const LevelUnits = ({
   currentDate,
   setLeasedUnits,
 }: LevelUnitsProp) => {
-  const object = useLoader(Rhino3dmLoader, `/level_${level}.3dm`, (loader) => {
-    loader.setLibraryPath("https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/");
-  });
+  const unitGeometry = useLoader(
+    Rhino3dmLoader,
+    `/floor_units/level_${level}.3dm`,
+    (loader) => {
+      loader.setLibraryPath(
+        "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
+      );
+    },
+  );
+  const unitText = useLoader(
+    Rhino3dmLoader,
+    `/unit_texts/level_${level}.3dm`,
+    (loader) => {
+      loader.setLibraryPath(
+        "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
+      );
+    },
+  );
+  const texMaterial = useMemo(() => {
+    const m = new THREE.MeshBasicMaterial({
+      color: 0x2a2a2a, // dark gray/black
+      transparent: true,
+      opacity: 1,
+    });
+
+    // Optional: keep labels always visible over units
+    m.depthTest = true;
+    m.depthWrite = true;
+
+    return m;
+  }, []);
   const baseMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
-      color: 0xffffff, // very light
-      transparent: true,
-      opacity: 0.08, // faint
+      color: 0xd2d2d2, // very light
       roughness: 1.0,
       metalness: 0.0,
     });
     // Helps with transparent surfaces not “blocking” others
-    m.depthWrite = false;
+    m.depthWrite = true;
     return m;
   }, []);
   const showMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: 0x8b1e3f, // bold (maroon-ish). change to whatever.
+        color: 0x59a310, // bold (maroon-ish). change to whatever.
         roughness: 0.4,
         metalness: 0.05,
       }),
     [],
   );
+
   useEffect(() => {
-    object.traverse((o) => {
+    unitText.traverse((o) => {
+      if (o instanceof THREE.Mesh) {
+        o.material = texMaterial;
+
+        // ✅ never catch hover/click rays
+        o.raycast = () => null;
+
+        // ✅ draw on top (when depthTest is false)
+        o.renderOrder = 999;
+      }
+    });
+  }, [unitText, texMaterial]);
+  useEffect(() => {
+    unitGeometry.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         o.castShadow = true;
         o.receiveShadow = true;
         o.material = baseMaterial;
       }
     });
-  }, [object, baseMaterial]);
+  }, [unitGeometry, baseMaterial]);
   useEffect(() => {
     if (!leaseData || !currentDate) return;
 
-    object.traverse((o) => {
+    unitGeometry.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
       const unitId = o.name;
       const row = leaseData[unitId];
@@ -95,13 +135,13 @@ const LevelUnits = ({
         o.material = baseMaterial;
       }
     });
-  }, [object, leaseData, currentDate]);
+  }, [unitGeometry, leaseData, currentDate]);
   useEffect(() => {
     if (!leaseData || !currentDate) return;
 
     const next = new Set<string>();
 
-    object.traverse((o) => {
+    unitGeometry.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
 
       const unitId = o.name;
@@ -117,9 +157,14 @@ const LevelUnits = ({
     });
 
     setLeasedUnits(Array.from(next));
-  }, [object, leaseData, currentDate, baseMaterial, showMaterial]);
+  }, [unitGeometry, leaseData, currentDate, baseMaterial, showMaterial]);
 
-  return <primitive object={object} dispose={null} />;
+  return (
+    <>
+      <primitive object={unitGeometry} dispose={null} />
+      <primitive object={unitText} dispose={null} />
+    </>
+  );
 };
 
 export default LevelUnits;

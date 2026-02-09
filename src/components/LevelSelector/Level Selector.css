@@ -1,0 +1,5 @@
+.level-selector {
+  cursor: pointer;
+  width: 100%;
+  pointer-events: auto;
+}

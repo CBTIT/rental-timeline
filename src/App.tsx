@@ -1,11 +1,11 @@
 import "./App.css";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useMemo } from "react";
 import LevelUnits from "./components/LevelUnits";
 import HUD from "./components/HUD/HUD";
-import TimeSlider from "./components/TimeSlider/TimeSlider";
-
+import UserSelection from "./components/UserSelection/UserSelection";
+import CamerasAndControls from "./components/CamerasAndControls/CamerasAndControls";
+import * as THREE from "three";
 export type LeaseRow = {
   unitType: string;
   description: string;
@@ -61,17 +61,17 @@ function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
   d.setDate(d.getDate() + dayIndex); // add days (calendar-safe)
   return d;
 }
-
 function App() {
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
   const [firstLease, setFirstLease] = useState<Date | null>(null);
   const [level, setLevel] = useState<string>("1");
   const [leasedUnits, setLeasedUnits] = useState<string[]>([]);
-  // const [lastLease, setLastLease] = useState<Date | null>(null);
   const [days, setDays] = useState<number>(0);
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [currentDateString, setCurrentDateString] = useState<string>("");
   const [currentDay, setCurrentDay] = useState<number>(1);
+  const [viewContext, setViewContext] = useState<string>("3D");
+
   useEffect(() => {
     fetch("/data/lease_data.json")
       .then((r) => r.json())
@@ -113,7 +113,7 @@ function App() {
           />
         </Suspense>
         {/* Soft overall fill */}
-        <ambientLight intensity={0.35} />
+        <ambientLight intensity={0.55} />
         {/* Key light */}
         <directionalLight
           castShadow
@@ -134,15 +134,7 @@ function App() {
         <directionalLight position={[-60000, 40000, 60000]} intensity={1} />
         {/* Rim/back light (adds edge separation) */}
         <directionalLight position={[0, -80000, 90000]} intensity={1} />
-        <PerspectiveCamera
-          makeDefault
-          position={[100000, -180000, 250000]}
-          fov={25} // lower = more “axon-like”
-          near={10}
-          far={1000000}
-          up={[0, 0, 1]}
-        />
-        <OrbitControls target={[0, 20000, 0]} />
+        <CamerasAndControls viewContext={viewContext} level={level} />
       </Canvas>
       {unitData && (
         <HUD
@@ -151,7 +143,10 @@ function App() {
           unitData={unitData}
         />
       )}
-      <TimeSlider
+      <UserSelection
+        setViewContext={setViewContext}
+        viewContext={viewContext}
+        setLevel={setLevel}
         days={days}
         currentDay={currentDay}
         setCurrentDay={setCurrentDay}

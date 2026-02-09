@@ -1,8 +1,4 @@
-.slider-container {
-  position: absolute;
-  left: 24px;
-  right: 24px;
-  bottom: 24px;
-  z-index: 10;
+#time-slider {
+  cursor: pointer;
   pointer-events: auto;
 }

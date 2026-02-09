@@ -1,0 +1,5 @@
+.view-button {
+  padding: 10px;
+  cursor: pointer;
+  pointer-events: auto;
+}
