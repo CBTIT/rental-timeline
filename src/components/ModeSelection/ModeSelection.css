@@ -1,0 +1,18 @@
+.mode-selection {
+  position: absolute;
+  left: 50px;
+  top: 50px;
+  text-align: left;
+  pointer-events: none;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.mode-selection button {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  pointer-events: all;
+  cursor: pointer;
+}

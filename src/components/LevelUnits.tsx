@@ -1,5 +1,5 @@
-import { useLoader } from "@react-three/fiber";
-import { useEffect, useMemo } from "react";
+import { useLoader, type ThreeEvent } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import { Rhino3dmLoader } from "three-stdlib";
 import * as THREE from "three";
 import type { LeaseData } from "../App";
@@ -9,6 +9,9 @@ type LevelUnitsProp = {
   leaseData: LeaseData | null;
   currentDate: Date | null;
   setLeasedUnits: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedUnit: string | null;
+  setSelectedUnit: React.Dispatch<React.SetStateAction<string | null>>;
+  mode: string;
 };
 
 function parseLeaseDate(s: string): Date | null {
@@ -39,7 +42,27 @@ const LevelUnits = ({
   leaseData,
   currentDate,
   setLeasedUnits,
+  setSelectedUnit,
+  selectedUnit,
+  mode,
 }: LevelUnitsProp) => {
+  const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
+  const maxPointerDelta = 6;
+  const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
+    pointerDownRef.current = { x: e.clientX, y: e.clientY };
+    e.stopPropagation();
+  };
+  const onPointerUp = (e: ThreeEvent<PointerEvent>) => {
+    const down = pointerDownRef.current;
+    pointerDownRef.current = null;
+    if (!down) return;
+    const dx = e.clientX - down.x;
+    const dy = e.clientY - down.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > maxPointerDelta) return;
+    const name = e.object.name;
+    setSelectedUnit(name);
+  };
   const unitGeometry = useLoader(
     Rhino3dmLoader,
     `/floor_units/level_${level}.3dm`,
@@ -58,7 +81,7 @@ const LevelUnits = ({
       );
     },
   );
-  const texMaterial = useMemo(() => {
+  const textMaterial = useMemo(() => {
     const m = new THREE.MeshBasicMaterial({
       color: 0x2a2a2a, // dark gray/black
       transparent: true,
@@ -71,6 +94,18 @@ const LevelUnits = ({
 
     return m;
   }, []);
+  const selectedMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: 0xffc107, // yellow-ish highlight
+        roughness: 0.35,
+        metalness: 0.1,
+        emissive: new THREE.Color(0x332200), // subtle glow
+        emissiveIntensity: 0.6,
+      }),
+    [],
+  );
+
   const baseMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
       color: 0xd2d2d2, // very light
@@ -94,7 +129,7 @@ const LevelUnits = ({
   useEffect(() => {
     unitText.traverse((o) => {
       if (o instanceof THREE.Mesh) {
-        o.material = texMaterial;
+        o.material = textMaterial;
 
         // ✅ never catch hover/click rays
         o.raycast = () => null;
@@ -103,39 +138,17 @@ const LevelUnits = ({
         o.renderOrder = 999;
       }
     });
-  }, [unitText, texMaterial]);
+  }, [unitText, textMaterial]);
   useEffect(() => {
     unitGeometry.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         o.castShadow = true;
         o.receiveShadow = true;
+        o.raycast = THREE.Mesh.prototype.raycast;
         o.material = baseMaterial;
       }
     });
   }, [unitGeometry, baseMaterial]);
-  useEffect(() => {
-    if (!leaseData || !currentDate) return;
-
-    unitGeometry.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      const unitId = o.name;
-      const row = leaseData[unitId];
-      if (!row) {
-        return;
-      }
-      const start = parseLeaseDate(row.leaseStartDate);
-      if (!start) {
-        return;
-      }
-      // console.log(start);
-      // console.log(currentDate);
-      if (start <= currentDate) {
-        o.material = showMaterial;
-      } else {
-        o.material = baseMaterial;
-      }
-    });
-  }, [unitGeometry, leaseData, currentDate]);
   useEffect(() => {
     if (!leaseData || !currentDate) return;
 
@@ -148,20 +161,40 @@ const LevelUnits = ({
       const row = leaseData[unitId];
       const start = row ? parseLeaseDate(row.leaseStartDate) : null;
 
-      if (start && start <= currentDate) {
+      const isLeased = !!(start && start <= currentDate);
+      const isSelected = !!(selectedUnit && unitId === selectedUnit);
+
+      if (isLeased) next.add(unitId);
+
+      if (isSelected) {
+        o.material = selectedMaterial;
+      } else if (isLeased) {
         o.material = showMaterial;
-        next.add(unitId);
       } else {
         o.material = baseMaterial;
       }
     });
 
     setLeasedUnits(Array.from(next));
-  }, [unitGeometry, leaseData, currentDate, baseMaterial, showMaterial]);
+  }, [
+    unitGeometry,
+    leaseData,
+    currentDate,
+    selectedUnit,
+    baseMaterial,
+    showMaterial,
+    selectedMaterial,
+    setLeasedUnits,
+  ]);
 
   return (
     <>
-      <primitive object={unitGeometry} dispose={null} />
+      <primitive
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        object={unitGeometry}
+        dispose={null}
+      />
       <primitive object={unitText} dispose={null} />
     </>
   );

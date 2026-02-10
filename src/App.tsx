@@ -1,11 +1,11 @@
 import "./App.css";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useState, useMemo } from "react";
+import { Suspense, useEffect, useState } from "react";
 import LevelUnits from "./components/LevelUnits";
 import HUD from "./components/HUD/HUD";
 import UserSelection from "./components/UserSelection/UserSelection";
 import CamerasAndControls from "./components/CamerasAndControls/CamerasAndControls";
-import * as THREE from "three";
+import ModeSelection from "./components/ModeSelection/ModeSelection";
 export type LeaseRow = {
   unitType: string;
   description: string;
@@ -62,6 +62,7 @@ function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
   return d;
 }
 function App() {
+  const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
   const [firstLease, setFirstLease] = useState<Date | null>(null);
   const [level, setLevel] = useState<string>("1");
@@ -71,12 +72,16 @@ function App() {
   const [currentDateString, setCurrentDateString] = useState<string>("");
   const [currentDay, setCurrentDay] = useState<number>(1);
   const [viewContext, setViewContext] = useState<string>("3D");
+  const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/data/lease_data.json")
       .then((r) => r.json())
       .then((data) => setUnitData(data));
   }, []);
+  useEffect(() => {
+    setSelectedUnit(null);
+  }, [level]);
   useEffect(() => {
     if (!firstLease) return;
     setCurrentDate(dateFromDayIndex(firstLease, currentDay));
@@ -100,16 +105,30 @@ function App() {
       setDays(0);
     }
   }, [unitData]);
-
   return (
     <div className="canvas-container">
       <Canvas shadows dpr={[1, 2]}>
-        <Suspense fallback={null}>
+        <mesh position={[0, 30000, 0]} frustumCulled={false}>
+          <boxGeometry args={[5000, 5000, 5000]} />
+          <meshStandardMaterial />
+        </mesh>
+
+        <Suspense
+          fallback={
+            <mesh position={[0, 0, 0]}>
+              <boxGeometry args={[10000, 10000, 10000]} />
+              <meshStandardMaterial />
+            </mesh>
+          }
+        >
           <LevelUnits
             level={level}
             leaseData={unitData}
             currentDate={currentDate}
             setLeasedUnits={setLeasedUnits}
+            setSelectedUnit={setSelectedUnit}
+            selectedUnit={selectedUnit}
+            mode={mode}
           />
         </Suspense>
         {/* Soft overall fill */}
@@ -141,6 +160,7 @@ function App() {
           date={currentDateString}
           leasedUnits={leasedUnits}
           unitData={unitData}
+          selectedUnit={selectedUnit}
         />
       )}
       <UserSelection
@@ -151,6 +171,7 @@ function App() {
         currentDay={currentDay}
         setCurrentDay={setCurrentDay}
       />
+      <ModeSelection setMode={setMode} mode={mode} />
     </div>
   );
 }
