@@ -1,4 +1,5 @@
 #time-slider {
   cursor: pointer;
   pointer-events: auto;
+  width: 100%;
 }

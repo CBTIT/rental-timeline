@@ -1,0 +1,73 @@
+.table-container {
+  margin: 125px 25px 25px 25px;
+  font-family: Arial, Helvetica, sans-serif;
+
+  height: calc(100vh - 160px); /* ✅ force scroll container */
+  overflow: auto;
+
+  border: 3px solid brown;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead th {
+  position: sticky !important;
+  top: 0;
+  z-index: 10;
+  background: white;
+  border-bottom: 3px solid brown;
+  padding: 10px;
+  text-align: left;
+}
+
+tbody td {
+  border-bottom: 1px solid #eee;
+  padding: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 20; /* ✅ top-left corner */
+  background: white;
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
+  border-right: 1px solid #eee;
+  box-shadow: 6px 0 0 rgba(0, 0, 0, 0.03);
+}
+
+tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: white;
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
+  border-right: 1px solid #eee;
+  box-shadow: 6px 0 0 rgba(0, 0, 0, 0.03);
+}
+thead th[role="button"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+thead th[role="button"]:hover {
+  background: #f4f4f4;
+}
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+th.sortable:hover {
+  background: #cfcfcf;
+}

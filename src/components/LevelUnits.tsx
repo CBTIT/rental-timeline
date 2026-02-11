@@ -83,6 +83,50 @@ const LevelUnits = ({
       );
     },
   );
+  const outlineMat = useMemo(() => {
+    return new THREE.LineBasicMaterial({
+      color: 0x111111,
+      transparent: true,
+      opacity: 0.35,
+      depthTest: true,
+      depthWrite: false,
+    });
+  }, []);
+  useEffect(() => {
+    if (viewContext === "2D" && mode === "combined") return;
+    // add outlines once
+    unitGeometry.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
+
+      // avoid duplicating if effect reruns
+      const already = o.children.find((c) => c.name === "__outline__");
+      if (already) return;
+
+      const edges = new THREE.EdgesGeometry(o.geometry, 25);
+      // ↑ thresholdAngle: bigger => fewer edges (try 5–30)
+
+      const lines = new THREE.LineSegments(edges, outlineMat);
+      lines.name = "__outline__";
+
+      // keep outlines visible
+      lines.renderOrder = (o.renderOrder ?? 0) + 1;
+
+      // IMPORTANT for your translucent combined mode:
+      // don't let outline write depth or it will kill stacking
+      lines.material.depthWrite = false;
+
+      o.add(lines);
+    });
+
+    return () => {
+      // cleanup if component unmounts
+      unitGeometry.traverse((o) => {
+        if (!(o instanceof THREE.Mesh)) return;
+        const lines = o.children.find((c) => c.name === "__outline__");
+        if (lines) o.remove(lines);
+      });
+    };
+  }, [unitGeometry, outlineMat]);
   const textMaterial = useMemo(() => {
     const m = new THREE.MeshBasicMaterial({
       color: 0x2a2a2a, // dark gray/black
@@ -109,7 +153,7 @@ const LevelUnits = ({
   );
   const combinedBaseMaterial = useMemo(() => {
     const m = new THREE.MeshBasicMaterial({
-      color: 0xd2d2d2, // pick your base heat color
+      color: 0xffffff, // pick your base heat color
       transparent: true,
       opacity: 0.1, // low per-layer opacity so stacking accumulates
       blending: THREE.AdditiveBlending,
@@ -120,9 +164,9 @@ const LevelUnits = ({
   }, []);
   const combinedLeasedMaterial = useMemo(() => {
     const m = new THREE.MeshBasicMaterial({
-      color: 0x59a310,
+      color: 0x2e6f40,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.15,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -141,7 +185,7 @@ const LevelUnits = ({
   }, []);
   const baseMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
-      color: 0xd2d2d2, // very light
+      color: 0xffffff, // very light
       roughness: 1.0,
       metalness: 0.0,
     });
@@ -152,7 +196,7 @@ const LevelUnits = ({
   const leasedMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: 0x59a310, // bold (maroon-ish). change to whatever.
+        color: 0x56ae57, // bold (maroon-ish). change to whatever.
         roughness: 0.4,
         metalness: 0.05,
       }),

@@ -1,5 +1,16 @@
 .level-selector {
   cursor: pointer;
-  width: 100%;
+  width: 50%;
   pointer-events: auto;
+  padding: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.level-selection-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-family: Arial, Helvetica, sans-serif;
+  color: brown;
+  font-weight: bold;
 }

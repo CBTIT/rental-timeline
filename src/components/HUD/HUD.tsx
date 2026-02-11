@@ -28,11 +28,11 @@ const HUD = ({
     <div className="HUD">
       <div className="date">{date}</div>
 
-      <div className="leased-units">
+      {/* <div className="leased-units">
         {leasedUnits.map((unitId) => (
           <HUDUnit key={unitId} unit={unitData[unitId]} name={unitId} />
         ))}
-      </div>
+      </div> */}
       {inCombined2D && (
         <div className="unit-detail">
           Change mode to 3D for unit selection details

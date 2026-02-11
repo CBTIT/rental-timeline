@@ -10,31 +10,40 @@ type DataChartsType = {
   mode: string;
   unitData: LeaseData | null;
   level: string;
+  showData: boolean;
 };
 
-const DataCharts = ({ leasedUnits, mode, unitData, level }: DataChartsType) => {
+const DataCharts = ({
+  leasedUnits,
+  mode,
+  unitData,
+  level,
+  showData,
+}: DataChartsType) => {
   return (
-    <div className="data-charts">
-      <LeasedKPI leasedUnits={leasedUnits} mode={mode} level={level} />
-      <SortedByRentPSFPercent
-        unitData={unitData}
-        leasedUnits={leasedUnits}
-        mode={mode}
-        level={level}
-      />
-      <SortedByUnitTypePercent
-        unitData={unitData}
-        leasedUnits={leasedUnits}
-        mode={mode}
-        level={level}
-      />
-      {mode === "combined" && (
-        <SortedByFloorLeasePercent
+    showData && (
+      <div className="data-charts">
+        <LeasedKPI leasedUnits={leasedUnits} mode={mode} level={level} />
+        <SortedByRentPSFPercent
           unitData={unitData}
           leasedUnits={leasedUnits}
+          mode={mode}
+          level={level}
         />
-      )}
-    </div>
+        <SortedByUnitTypePercent
+          unitData={unitData}
+          leasedUnits={leasedUnits}
+          mode={mode}
+          level={level}
+        />
+        {mode === "combined" && (
+          <SortedByFloorLeasePercent
+            unitData={unitData}
+            leasedUnits={leasedUnits}
+          />
+        )}
+      </div>
+    )
   );
 };
 

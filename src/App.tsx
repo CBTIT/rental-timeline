@@ -7,6 +7,8 @@ import UserSelection from "./components/UserSelection/UserSelection";
 import CamerasAndControls from "./components/CamerasAndControls/CamerasAndControls";
 import ModeSelection from "./components/ModeSelection/ModeSelection";
 import DataCharts from "./components/DataCharts/DataCharts";
+import BaseMap from "./components/BaseMap/BaseMap";
+import DataTable from "./components/DataTable/DataTable";
 export type LeaseRow = {
   unitType: string;
   description: string;
@@ -63,6 +65,7 @@ function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
   return d;
 }
 function App() {
+  const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
   const [firstLease, setFirstLease] = useState<Date | null>(null);
@@ -88,9 +91,6 @@ function App() {
     setSelectedUnit(null);
   }, [level]);
   useEffect(() => {
-    console.log("[App] mode changed ->", mode);
-  }, [mode]);
-  useEffect(() => {
     if (!firstLease) return;
     setCurrentDate(dateFromDayIndex(firstLease, currentDay));
     setCurrentDateString(stringDateFromDayIndex(firstLease, currentDay));
@@ -113,76 +113,95 @@ function App() {
       setDays(0);
     }
   }, [unitData]);
-  console.log("[App render] mode =", mode);
-
-  return (
-    <div className="canvas-container">
-      <Canvas shadows dpr={[1, 2]}>
-        <Suspense fallback={null}>
-          <LevelUnits
-            level={level}
-            leaseData={unitData}
-            currentDate={currentDate}
-            setLeasedUnits={setLeasedUnits}
-            setSelectedUnit={setSelectedUnit}
+  if (mode === "table") {
+    return (
+      <div>
+        <ModeSelection
+          setMode={setMode}
+          mode={mode}
+          showData={showData}
+          setShowData={setShowData}
+        />
+        <DataTable unitData={unitData} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="canvas-container">
+        <Canvas shadows dpr={[1, 2]}>
+          <Suspense fallback={null}>
+            <LevelUnits
+              level={level}
+              leaseData={unitData}
+              currentDate={currentDate}
+              setLeasedUnits={setLeasedUnits}
+              setSelectedUnit={setSelectedUnit}
+              selectedUnit={selectedUnit}
+              mode={mode}
+              viewContext={viewContext}
+            />
+            <BaseMap level={level} viewContext={viewContext} mode={mode} />
+          </Suspense>
+          {/* Soft overall fill */}
+          <ambientLight intensity={0.55} />
+          {/* Key light */}
+          <directionalLight
+            castShadow
+            position={[40000, -100000, 60000]}
+            intensity={1}
+            shadow-mapSize-width={4096}
+            shadow-mapSize-height={4096}
+            shadow-camera-near={10}
+            shadow-camera-far={100000}
+            shadow-camera-left={-400000}
+            shadow-camera-right={400000}
+            shadow-camera-top={400000}
+            shadow-camera-bottom={-400000}
+            shadow-bias={-0.0002}
+            shadow-normalBias={0.02}
+          />
+          {/* Fill light (opposite side, weaker) */}
+          <directionalLight position={[-60000, 40000, 60000]} intensity={1} />
+          {/* Rim/back light (adds edge separation) */}
+          <directionalLight position={[0, -80000, 90000]} intensity={1} />
+          <CamerasAndControls viewContext={viewContext} level={level} />
+        </Canvas>
+        {unitData && (
+          <HUD
+            date={currentDateString}
+            leasedUnits={leasedUnits}
+            unitData={unitData}
             selectedUnit={selectedUnit}
             mode={mode}
             viewContext={viewContext}
           />
-        </Suspense>
-        {/* Soft overall fill */}
-        <ambientLight intensity={0.55} />
-        {/* Key light */}
-        <directionalLight
-          castShadow
-          position={[40000, -100000, 60000]}
-          intensity={1}
-          shadow-mapSize-width={4096}
-          shadow-mapSize-height={4096}
-          shadow-camera-near={10}
-          shadow-camera-far={100000}
-          shadow-camera-left={-400000}
-          shadow-camera-right={400000}
-          shadow-camera-top={400000}
-          shadow-camera-bottom={-400000}
-          shadow-bias={-0.0002}
-          shadow-normalBias={0.02}
-        />
-        {/* Fill light (opposite side, weaker) */}
-        <directionalLight position={[-60000, 40000, 60000]} intensity={1} />
-        {/* Rim/back light (adds edge separation) */}
-        <directionalLight position={[0, -80000, 90000]} intensity={1} />
-        <CamerasAndControls viewContext={viewContext} level={level} />
-      </Canvas>
-      {unitData && (
-        <HUD
-          date={currentDateString}
-          leasedUnits={leasedUnits}
-          unitData={unitData}
-          selectedUnit={selectedUnit}
-          mode={mode}
+        )}
+        <UserSelection
+          setViewContext={setViewContext}
           viewContext={viewContext}
+          setLevel={setLevel}
+          days={days}
+          currentDay={currentDay}
+          setCurrentDay={setCurrentDay}
+          mode={mode}
+          level={level}
         />
-      )}
-      <UserSelection
-        setViewContext={setViewContext}
-        viewContext={viewContext}
-        setLevel={setLevel}
-        days={days}
-        currentDay={currentDay}
-        setCurrentDay={setCurrentDay}
-        mode={mode}
-        level={level}
-      />
-      <ModeSelection setMode={setMode} mode={mode} />
-      <DataCharts
-        leasedUnits={leasedUnits}
-        mode={mode}
-        unitData={unitData}
-        level={level}
-      />
-    </div>
-  );
+        <ModeSelection
+          setMode={setMode}
+          mode={mode}
+          showData={showData}
+          setShowData={setShowData}
+        />
+        <DataCharts
+          showData={showData}
+          leasedUnits={leasedUnits}
+          mode={mode}
+          unitData={unitData}
+          level={level}
+        />
+      </div>
+    );
+  }
 }
 
 export default App;
