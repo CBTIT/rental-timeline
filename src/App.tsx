@@ -6,6 +6,7 @@ import HUD from "./components/HUD/HUD";
 import UserSelection from "./components/UserSelection/UserSelection";
 import CamerasAndControls from "./components/CamerasAndControls/CamerasAndControls";
 import ModeSelection from "./components/ModeSelection/ModeSelection";
+import DataCharts from "./components/DataCharts/DataCharts";
 export type LeaseRow = {
   unitType: string;
   description: string;
@@ -73,7 +74,11 @@ function App() {
   const [currentDay, setCurrentDay] = useState<number>(1);
   const [viewContext, setViewContext] = useState<string>("3D");
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
-
+  useEffect(() => {
+    if (mode === "combined" && viewContext === "2D") {
+      setSelectedUnit(null);
+    }
+  }, [viewContext, mode]);
   useEffect(() => {
     fetch("/data/lease_data.json")
       .then((r) => r.json())
@@ -82,6 +87,9 @@ function App() {
   useEffect(() => {
     setSelectedUnit(null);
   }, [level]);
+  useEffect(() => {
+    console.log("[App] mode changed ->", mode);
+  }, [mode]);
   useEffect(() => {
     if (!firstLease) return;
     setCurrentDate(dateFromDayIndex(firstLease, currentDay));
@@ -105,22 +113,12 @@ function App() {
       setDays(0);
     }
   }, [unitData]);
+  console.log("[App render] mode =", mode);
+
   return (
     <div className="canvas-container">
       <Canvas shadows dpr={[1, 2]}>
-        <mesh position={[0, 30000, 0]} frustumCulled={false}>
-          <boxGeometry args={[5000, 5000, 5000]} />
-          <meshStandardMaterial />
-        </mesh>
-
-        <Suspense
-          fallback={
-            <mesh position={[0, 0, 0]}>
-              <boxGeometry args={[10000, 10000, 10000]} />
-              <meshStandardMaterial />
-            </mesh>
-          }
-        >
+        <Suspense fallback={null}>
           <LevelUnits
             level={level}
             leaseData={unitData}
@@ -129,6 +127,7 @@ function App() {
             setSelectedUnit={setSelectedUnit}
             selectedUnit={selectedUnit}
             mode={mode}
+            viewContext={viewContext}
           />
         </Suspense>
         {/* Soft overall fill */}
@@ -161,6 +160,8 @@ function App() {
           leasedUnits={leasedUnits}
           unitData={unitData}
           selectedUnit={selectedUnit}
+          mode={mode}
+          viewContext={viewContext}
         />
       )}
       <UserSelection
@@ -170,8 +171,16 @@ function App() {
         days={days}
         currentDay={currentDay}
         setCurrentDay={setCurrentDay}
+        mode={mode}
+        level={level}
       />
       <ModeSelection setMode={setMode} mode={mode} />
+      <DataCharts
+        leasedUnits={leasedUnits}
+        mode={mode}
+        unitData={unitData}
+        level={level}
+      />
     </div>
   );
 }

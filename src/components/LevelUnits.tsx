@@ -12,6 +12,7 @@ type LevelUnitsProp = {
   selectedUnit: string | null;
   setSelectedUnit: React.Dispatch<React.SetStateAction<string | null>>;
   mode: string;
+  viewContext: string;
 };
 
 function parseLeaseDate(s: string): Date | null {
@@ -45,6 +46,7 @@ const LevelUnits = ({
   setSelectedUnit,
   selectedUnit,
   mode,
+  viewContext,
 }: LevelUnitsProp) => {
   const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
   const maxPointerDelta = 6;
@@ -65,7 +67,7 @@ const LevelUnits = ({
   };
   const unitGeometry = useLoader(
     Rhino3dmLoader,
-    `/floor_units/level_${level}.3dm`,
+    `/floor_units/allUnits.3dm`,
     (loader) => {
       loader.setLibraryPath(
         "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
@@ -105,7 +107,38 @@ const LevelUnits = ({
       }),
     [],
   );
+  const combinedBaseMaterial = useMemo(() => {
+    const m = new THREE.MeshBasicMaterial({
+      color: 0xd2d2d2, // pick your base heat color
+      transparent: true,
+      opacity: 0.1, // low per-layer opacity so stacking accumulates
+      blending: THREE.AdditiveBlending,
+      depthTest: true,
+      depthWrite: false, // IMPORTANT: don't write depth or you'll block layers behind
+    });
+    return m;
+  }, []);
+  const combinedLeasedMaterial = useMemo(() => {
+    const m = new THREE.MeshBasicMaterial({
+      color: 0x59a310,
+      transparent: true,
+      opacity: 0.18,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    return m;
+  }, []);
 
+  const combinedSelectedMaterial = useMemo(() => {
+    const m = new THREE.MeshBasicMaterial({
+      color: 0xffc107,
+      transparent: true,
+      opacity: 0.3,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    return m;
+  }, []);
   const baseMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
       color: 0xd2d2d2, // very light
@@ -116,7 +149,7 @@ const LevelUnits = ({
     m.depthWrite = true;
     return m;
   }, []);
-  const showMaterial = useMemo(
+  const leasedMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: 0x59a310, // bold (maroon-ish). change to whatever.
@@ -140,22 +173,51 @@ const LevelUnits = ({
     });
   }, [unitText, textMaterial]);
   useEffect(() => {
+    const in2D = viewContext === "2D";
     unitGeometry.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         o.castShadow = true;
         o.receiveShadow = true;
-        o.raycast = THREE.Mesh.prototype.raycast;
         o.material = baseMaterial;
+        if (mode == "levels") {
+          if (o.name.startsWith(level)) {
+            o.visible = true;
+
+            o.raycast = THREE.Mesh.prototype.raycast;
+          } else {
+            o.visible = false;
+            o.raycast = () => null;
+          }
+        } else if (mode == "combined") {
+          o.visible = true;
+
+          o.raycast = in2D
+            ? (o.raycast = () => null)
+            : THREE.Mesh.prototype.raycast;
+        }
       }
     });
-  }, [unitGeometry, baseMaterial]);
+  }, [unitGeometry, baseMaterial, level, mode, viewContext]);
+  useEffect(() => {
+    if (mode !== "combined") return;
+
+    let i = 0;
+    unitGeometry.traverse((o) => {
+      if (o instanceof THREE.Mesh) {
+        o.renderOrder = i++; // deterministic order
+      }
+    });
+  }, [unitGeometry, mode]);
+
   useEffect(() => {
     if (!leaseData || !currentDate) return;
 
     const next = new Set<string>();
-
+    const inCombined = mode === "combined";
+    const in2D = viewContext === "2D";
     unitGeometry.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
+      if (!o.visible) return;
 
       const unitId = o.name;
       const row = leaseData[unitId];
@@ -167,11 +229,23 @@ const LevelUnits = ({
       if (isLeased) next.add(unitId);
 
       if (isSelected) {
-        o.material = selectedMaterial;
+        o.material = inCombined
+          ? in2D
+            ? combinedSelectedMaterial
+            : selectedMaterial
+          : selectedMaterial;
       } else if (isLeased) {
-        o.material = showMaterial;
+        o.material = inCombined
+          ? in2D
+            ? combinedLeasedMaterial
+            : leasedMaterial
+          : leasedMaterial;
       } else {
-        o.material = baseMaterial;
+        o.material = inCombined
+          ? in2D
+            ? combinedBaseMaterial
+            : baseMaterial
+          : baseMaterial;
       }
     });
 
@@ -182,9 +256,12 @@ const LevelUnits = ({
     currentDate,
     selectedUnit,
     baseMaterial,
-    showMaterial,
+    leasedMaterial,
     selectedMaterial,
     setLeasedUnits,
+    level,
+    mode,
+    viewContext,
   ]);
 
   return (
@@ -195,7 +272,7 @@ const LevelUnits = ({
         object={unitGeometry}
         dispose={null}
       />
-      <primitive object={unitText} dispose={null} />
+      {mode === "levels" && <primitive object={unitText} dispose={null} />}
     </>
   );
 };

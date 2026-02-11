@@ -9,13 +9,13 @@ const ModeSelection = ({ setMode, mode }: ModeSelectionProps) => {
   return (
     <div className="mode-selection">
       <button disabled={mode == "levels"} onClick={() => setMode("levels")}>
-        Levels View
+        Levels
       </button>
       <button disabled={mode == "combined"} onClick={() => setMode("combined")}>
-        Combined View
+        Combined
       </button>
       <button disabled={mode == "table"} onClick={() => setMode("table")}>
-        Table View
+        Table
       </button>
     </div>
   );

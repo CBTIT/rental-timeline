@@ -7,9 +7,19 @@ type HUDProps = {
   leasedUnits: string[];
   unitData: LeaseData;
   selectedUnit: string | null;
+  mode: string;
+  viewContext: string;
 };
 
-const HUD = ({ date, leasedUnits, unitData, selectedUnit }: HUDProps) => {
+const HUD = ({
+  date,
+  leasedUnits,
+  unitData,
+  selectedUnit,
+  mode,
+  viewContext,
+}: HUDProps) => {
+  const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
   const selectedIsLeasedNow =
     !!selectedUnit && leasedUnits.includes(selectedUnit);
@@ -23,20 +33,24 @@ const HUD = ({ date, leasedUnits, unitData, selectedUnit }: HUDProps) => {
           <HUDUnit key={unitId} unit={unitData[unitId]} name={unitId} />
         ))}
       </div>
-
-      {!selectedUnit && (
+      {inCombined2D && (
+        <div className="unit-detail">
+          Change mode to 3D for unit selection details
+        </div>
+      )}
+      {!inCombined2D && !selectedUnit && (
         <div className="unit-detail">Select a Unit for details</div>
       )}
 
-      {selectedUnit && !selectedRow && (
+      {!inCombined2D && selectedUnit && !selectedRow && (
         <div className="unit-detail">{selectedUnit} — Unleased</div>
       )}
 
-      {selectedUnit && selectedRow && !selectedIsLeasedNow && (
+      {!inCombined2D && selectedUnit && selectedRow && !selectedIsLeasedNow && (
         <div className="unit-detail">{selectedUnit} — Unleased</div>
       )}
 
-      {selectedUnit && selectedRow && selectedIsLeasedNow && (
+      {!inCombined2D && selectedUnit && selectedRow && selectedIsLeasedNow && (
         <div className="unit-detail">
           <div className="unit-detail-row">
             <div>Unit</div>

@@ -1,13 +1,14 @@
 import "./Level Selector.css";
 import React from "react";
 type LevelSelectorProps = {
+  level: string;
   setLevel: React.Dispatch<React.SetStateAction<string>>;
 };
-const LevelSelector = ({ setLevel }: LevelSelectorProps) => {
+const LevelSelector = ({ level, setLevel }: LevelSelectorProps) => {
   return (
     <select
       className="level-selector"
-      defaultValue={"1"}
+      defaultValue={level}
       onChange={(e) => setLevel(e.target.value)}
     >
       <option value={"1"}>Level 1</option>

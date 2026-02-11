@@ -9,6 +9,8 @@ type UserSelectionTypes = {
   days: number;
   currentDay: number;
   setCurrentDay: React.Dispatch<React.SetStateAction<number>>;
+  mode: string;
+  level: string;
 };
 const UserSelection = ({
   setViewContext,
@@ -17,6 +19,8 @@ const UserSelection = ({
   days,
   currentDay,
   setCurrentDay,
+  mode,
+  level,
 }: UserSelectionTypes) => {
   return (
     <div className="user-selection">
@@ -33,7 +37,7 @@ const UserSelection = ({
         />
       </div>
 
-      <LevelSelector setLevel={setLevel} />
+      {mode == "levels" && <LevelSelector level={level} setLevel={setLevel} />}
       <TimeSlider
         days={days}
         currentDay={currentDay}

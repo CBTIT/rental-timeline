@@ -1,0 +1,11 @@
+.data-charts {
+  position: absolute;
+  left: 25px;
+  top: 100px;
+  width: 300px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+}
