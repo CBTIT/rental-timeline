@@ -1,4 +1,4 @@
-# Floorplan Rental Timeline (2.5D Viewer)
+# Floorplan Rental Timeline 
 
 An interactive web app that visualizes apartment/unit occupancy over time. Users scrub a timeline slider to see which units are rented at a given date, and rented units “reveal” their 2.5D / 3D geometry in the viewer. Users can also click units to view details.
 
