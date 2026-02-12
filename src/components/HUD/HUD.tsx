@@ -1,5 +1,4 @@
 import type { LeaseData } from "../../App";
-import HUDUnit from "../HUDUnit/HUDUnit";
 import "./HUD.css";
 
 type HUDProps = {
