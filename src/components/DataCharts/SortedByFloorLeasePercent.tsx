@@ -19,7 +19,7 @@ export default function SortedByFloorLeasePercent({
   unitData,
   leasedUnits,
 }: Props) {
-  const { floors, maxPct, denomStatic } = useMemo(() => {
+  const { floors, maxPct} = useMemo(() => {
     // denom is STATIC: total count from lease_data.json
     const denom = unitData ? Object.keys(unitData).length : 0;
 
@@ -29,7 +29,7 @@ export default function SortedByFloorLeasePercent({
 
     if (!unitData || leasedUnits.length === 0) {
       const floors = FLOORS.map((f) => ({ floor: f, count: 0, pct: 0 }));
-      return { floors, maxPct: 1, denomStatic: denom };
+      return { floors, maxPct: 1};
     }
 
     // count leased units by floor
@@ -45,11 +45,11 @@ export default function SortedByFloorLeasePercent({
     const floors = FLOORS.map((f) => {
       const c = counts[f] ?? 0;
       const pct = denom > 0 ? (c / denom) * 100 : 0;
-      return { floor: f, count: c, pct };
+      return { floor: f, count: c};
     });
 
     const maxPct = Math.max(1, ...floors.map((x) => x.pct));
-    return { floors, maxPct, denomStatic: denom };
+    return { floors, maxPct};
   }, [unitData, leasedUnits]);
 
   return (
