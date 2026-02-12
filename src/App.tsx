@@ -65,6 +65,7 @@ function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
   return d;
 }
 function App() {
+  const base = import.meta.env.BASE_URL;
   const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
@@ -83,7 +84,7 @@ function App() {
     }
   }, [viewContext, mode]);
   useEffect(() => {
-    fetch("/data/lease_data.json")
+    fetch(base + "data/lease_data.json")
       .then((r) => r.json())
       .then((data) => setUnitData(data));
   }, []);

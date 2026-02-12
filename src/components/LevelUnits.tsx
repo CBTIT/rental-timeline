@@ -48,6 +48,7 @@ const LevelUnits = ({
   mode,
   viewContext,
 }: LevelUnitsProp) => {
+  const base = import.meta.env.BASE_URL;
   const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
   const maxPointerDelta = 6;
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
@@ -67,7 +68,7 @@ const LevelUnits = ({
   };
   const unitGeometry = useLoader(
     Rhino3dmLoader,
-    `/floor_units/allUnits.3dm`,
+    base + `floor_units/allUnits.3dm`,
     (loader) => {
       loader.setLibraryPath(
         "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
@@ -76,7 +77,7 @@ const LevelUnits = ({
   );
   const unitText = useLoader(
     Rhino3dmLoader,
-    `/unit_texts/level_${level}.3dm`,
+    base + `unit_texts/level_${level}.3dm`,
     (loader) => {
       loader.setLibraryPath(
         "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",

@@ -11,10 +11,17 @@ type BaseMapProps = {
 };
 
 const BaseMap = ({ level, viewContext, mode }: BaseMapProps) => {
-  const baseMap = useLoader(Rhino3dmLoader, "/base_map/base.3dm", (loader) => {
-    loader.setLibraryPath("https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/");
-  });
-  const tex = useTexture("/textures/satellite.jpg");
+  const base = import.meta.env.BASE_URL;
+  const baseMap = useLoader(
+    Rhino3dmLoader,
+    base + "base_map/base.3dm",
+    (loader) => {
+      loader.setLibraryPath(
+        "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
+      );
+    },
+  );
+  const tex = useTexture(base + "textures/satellite.jpg");
   const mat = useMemo(() => {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.flipY = true;

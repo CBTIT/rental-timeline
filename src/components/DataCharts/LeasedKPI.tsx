@@ -17,9 +17,9 @@ function levelFromUnitId(unitId: string): string {
 
 export default function LeasedKPI({ leasedUnits, mode, level }: Props) {
   const [floorCounts, setFloorCounts] = useState<FloorCountRow[] | null>(null);
-
+  const base = import.meta.env.BASE_URL;
   useEffect(() => {
-    fetch("/data/floor_unitCount.json")
+    fetch(base + "data/floor_unitCount.json")
       .then((r) => r.json())
       .then((data) => setFloorCounts(data));
   }, []);
