@@ -45,7 +45,7 @@ export default function SortedByFloorLeasePercent({
     const floors = FLOORS.map((f) => {
       const c = counts[f] ?? 0;
       const pct = denom > 0 ? (c / denom) * 100 : 0;
-      return { floor: f, count: c};
+      return { floor: f, count: c,pct};
     });
 
     const maxPct = Math.max(1, ...floors.map((x) => x.pct));
