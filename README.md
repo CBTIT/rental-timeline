@@ -4,20 +4,20 @@ An interactive web app that visualizes apartment/unit occupancy over time. Users
 
 ## Features
 
-- Timeline slider (scrub / play) to visualize occupancy over time
-- 2.5D / 3D top-down viewer (orthographic camera) with pan/zoom (and optional orbit)
+- Timeline slider to visualize occupancy over time
+- 3D viewer using a perspective camera and 2D top-down viewer using an orthographic camera
 - Units update state based on selected date:
-  - Available (base geometry only)
-  - Rented (unit interior / furniture geometry becomes visible)
+  - Available (base color)
+  - Rented (unit acquires highlight color)
 - Click a unit to view details (lease dates, unit type, sqft, etc.)
-- Multi-floor support (planned) (maybe)
+- Multi-floor support 
 
 ## Tech Stack
 
 - React + Vite
 - three.js + React Three Fiber
 - @react-three/drei (controls + helpers)
-- glTF/GLB assets exported from Rhino/Grasshopper (or other DCC)
+- 3dm assets exported from Rhino
 
 ## Getting Started
 
