@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { Rhino3dmLoader } from "three-stdlib";
 
