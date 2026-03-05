@@ -68,10 +68,6 @@ const HUD = ({
             <div className="value">{selectedRow.unitArea}</div>
           </div>
           <div className="unit-detail-row">
-            <div>Rent</div>
-            <div className="value">{selectedRow.rent}</div>
-          </div>
-          <div className="unit-detail-row">
             <div>Lease Start</div>
             <div className="value">{selectedRow.leaseStartDate}</div>
           </div>
