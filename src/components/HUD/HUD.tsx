@@ -20,6 +20,7 @@ const HUD = ({
 }: HUDProps) => {
   const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
+  console.log(selectedRow);
   const selectedIsLeasedNow =
     !!selectedUnit && leasedUnits.includes(selectedUnit);
 
@@ -74,6 +75,10 @@ const HUD = ({
           <div className="unit-detail-row">
             <div>Lease End</div>
             <div className="value">{selectedRow.leaseEndDate}</div>
+          </div>
+          <div className="unit-detail-row">
+            <div>Rent</div>
+            <div className="value">{selectedRow.rent}</div>
           </div>
           <div className="unit-detail-row">
             <div>Leasing Associate</div>
