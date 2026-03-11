@@ -1,4 +1,4 @@
-import type { LeaseData } from "../../App";
+import type { LeaseData } from "../../types/lease";
 import "./HUD.css";
 
 type HUDProps = {
@@ -83,6 +83,10 @@ const HUD = ({
           <div className="unit-detail-row">
             <div>Leasing Associate</div>
             <div className="value">{selectedRow.leasingAssociate}</div>
+          </div>
+          <div className="unit-detail-row">
+            <div>Affordable</div>
+            <div className="value">{selectedRow.affordable ? "Yes" : "No"}</div>
           </div>
         </div>
       )}

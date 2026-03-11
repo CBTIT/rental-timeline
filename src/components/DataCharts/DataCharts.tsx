@@ -1,4 +1,5 @@
-import type { LeaseData } from "../../App";
+import type {} from "../../App";
+import type { LeaseData } from "../../types/lease";
 import "./DataCharts.css";
 import LeasedKPI from "./LeasedKPI";
 import SortedByFloorLeasePercent from "./SortedByFloorLeasePercent";

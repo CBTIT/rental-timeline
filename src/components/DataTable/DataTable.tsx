@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import type { LeaseData } from "../../App";
+
 import "./DataTable.css";
+import type { LeaseData } from "../../types/lease";
 
 type Props = {
   unitData: LeaseData | null;
@@ -8,6 +9,7 @@ type Props = {
 
 type SortKey =
   | "unit"
+  | "type"
   | "area"
   | "leaseTerm"
   | "leaseStartDate"
@@ -15,7 +17,9 @@ type SortKey =
   | "rent"
   | "psf"
   | "freeMonths"
-  | "netRent";
+  | "netRent"
+  | "associate"
+  | "affordable";
 
 type SortDir = "asc" | "desc";
 
@@ -102,7 +106,13 @@ export default function DataTable({ unitData }: Props) {
           return parseMoneyLike(row.psf);
         case "netRent":
           return parseMoneyLike(row.netRent);
+        case "associate":
+          return row.leasingAssociate.trim().toLowerCase();
 
+        case "affordable":
+          return row.affordable ? "yes" : "no";
+        case "type":
+          return row.unitType.trim().toLowerCase();
         case "area":
           return parseNumberLike(row.unitArea);
         case "leaseTerm":
@@ -159,7 +169,20 @@ export default function DataTable({ unitData }: Props) {
               Unit {sortIcon("unit")}
             </th>
 
-            <th>Type</th>
+            <th
+              className="sortable"
+              role="button"
+              onClick={() => onHeaderClick("type")}
+            >
+              Type {sortIcon("rent")}
+            </th>
+            <th
+              className="sortable"
+              role="button"
+              onClick={() => onHeaderClick("affordable")}
+            >
+              Affordable {sortIcon("rent")}
+            </th>
             <th>Description</th>
 
             <th
@@ -224,7 +247,13 @@ export default function DataTable({ unitData }: Props) {
             >
               Net Rent {sortIcon("area")}
             </th>
-            <th>Leasing Associate</th>
+            <th
+              className="sortable"
+              role="button"
+              onClick={() => onHeaderClick("associate")}
+            >
+              Leasing Associate {sortIcon("rent")}
+            </th>
           </tr>
         </thead>
 
@@ -233,6 +262,7 @@ export default function DataTable({ unitData }: Props) {
             <tr key={unitId} className="row">
               <td className="data">{unitId}</td>
               <td className="data">{dataRow.unitType}</td>
+              <td className="data">{dataRow.affordable ? "Yes" : "No"}</td>
               <td className="data">{dataRow.description}</td>
               <td className="data">{dataRow.unitArea}</td>
               <td className="data">{dataRow.leaseStartDate}</td>

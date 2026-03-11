@@ -1,4 +1,4 @@
-import type { LeaseRow } from "../../App";
+import type { LeaseRow } from "../../types/lease";
 
 type HUDUnitProps = {
   unit: LeaseRow;

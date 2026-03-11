@@ -9,20 +9,7 @@ import ModeSelection from "./components/ModeSelection/ModeSelection";
 import DataCharts from "./components/DataCharts/DataCharts";
 import BaseMap from "./components/BaseMap/BaseMap";
 import DataTable from "./components/DataTable/DataTable";
-export type LeaseRow = {
-  unitType: string;
-  description: string;
-  unitArea: number;
-  leaseStartDate: string;
-  leaseEndDate: string;
-  leaseTerm: number;
-  rent: string;
-  psf: string;
-  freeMonths: number;
-  netRent: string;
-  leasingAssociate: string;
-};
-export type LeaseData = Record<string, LeaseRow>;
+import type { LeaseData } from "./types/lease";
 
 function parseLeaseDate(s: string): Date | null {
   if (!s) return null;
@@ -64,7 +51,11 @@ function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
   d.setDate(d.getDate() + dayIndex); // add days (calendar-safe)
   return d;
 }
+function onStartup() {
+  console.log("startup command");
+}
 function App() {
+  onStartup();
   const base = import.meta.env.BASE_URL;
   const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
