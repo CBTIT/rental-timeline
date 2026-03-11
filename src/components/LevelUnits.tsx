@@ -2,7 +2,8 @@ import { useLoader, type ThreeEvent } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { Rhino3dmLoader } from "three-stdlib";
 import * as THREE from "three";
-import type { LeaseData } from "../App";
+import type {} from "../App";
+import type { LeaseData } from "../types/lease";
 
 type LevelUnitsProp = {
   level: string;
@@ -163,6 +164,7 @@ const LevelUnits = ({
     });
     return m;
   }, []);
+
   const combinedLeasedMaterial = useMemo(() => {
     const m = new THREE.MeshBasicMaterial({
       color: 0x2e6f40,
@@ -187,6 +189,16 @@ const LevelUnits = ({
   const baseMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
       color: 0xffffff, // very light
+      roughness: 1.0,
+      metalness: 0.0,
+    });
+    // Helps with transparent surfaces not “blocking” others
+    m.depthWrite = true;
+    return m;
+  }, []);
+  const affordableMaterial = useMemo(() => {
+    const m = new THREE.MeshStandardMaterial({
+      color: 0xffb7ce, // very light
       roughness: 1.0,
       metalness: 0.0,
     });
@@ -259,7 +271,8 @@ const LevelUnits = ({
 
     const next = new Set<string>();
     const inCombined = mode === "combined";
-    const in2D = viewContext === "2D";
+    const in2DCombined = inCombined && viewContext === "2D";
+
     unitGeometry.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
       if (!o.visible) return;
@@ -270,27 +283,30 @@ const LevelUnits = ({
 
       const isLeased = !!(start && start <= currentDate);
       const isSelected = !!(selectedUnit && unitId === selectedUnit);
+      const isAffordable = !!row?.affordable;
 
       if (isLeased) next.add(unitId);
 
-      if (isSelected) {
-        o.material = inCombined
-          ? in2D
-            ? combinedSelectedMaterial
-            : selectedMaterial
-          : selectedMaterial;
-      } else if (isLeased) {
-        o.material = inCombined
-          ? in2D
-            ? combinedLeasedMaterial
-            : leasedMaterial
-          : leasedMaterial;
+      if (in2DCombined) {
+        if (isSelected) {
+          o.material = combinedSelectedMaterial;
+        } else if (isLeased) {
+          o.material = combinedLeasedMaterial;
+        } else {
+          o.material = combinedBaseMaterial;
+        }
       } else {
-        o.material = inCombined
-          ? in2D
-            ? combinedBaseMaterial
-            : baseMaterial
-          : baseMaterial;
+        if (isSelected) {
+          o.material = selectedMaterial;
+        } else if (isLeased && isAffordable) {
+          o.material = leasedMaterial;
+        } else if (isLeased) {
+          o.material = leasedMaterial;
+        } else if (isAffordable) {
+          o.material = affordableMaterial;
+        } else {
+          o.material = baseMaterial;
+        }
       }
     });
 

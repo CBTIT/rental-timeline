@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import type { LeaseData } from "../../App";
 import "./SortedByRentPSFPercent.css";
+import type { LeaseData } from "../../types/lease";
 
 type Props = {
   unitData: LeaseData | null;
