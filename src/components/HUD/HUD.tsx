@@ -8,7 +8,9 @@ type HUDProps = {
   selectedUnit: string | null;
   mode: string;
   viewContext: string;
+  setUnitColor: React.Dispatch<React.SetStateAction<string>>;
 };
+const colors = ["#E23D3D", "#2BB673", "#1B5EAA"];
 
 const HUD = ({
   date,
@@ -17,6 +19,7 @@ const HUD = ({
   selectedUnit,
   mode,
   viewContext,
+  setUnitColor,
 }: HUDProps) => {
   const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
@@ -27,7 +30,21 @@ const HUD = ({
   return (
     <div className="HUD">
       <div className="date">{date}</div>
-
+      <div className="color-selection">
+        <div className="color-selection-title">Select a Unit Display Color</div>
+        <div className="color-selection-group">
+          {colors.map((color) => {
+            return (
+              <div
+                className="color-box"
+                key={color}
+                style={{ backgroundColor: color }}
+                onClick={() => setUnitColor(color)}
+              ></div>
+            );
+          })}
+        </div>
+      </div>
       {/* <div className="leased-units">
         {leasedUnits.map((unitId) => (
           <HUDUnit key={unitId} unit={unitData[unitId]} name={unitId} />

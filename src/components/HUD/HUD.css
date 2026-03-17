@@ -1,3 +1,18 @@
+.color-box {
+  pointer-events: auto;
+  width: 20px;
+  height: 20px;
+  border: 2px solid white;
+}
+.color-box:hover {
+  cursor: pointer;
+  border: 2px solid black;
+}
+.color-selection-group {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
 .HUD {
   position: absolute;
   right: 50px;
@@ -30,11 +45,17 @@
   overflow-y: auto;
   background-color: white;
 }
-.unit-detail {
+.unit-detail,
+.color-selection {
   background-color: white;
   border: 4px solid brown;
   padding: 10px;
   font-size: 16px;
+}
+.color-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .value {
   font-weight: bold;

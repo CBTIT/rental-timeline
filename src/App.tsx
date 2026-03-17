@@ -1,7 +1,7 @@
 import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState } from "react";
-import LevelUnits from "./components/LevelUnits";
+import LevelUnits from "./components/LevelUnits/LevelUnits";
 import HUD from "./components/HUD/HUD";
 import UserSelection from "./components/UserSelection/UserSelection";
 import CamerasAndControls from "./components/CamerasAndControls/CamerasAndControls";
@@ -51,12 +51,9 @@ function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
   d.setDate(d.getDate() + dayIndex); // add days (calendar-safe)
   return d;
 }
-function onStartup() {
-  console.log("startup command");
-}
 function App() {
-  onStartup();
   const base = import.meta.env.BASE_URL;
+  const [unitColor, setUnitColor] = useState<string>("#56ae57");
   const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
@@ -131,6 +128,7 @@ function App() {
               selectedUnit={selectedUnit}
               mode={mode}
               viewContext={viewContext}
+              unitColor={unitColor}
             />
             <BaseMap level={level} viewContext={viewContext} mode={mode} />
           </Suspense>
@@ -166,6 +164,7 @@ function App() {
             selectedUnit={selectedUnit}
             mode={mode}
             viewContext={viewContext}
+            setUnitColor={setUnitColor}
           />
         )}
         <UserSelection

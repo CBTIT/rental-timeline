@@ -2,8 +2,8 @@ import { useLoader, type ThreeEvent } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { Rhino3dmLoader } from "three-stdlib";
 import * as THREE from "three";
-import type {} from "../App";
-import type { LeaseData } from "../types/lease";
+import type {} from "../../App";
+import type { LeaseData } from "../../types/lease";
 
 type LevelUnitsProp = {
   level: string;
@@ -14,6 +14,7 @@ type LevelUnitsProp = {
   setSelectedUnit: React.Dispatch<React.SetStateAction<string | null>>;
   mode: string;
   viewContext: string;
+  unitColor: string;
 };
 
 function parseLeaseDate(s: string): Date | null {
@@ -48,6 +49,7 @@ const LevelUnits = ({
   selectedUnit,
   mode,
   viewContext,
+  unitColor,
 }: LevelUnitsProp) => {
   const base = import.meta.env.BASE_URL;
   const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
@@ -89,7 +91,7 @@ const LevelUnits = ({
     return new THREE.LineBasicMaterial({
       color: 0x111111,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.85,
       depthTest: true,
       depthWrite: false,
     });
@@ -157,7 +159,7 @@ const LevelUnits = ({
     const m = new THREE.MeshBasicMaterial({
       color: 0xffffff, // pick your base heat color
       transparent: true,
-      opacity: 0.1, // low per-layer opacity so stacking accumulates
+      opacity: 0.01, // low per-layer opacity so stacking accumulates
       blending: THREE.AdditiveBlending,
       depthTest: true,
       depthWrite: false, // IMPORTANT: don't write depth or you'll block layers behind
@@ -169,7 +171,7 @@ const LevelUnits = ({
     const m = new THREE.MeshBasicMaterial({
       color: 0x2e6f40,
       transparent: true,
-      opacity: 0.15,
+      opacity: 0.12,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -189,8 +191,9 @@ const LevelUnits = ({
   const baseMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
       color: 0xffffff, // very light
-      roughness: 1.0,
+      opacity: 0.5,
       metalness: 0.0,
+      transparent: true,
     });
     // Helps with transparent surfaces not “blocking” others
     m.depthWrite = true;
@@ -209,11 +212,11 @@ const LevelUnits = ({
   const leasedMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: 0x56ae57, // bold (maroon-ish). change to whatever.
+        color: unitColor,
         roughness: 0.4,
         metalness: 0.05,
       }),
-    [],
+    [unitColor],
   );
 
   useEffect(() => {
@@ -298,8 +301,6 @@ const LevelUnits = ({
       } else {
         if (isSelected) {
           o.material = selectedMaterial;
-        } else if (isLeased && isAffordable) {
-          o.material = leasedMaterial;
         } else if (isLeased) {
           o.material = leasedMaterial;
         } else if (isAffordable) {
@@ -323,6 +324,7 @@ const LevelUnits = ({
     level,
     mode,
     viewContext,
+    unitColor,
   ]);
 
   return (
