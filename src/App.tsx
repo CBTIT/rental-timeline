@@ -53,7 +53,8 @@ function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
 }
 function App() {
   const base = import.meta.env.BASE_URL;
-  const [unitColor, setUnitColor] = useState<string>("#56ae57");
+  const [selectedLeaseColor, setSelectedLeaseColor] =
+    useState<string>("#56ae57");
   const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
@@ -63,7 +64,7 @@ function App() {
   const [days, setDays] = useState<number>(0);
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [currentDateString, setCurrentDateString] = useState<string>("");
-  const [currentDay, setCurrentDay] = useState<number>(1);
+  const [currentDay, setCurrentDay] = useState<number>(-1);
   const [viewContext, setViewContext] = useState<string>("3D");
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
   useEffect(() => {
@@ -128,7 +129,7 @@ function App() {
               selectedUnit={selectedUnit}
               mode={mode}
               viewContext={viewContext}
-              unitColor={unitColor}
+              selectedLeasedColor={selectedLeaseColor}
             />
             <BaseMap level={level} viewContext={viewContext} mode={mode} />
           </Suspense>
@@ -164,7 +165,7 @@ function App() {
             selectedUnit={selectedUnit}
             mode={mode}
             viewContext={viewContext}
-            setUnitColor={setUnitColor}
+            setSelectedLeaseColor={setSelectedLeaseColor}
           />
         )}
         <UserSelection

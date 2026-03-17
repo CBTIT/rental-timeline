@@ -8,7 +8,7 @@ type HUDProps = {
   selectedUnit: string | null;
   mode: string;
   viewContext: string;
-  setUnitColor: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedLeaseColor: React.Dispatch<React.SetStateAction<string>>;
 };
 const colors = ["#E23D3D", "#2BB673", "#1B5EAA"];
 
@@ -19,7 +19,7 @@ const HUD = ({
   selectedUnit,
   mode,
   viewContext,
-  setUnitColor,
+  setSelectedLeaseColor,
 }: HUDProps) => {
   const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
@@ -39,7 +39,7 @@ const HUD = ({
                 className="color-box"
                 key={color}
                 style={{ backgroundColor: color }}
-                onClick={() => setUnitColor(color)}
+                onClick={() => setSelectedLeaseColor(color)}
               ></div>
             );
           })}

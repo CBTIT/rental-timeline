@@ -196,17 +196,17 @@ export default function DataTable({ unitData }: Props) {
             <th
               className="sortable"
               role="button"
-              onClick={() => onHeaderClick("area")}
+              onClick={() => onHeaderClick("leaseStartDate")}
             >
-              Lease Start Date {sortIcon("area")}
+              Lease Start Date {sortIcon("leaseStartDate")}
             </th>
 
             <th
               className="sortable"
               role="button"
-              onClick={() => onHeaderClick("area")}
+              onClick={() => onHeaderClick("leaseEndDate")}
             >
-              Lease End Date
+              Lease End Date {sortIcon("leaseEndDate")}
             </th>
 
             <th

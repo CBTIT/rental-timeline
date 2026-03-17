@@ -16,7 +16,7 @@ const TimeSlider = ({ days, currentDay, setCurrentDay }: TimeSliderProps) => {
       <input
         type="range"
         id="time-slider"
-        min="1"
+        min="-1"
         max={`${days}`}
         value={currentDay}
         onChange={handleSliderChange}
