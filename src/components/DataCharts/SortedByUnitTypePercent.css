@@ -5,7 +5,7 @@
 
 .ut-strip {
   width: 100%;
-  padding: var(--space-md);
+  padding: var(--space-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,7 +13,7 @@
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
   background-color: var(--color-bg-primary);
-  gap: var(--space-xs);
+  gap: 2px;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
 }
@@ -27,7 +27,7 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
-  gap: var(--space-sm);
+  gap: 2px;
   align-items: flex-end;
   flex-wrap: wrap;
 }
@@ -50,7 +50,7 @@
 }
 
 .ut-bar-wrap {
-  height: 60px;
+  height: 50px;
   width: var(--space-lg);
   display: flex;
   align-items: flex-end;
@@ -63,7 +63,7 @@
   border-radius: var(--radius-sm);
   opacity: 0.85;
   transition: all var(--transition-fast);
-  min-height: var(--space-xs);
+  min-height: 1px;
 }
 
 .ut-bar:hover {
@@ -73,7 +73,7 @@
 }
 
 .ut-label {
-  margin-top: 2px;
+  margin-top: 1px;
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   text-align: center;
@@ -83,6 +83,6 @@
 .ut-title {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--space-sm);
+  font-size: var(--font-size-xs);
+  margin-bottom: 2px;
 }

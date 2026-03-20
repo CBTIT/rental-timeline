@@ -7,10 +7,10 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 2px;
   align-items: center;
   justify-content: center;
-  padding: var(--space-md);
+  padding: var(--space-sm);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
   background-color: var(--color-bg-primary);
@@ -26,8 +26,8 @@
 .fl-title {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--space-sm);
+  font-size: var(--font-size-xs);
+  margin-bottom: 2px;
 }
 
 .fl-row {
