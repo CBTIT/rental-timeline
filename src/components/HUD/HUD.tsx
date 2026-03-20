@@ -207,11 +207,13 @@ const HUD = ({
                 text={"2D"}
                 onClick={setViewContext}
                 isDisabled={viewContext === "2D"}
+                isActive={viewContext === "2D"}
               />
               <ViewContextButton
                 text={"3D"}
                 onClick={setViewContext}
                 isDisabled={viewContext === "3D"}
+                isActive={viewContext === "3D"}
               />
             </div>
           </div>
