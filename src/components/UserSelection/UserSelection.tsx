@@ -1,5 +1,4 @@
 import TimeSlider from "../TimeSlider/TimeSlider";
-import LevelSelector from "../LevelSelector/LevelSelector";
 import ViewContextButton from "../ViewContextButton/ViewContextButton";
 import { memo } from "react";
 import "./UserSelection.css";
@@ -37,8 +36,6 @@ const UserSelection = ({
           isDisabled={viewContext == "3D"}
         />
       </div>
-
-      {mode == "levels" && <LevelSelector level={level} setLevel={setLevel} />}
       <TimeSlider
         days={days}
         currentDay={currentDay}

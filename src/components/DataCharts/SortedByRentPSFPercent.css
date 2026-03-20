@@ -6,39 +6,39 @@
 .psf-row {
   display: flex;
   justify-content: flex-start;
-  gap: var(--space-md);
+  gap: 2px;
   align-items: flex-end;
   width: 100%;
   overflow-x: auto;
-  padding-bottom: var(--space-xs);
+  padding-bottom: 2px;
 }
 
 .psf-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xs);
-  min-width: var(--space-xl);
+  gap: 2px;
+  min-width: var(--space-md);
   flex-shrink: 0;
 }
 
 .psf-bar-wrap {
-  height: 80px;
+  height: 60px;
   width: var(--space-md);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: var(--space-xs);
+  gap: 2px;
 }
 
 .psf-bar {
-  width: var(--space-md);
+  width: var(--space-sm);
   display: block;
   background: var(--color-info);
   border-radius: var(--radius-sm);
   opacity: 0.8;
   transition: all var(--transition-fast);
-  min-height: 4px;
+  min-height: 2px;
 }
 
 .psf-bar:hover {

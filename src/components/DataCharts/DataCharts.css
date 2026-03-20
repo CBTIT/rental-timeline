@@ -11,10 +11,12 @@
   pointer-events: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   font-family: var(--font-family);
   background-color: transparent;
   z-index: var(--z-dropdown);
+  max-height: calc(100vh - 120px);
+  overflow-y: hidden;
 }
 
 /* Responsive mobile - hide by default on small screens */

@@ -7,10 +7,10 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg);
+  padding: var(--space-md);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
   background-color: var(--color-bg-primary);
@@ -26,8 +26,8 @@
 .fl-title {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-base);
-  margin-bottom: var(--space-md);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-sm);
 }
 
 .fl-row {
@@ -42,7 +42,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 2px;
   flex: 1;
   min-width: 0;
 }
@@ -54,7 +54,7 @@
 }
 
 .fl-bar-wrap {
-  height: 80px;
+  height: 60px;
   width: var(--space-lg);
   display: flex;
   align-items: flex-end;
@@ -77,7 +77,7 @@
 }
 
 .fl-label {
-  margin-top: var(--space-sm);
+  margin-top: 2px;
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   text-align: center;

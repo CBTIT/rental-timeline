@@ -80,7 +80,7 @@
   right: var(--space-lg);
   top: var(--space-lg);
   text-align: left;
-  width: 280px;
+  width: 300px;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
@@ -89,9 +89,11 @@
   background-color: var(--color-bg-primary);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   box-shadow: var(--shadow-lg);
   z-index: var(--z-modal);
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
 }
 
 .date {
@@ -114,8 +116,8 @@
 .leased-units {
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-lg);
-  height: 280px;
+  padding: var(--space-md);
+  height: 180px;
   overflow-y: auto;
   background-color: var(--color-bg-secondary);
   box-shadow: var(--shadow-sm) inset;
@@ -126,7 +128,7 @@
   background-color: var(--color-bg-secondary);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   font-size: var(--font-size-base);
   transition: all var(--transition-normal);
 }
@@ -142,6 +144,96 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+}
+
+/* Level Selector - integrated into HUD */
+.hud-level-selector {
+  border-top: var(--border-width) solid var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.hud-level-title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.hud-level-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.hud-level-btn {
+  padding: var(--space-xs) var(--space-md);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+}
+
+.hud-level-btn:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+}
+
+.hud-level-btn.active {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+/* Mode Selection - integrated into HUD */
+.hud-mode-selector {
+  border-top: var(--border-width) solid var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.hud-mode-title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.hud-mode-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-xs);
+}
+
+.hud-mode-btn {
+  padding: var(--space-xs) var(--space-md);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+  flex: 1;
+}
+
+.hud-mode-btn:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+}
+
+.hud-mode-btn.active {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
 }
 
 .value {
@@ -192,6 +284,15 @@
   .bucket-selection {
     padding: var(--space-md);
   }
+
+  .hud-level-buttons {
+    gap: var(--space-sm);
+  }
+
+  .hud-level-btn {
+    flex: 1;
+    min-width: 40px;
+  }
 }
 
 /* Responsive tablet adjustments */
@@ -199,9 +300,9 @@
   .HUD {
     right: var(--space-md);
     top: var(--space-md);
-    width: 260px;
+    width: 280px;
     padding: var(--space-md);
-    max-height: 70vh;
+    max-height: 80vh;
   }
 
   .leased-units {

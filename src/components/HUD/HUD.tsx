@@ -12,6 +12,11 @@ type HUDProps = {
   setSelectedLeaseColor: React.Dispatch<React.SetStateAction<string>>;
   bucketCount: number;
   setBucketCount: React.Dispatch<React.SetStateAction<number>>;
+  level: string;
+  setLevel: React.Dispatch<React.SetStateAction<string>>;
+  setMode: React.Dispatch<React.SetStateAction<string>>;
+  showData: boolean;
+  setShowData: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const colors = ["#E23D3D", "#2BB673", "#1B5EAA"];
 
@@ -25,6 +30,11 @@ const HUD = ({
   setSelectedLeaseColor,
   bucketCount,
   setBucketCount,
+  level,
+  setLevel,
+  setMode,
+  showData,
+  setShowData,
 }: HUDProps) => {
   const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
@@ -124,6 +134,58 @@ const HUD = ({
           </div>
         </div>
       )}
+
+      {/* Level Selector - Only show in levels mode */}
+      {mode === "levels" && (
+        <div className="hud-level-selector">
+          <div className="hud-level-title">Level</div>
+          <div className="hud-level-buttons">
+            {["1", "2", "3", "4", "5", "6", "7", "8"].map((lvl) => (
+              <button
+                key={lvl}
+                className={`hud-level-btn ${level === lvl ? "active" : ""}`}
+                onClick={() => setLevel(lvl)}
+              >
+                L{lvl}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mode Selection */}
+      <div className="hud-mode-selector">
+        <div className="hud-mode-title">View Mode</div>
+        <div className="hud-mode-buttons">
+          <button
+            className={`hud-mode-btn ${mode === "levels" ? "active" : ""}`}
+            onClick={() => setMode("levels")}
+          >
+            Levels
+          </button>
+          <button
+            className={`hud-mode-btn ${mode === "combined" ? "active" : ""}`}
+            onClick={() => setMode("combined")}
+          >
+            Combined
+          </button>
+          <button
+            className={`hud-mode-btn ${mode === "table" ? "active" : ""}`}
+            onClick={() => setMode("table")}
+          >
+            Table
+          </button>
+        </div>
+        {mode !== "table" && (
+          <button
+            className="hud-mode-btn"
+            onClick={() => setShowData(showData ? false : true)}
+            style={{ marginTop: "var(--space-xs)" }}
+          >
+            {showData ? "Hide Data" : "Show Data"}
+          </button>
+        )}
+      </div>
     </div>
   );
 };

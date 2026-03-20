@@ -5,7 +5,6 @@ import LevelUnits from "./components/LevelUnits/LevelUnits";
 import HUD from "./components/HUD/HUD";
 import UserSelection from "./components/UserSelection/UserSelection";
 import CamerasAndControls from "./components/CamerasAndControls/CamerasAndControls";
-import ModeSelection from "./components/ModeSelection/ModeSelection";
 import DataCharts from "./components/DataCharts/DataCharts";
 import BaseMap from "./components/BaseMap/BaseMap";
 import DataTable from "./components/DataTable/DataTable";
@@ -138,6 +137,11 @@ function App() {
             setSelectedLeaseColor={setSelectedLeaseColor}
             bucketCount={bucketCount}
             setBucketCount={setBucketCount}
+            level={level}
+            setLevel={setLevel}
+            setMode={setMode}
+            showData={showData}
+            setShowData={setShowData}
           />
         )}
         <UserSelection
@@ -149,12 +153,6 @@ function App() {
           setCurrentDay={setCurrentDay}
           mode={mode}
           level={level}
-        />
-        <ModeSelection
-          setMode={setMode}
-          mode={mode}
-          showData={showData}
-          setShowData={setShowData}
         />
         <DataCharts
           showData={showData}
