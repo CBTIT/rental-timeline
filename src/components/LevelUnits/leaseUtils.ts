@@ -1,5 +1,7 @@
 import type { LeaseData } from "../../types/lease";
 import type { UnitMaterialSet } from "./materials";
+import { getBucketIndex } from "../../utils/leaseBuckets";
+import { parseLeaseDate } from "../../utils/dateUtils";
 
 type GetUnitMaterialProps = {
   mode: string;
@@ -7,6 +9,7 @@ type GetUnitMaterialProps = {
   isSelected: boolean;
   isLeased: boolean;
   isAffordable: boolean;
+  bucketIndex: number;
   materials: UnitMaterialSet;
 };
 type GetUnitVisualStateProps = {
@@ -14,6 +17,9 @@ type GetUnitVisualStateProps = {
   leaseData: LeaseData;
   currentDate: Date;
   selectedUnit: string | null;
+  firstLeaseDate: Date | null;
+  totalDays: number;
+  bucketCount?: number;
 };
 type UnitVisualState = {
   row: LeaseData[string] | undefined;
@@ -21,30 +27,8 @@ type UnitVisualState = {
   isLeased: boolean;
   isSelected: boolean;
   isAffordable: boolean;
+  bucketIndex: number;
 };
-
-function parseLeaseDate(s: string): Date | null {
-  if (!s) return null;
-  const t = s.trim();
-
-  // YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) {
-    const d = new Date(t + "T00:00:00");
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  // M/D/YYYY or MM/DD/YYYY
-  const m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (m) {
-    const month = Number(m[1]);
-    const day = Number(m[2]);
-    const year = Number(m[3]);
-    const d = new Date(year, month - 1, day);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  return null;
-}
 
 export function getUnitMaterial({
   mode,
@@ -52,6 +36,7 @@ export function getUnitMaterial({
   isSelected,
   isLeased,
   isAffordable,
+  bucketIndex,
   materials,
 }: GetUnitMaterialProps) {
   const inCombined = mode === "combined";
@@ -60,18 +45,21 @@ export function getUnitMaterial({
 
   if (in2DCombined) {
     if (isSelected) return materials.selected;
-    if (isLeased) return materials.overlayLeased;
+    if (isLeased && bucketIndex >= 0)
+      return materials.bucketOverlayMaterials[bucketIndex];
     return materials.combinedBase3D;
   }
 
   if (in3DCombined) {
     if (isSelected) return materials.selected;
-    if (isLeased) return materials.leased;
+    if (isLeased && bucketIndex >= 0)
+      return materials.bucketMaterials[bucketIndex];
     return materials.combinedBase3D;
   }
 
   if (isSelected) return materials.selected;
-  if (isLeased) return materials.leased;
+  if (isLeased && bucketIndex >= 0)
+    return materials.bucketMaterials[bucketIndex];
   if (isAffordable) return materials.affordable;
   return materials.base;
 }
@@ -80,6 +68,9 @@ export function getUnitVisualState({
   leaseData,
   currentDate,
   selectedUnit,
+  firstLeaseDate,
+  totalDays,
+  bucketCount = 5,
 }: GetUnitVisualStateProps): UnitVisualState {
   const row = leaseData[unitId];
   const start = row ? parseLeaseDate(row.leaseStartDate) : null;
@@ -88,11 +79,17 @@ export function getUnitVisualState({
   const isSelected = selectedUnit === unitId;
   const isAffordable = !!row?.affordable;
 
+  let bucketIndex = -1;
+  if (isLeased && start && firstLeaseDate) {
+    bucketIndex = getBucketIndex(start, firstLeaseDate, totalDays, bucketCount);
+  }
+
   return {
     row,
     start,
     isLeased,
     isSelected,
     isAffordable,
+    bucketIndex,
   };
 }

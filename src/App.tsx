@@ -10,51 +10,17 @@ import DataCharts from "./components/DataCharts/DataCharts";
 import BaseMap from "./components/BaseMap/BaseMap";
 import DataTable from "./components/DataTable/DataTable";
 import type { LeaseData } from "./types/lease";
-
-function parseLeaseDate(s: string): Date | null {
-  if (!s) return null;
-  const t = s.trim();
-
-  // YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) {
-    const d = new Date(t + "T00:00:00");
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  // M/D/YYYY or MM/DD/YYYY
-  const m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (m) {
-    const month = Number(m[1]);
-    const day = Number(m[2]);
-    const year = Number(m[3]);
-    const d = new Date(year, month - 1, day);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  return null;
-}
-function daysBetween(a: Date, b: Date): number {
-  const msPerDay = 24 * 60 * 60 * 1000;
-
-  const utcA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-  const utcB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-
-  return Math.round((utcB - utcA) / msPerDay); // can be negative
-}
-function stringDateFromDayIndex(firstDate: Date, dayIndex: number): string {
-  const d = new Date(firstDate); // copy
-  d.setDate(d.getDate() + dayIndex); // add days (calendar-safe)
-  return d.toDateString(); // "YYYY-MM-DD"
-}
-function dateFromDayIndex(firstDate: Date, dayIndex: number): Date {
-  const d = new Date(firstDate); // copy
-  d.setDate(d.getDate() + dayIndex); // add days (calendar-safe)
-  return d;
-}
+import {
+  parseLeaseDate,
+  daysBetween,
+  stringDateFromDayIndex,
+  dateFromDayIndex,
+} from "./utils/dateUtils";
 function App() {
   const base = import.meta.env.BASE_URL;
   const [selectedLeaseColor, setSelectedLeaseColor] =
     useState<string>("#56ae57");
+  const [bucketCount, setBucketCount] = useState<number>(5);
   const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
@@ -67,6 +33,7 @@ function App() {
   const [currentDay, setCurrentDay] = useState<number>(-1);
   const [viewContext, setViewContext] = useState<string>("3D");
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
+  console.log(days);
   useEffect(() => {
     if (mode === "combined" && viewContext === "2D") {
       setSelectedUnit(null);
@@ -130,6 +97,9 @@ function App() {
               mode={mode}
               viewContext={viewContext}
               selectedLeasedColor={selectedLeaseColor}
+              firstLeaseDate={firstLease}
+              totalDays={days}
+              bucketCount={bucketCount}
             />
             <BaseMap level={level} viewContext={viewContext} mode={mode} />
           </Suspense>
@@ -166,6 +136,8 @@ function App() {
             mode={mode}
             viewContext={viewContext}
             setSelectedLeaseColor={setSelectedLeaseColor}
+            bucketCount={bucketCount}
+            setBucketCount={setBucketCount}
           />
         )}
         <UserSelection

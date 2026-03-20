@@ -17,6 +17,9 @@ type LevelUnitsProp = {
   mode: string;
   viewContext: string;
   selectedLeasedColor: string;
+  firstLeaseDate: Date | null;
+  totalDays: number;
+  bucketCount: number;
 };
 
 const LevelUnits = ({
@@ -29,11 +32,14 @@ const LevelUnits = ({
   mode,
   viewContext,
   selectedLeasedColor,
+  firstLeaseDate,
+  totalDays,
+  bucketCount,
 }: LevelUnitsProp) => {
   //getting material set and disposing older material
   const materials = useMemo(
-    () => createUnitMaterials(selectedLeasedColor),
-    [selectedLeasedColor],
+    () => createUnitMaterials(selectedLeasedColor, bucketCount),
+    [selectedLeasedColor, bucketCount],
   );
   useEffect(() => {
     return () => disposeUnitMaterials(materials);
@@ -178,12 +184,16 @@ const LevelUnits = ({
       if (!o.visible) return;
 
       const unitId = o.name;
-      const { isLeased, isSelected, isAffordable } = getUnitVisualState({
-        unitId,
-        leaseData,
-        currentDate,
-        selectedUnit,
-      });
+      const { isLeased, isSelected, isAffordable, bucketIndex } =
+        getUnitVisualState({
+          unitId,
+          leaseData,
+          currentDate,
+          selectedUnit,
+          firstLeaseDate,
+          totalDays,
+          bucketCount,
+        });
 
       if (isLeased) next.add(unitId);
 
@@ -193,6 +203,7 @@ const LevelUnits = ({
         isSelected,
         isLeased,
         isAffordable,
+        bucketIndex,
         materials,
       });
     });
@@ -208,6 +219,9 @@ const LevelUnits = ({
     level,
     mode,
     viewContext,
+    firstLeaseDate,
+    totalDays,
+    bucketCount,
   ]);
 
   return (

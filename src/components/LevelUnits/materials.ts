@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { generateGradient } from "../../utils/colorGradient";
 
 export type UnitMaterialSet = {
   outline: THREE.LineBasicMaterial;
@@ -10,10 +11,14 @@ export type UnitMaterialSet = {
   overlayLeased: THREE.MeshStandardMaterial;
   affordable: THREE.MeshStandardMaterial;
   combinedBase3D: THREE.MeshStandardMaterial;
+  bucketMaterials: THREE.MeshStandardMaterial[];
+  bucketOverlayMaterials: THREE.MeshStandardMaterial[];
 };
 
 export function createUnitMaterials(
   selectedLeaseColor: string,
+  bucketCount: number = 5,
+  minLightness: number = 0.3,
 ): UnitMaterialSet {
   const outline = new THREE.LineBasicMaterial({
     color: "#111111",
@@ -77,6 +82,33 @@ export function createUnitMaterials(
     depthWrite: true,
     depthTest: true,
   });
+
+  // Generate gradient bucket materials
+  const gradientColors = generateGradient(
+    selectedLeaseColor,
+    bucketCount,
+    minLightness,
+  );
+  const bucketMaterials = gradientColors.map(
+    (color) =>
+      new THREE.MeshStandardMaterial({
+        color: color,
+        depthWrite: true,
+        depthTest: true,
+      }),
+  );
+
+  const bucketOverlayMaterials = gradientColors.map(
+    (color) =>
+      new THREE.MeshStandardMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.25,
+        depthTest: true,
+        depthWrite: true,
+      }),
+  );
+
   return {
     outline,
     text,
@@ -87,6 +119,8 @@ export function createUnitMaterials(
     overlayLeased,
     affordable,
     combinedBase3D,
+    bucketMaterials,
+    bucketOverlayMaterials,
   };
 }
 
@@ -99,4 +133,6 @@ export function disposeUnitMaterials(materials: UnitMaterialSet) {
   materials.overlayBase.dispose();
   materials.overlayLeased.dispose();
   materials.affordable.dispose();
+  materials.bucketMaterials.forEach((m) => m.dispose());
+  materials.bucketOverlayMaterials.forEach((m) => m.dispose());
 }
