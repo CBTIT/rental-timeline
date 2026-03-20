@@ -5,7 +5,7 @@
 
 .ut-strip {
   width: 100%;
-  padding: var(--space-md);
+  padding: var(--space-lg) var(--space-md);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,7 +25,6 @@
 .ut-strip:hover {
   box-shadow: var(--shadow-lg);
   border-color: var(--color-accent);
-  transform: translateY(-2px);
 }
 
 .ut-row {
@@ -35,6 +34,7 @@
   gap: var(--space-md);
   align-items: flex-end;
   flex-wrap: wrap;
+  min-height: 130px;
 }
 
 .ut-col {
@@ -42,16 +42,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   flex: 0 0 auto;
   min-width: var(--space-lg);
 }
 
 .ut-count {
-  margin-bottom: 0;
+  margin-bottom: var(--space-sm);
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
+  min-height: 18px;
 }
 
 .ut-bar-wrap {

@@ -15,16 +15,25 @@ const ModeSelection = ({
 }: ModeSelectionProps) => {
   return (
     <div className="mode-selection">
-      <button disabled={mode === "levels"} onClick={() => setMode("levels")}>
+      <button 
+        disabled={mode === "levels"} 
+        onClick={() => setMode("levels")}
+        className={mode === "levels" ? "active" : ""}
+      >
         Levels
       </button>
       <button
         disabled={mode === "combined"}
         onClick={() => setMode("combined")}
+        className={mode === "combined" ? "active" : ""}
       >
         Combined
       </button>
-      <button disabled={mode === "table"} onClick={() => setMode("table")}>
+      <button 
+        disabled={mode === "table"} 
+        onClick={() => setMode("table")}
+        className={mode === "table" ? "active" : ""}
+      >
         Table
       </button>
       {mode !== "table" && (

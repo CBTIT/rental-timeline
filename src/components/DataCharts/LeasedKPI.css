@@ -23,7 +23,6 @@
 .kpi-container:hover {
   box-shadow: var(--shadow-lg);
   border-color: var(--color-accent);
-  transform: translateY(-2px);
 }
 
 .kpi {

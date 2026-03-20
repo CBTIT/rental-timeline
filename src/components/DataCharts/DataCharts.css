@@ -15,7 +15,7 @@
   font-family: var(--font-family);
   background-color: transparent;
   z-index: var(--z-dropdown);
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - 100px);
   overflow-y: hidden;
 }
 

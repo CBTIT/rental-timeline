@@ -42,12 +42,13 @@
   border-color: var(--color-border);
 }
 
-.mode-selection button:active,
+.mode-selection button:disabled,
 .mode-selection button.active {
   background-color: var(--color-accent);
   color: white;
   border-color: var(--color-accent);
   box-shadow: var(--shadow-md);
+  cursor: default;
 }
 
 .mode-selection button:focus {
