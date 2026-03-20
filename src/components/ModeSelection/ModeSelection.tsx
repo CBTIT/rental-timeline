@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import "./ModeSelection.css";
 type ModeSelectionProps = {
   setMode: React.Dispatch<React.SetStateAction<string>>;
@@ -36,4 +36,4 @@ const ModeSelection = ({
   );
 };
 
-export default ModeSelection;
+export default memo(ModeSelection);

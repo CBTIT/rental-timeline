@@ -1,6 +1,7 @@
 import TimeSlider from "../TimeSlider/TimeSlider";
 import LevelSelector from "../LevelSelector/LevelSelector";
-import ViewCotextButton from "../ViewContextButton/ViewContextButton";
+import ViewContextButton from "../ViewContextButton/ViewContextButton";
+import { memo } from "react";
 import "./UserSelection.css";
 type UserSelectionTypes = {
   setViewContext: React.Dispatch<React.SetStateAction<string>>;
@@ -25,12 +26,12 @@ const UserSelection = ({
   return (
     <div className="user-selection">
       <div className="views">
-        <ViewCotextButton
+        <ViewContextButton
           text={"2D"}
           onClick={setViewContext}
           isDisabled={viewContext == "2D"}
         />
-        <ViewCotextButton
+        <ViewContextButton
           text={"3D"}
           onClick={setViewContext}
           isDisabled={viewContext == "3D"}
@@ -47,4 +48,4 @@ const UserSelection = ({
   );
 };
 
-export default UserSelection;
+export default memo(UserSelection);

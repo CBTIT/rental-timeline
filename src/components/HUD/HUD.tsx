@@ -1,4 +1,5 @@
 import type { LeaseData } from "../../types/lease";
+import { memo } from "react";
 import "./HUD.css";
 
 type HUDProps = {
@@ -8,7 +9,9 @@ type HUDProps = {
   selectedUnit: string | null;
   mode: string;
   viewContext: string;
-  setUnitColor: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedLeaseColor: React.Dispatch<React.SetStateAction<string>>;
+  bucketCount: number;
+  setBucketCount: React.Dispatch<React.SetStateAction<number>>;
 };
 const colors = ["#E23D3D", "#2BB673", "#1B5EAA"];
 
@@ -19,11 +22,12 @@ const HUD = ({
   selectedUnit,
   mode,
   viewContext,
-  setUnitColor,
+  setSelectedLeaseColor,
+  bucketCount,
+  setBucketCount,
 }: HUDProps) => {
   const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
-  console.log(selectedRow);
   const selectedIsLeasedNow =
     !!selectedUnit && leasedUnits.includes(selectedUnit);
 
@@ -39,11 +43,24 @@ const HUD = ({
                 className="color-box"
                 key={color}
                 style={{ backgroundColor: color }}
-                onClick={() => setUnitColor(color)}
+                onClick={() => setSelectedLeaseColor(color)}
               ></div>
             );
           })}
         </div>
+      </div>
+      <div className="bucket-selection">
+        <div className="bucket-selection-title">
+          Gradient Buckets: <span>{bucketCount}</span>
+        </div>
+        <input
+          type="range"
+          min="3"
+          max="7"
+          value={bucketCount}
+          onChange={(e) => setBucketCount(Number(e.target.value))}
+          className="bucket-slider"
+        />
       </div>
       {/* <div className="leased-units">
         {leasedUnits.map((unitId) => (
@@ -111,4 +128,4 @@ const HUD = ({
   );
 };
 
-export default HUD;
+export default memo(HUD);

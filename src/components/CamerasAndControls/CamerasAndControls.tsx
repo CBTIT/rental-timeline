@@ -5,7 +5,7 @@ import {
   MapControls,
 } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, memo } from "react";
 import * as THREE from "three";
 import type { MapControls as ThreeMapControls } from "three-stdlib";
 
@@ -108,4 +108,4 @@ const CamerasAndControls = ({ viewContext, level }: CameraAndControlsProps) => {
   );
 };
 
-export default CamerasAndControls;
+export default memo(CamerasAndControls);

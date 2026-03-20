@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, memo } from "react";
 import * as THREE from "three";
 import { Rhino3dmLoader } from "three-stdlib";
 
@@ -52,4 +52,4 @@ const BaseMap = ({ level, viewContext, mode }: BaseMapProps) => {
   return <primitive object={baseMap} dispose={null} />;
 };
 
-export default BaseMap;
+export default memo(BaseMap);
