@@ -16,6 +16,7 @@ import {
   stringDateFromDayIndex,
   dateFromDayIndex,
 } from "./utils/dateUtils";
+import { AppProvider } from "./contexts/AppProvider";
 function App() {
   const base = import.meta.env.BASE_URL;
   const [selectedLeaseColor, setSelectedLeaseColor] =
@@ -168,4 +169,16 @@ function App() {
   }
 }
 
-export default App;
+/**
+ * Wrap App with AppProvider to provide context throughout the component tree
+ * This eliminates prop drilling and allows components to access shared state via useAppContext()
+ */
+function AppWithProvider() {
+  return (
+    <AppProvider>
+      <App />
+    </AppProvider>
+  );
+}
+
+export default AppWithProvider;
