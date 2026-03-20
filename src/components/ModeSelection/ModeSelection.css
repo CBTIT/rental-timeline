@@ -19,6 +19,7 @@
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 6px;
+  overflow: hidden;
   box-shadow: var(--shadow-md);
   z-index: var(--z-dropdown);
   flex-wrap: nowrap;
@@ -60,17 +61,19 @@
 }
 
 .mode-selection .theme-toggle-mode-btn {
-  min-width: 36px;
-  margin-left: var(--space-sm);
-  padding: 10px;
-  font-size: 16px;
+  flex-shrink: 0;
+  margin-left: 0;
+  width: 36px;
+  padding: 7px 0;
+  font-size: 13px;
   line-height: 1;
-  color: var(--color-text-primary);
+  text-align: center;
 }
 
 .mode-selection .theme-toggle-mode-btn:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
 }
 
 .mode-selection button:disabled,

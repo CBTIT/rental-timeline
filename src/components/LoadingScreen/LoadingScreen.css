@@ -1,0 +1,100 @@
+/* ============================================================================
+   LOADING SCREEN
+   Full-screen splash shown on first visit with title, subtitle, and
+   a simulated progress bar. Always visible for at least 0.5 s.
+   ============================================================================ */
+
+.ls-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f172a;
+  opacity: 1;
+  transition: opacity 0.32s ease;
+}
+
+.ls-screen--out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Content block ─────────────────────────────────────────────────────────── */
+
+.ls-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(600px, 92vw);
+}
+
+/* ── Title ─────────────────────────────────────────────────────────────────── */
+
+.ls-title {
+  font-family:
+    "Cal Sans",
+    "Playfair Display",
+    "Georgia",
+    serif;
+  font-size: clamp(3.5rem, 11vw, 7rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 60%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  text-align: center;
+  line-height: 1.05;
+}
+
+/* ── Subtitle ──────────────────────────────────────────────────────────────── */
+
+.ls-subtitle {
+  font-family:
+    "Inter",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  font-weight: 400;
+  letter-spacing: 0.45em;
+  color: #64748b;
+  margin: 0 0 28px 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ── Progress bar ──────────────────────────────────────────────────────────── */
+
+.ls-bar-track {
+  width: 100%;
+  height: 2px;
+  background-color: #1e293b;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.ls-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #0ea5e9 0%, #818cf8 55%, #38bdf8 100%);
+  border-radius: 9999px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  /* Fill over 1 s, matching the minimum display time */
+  animation: ls-fill 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes ls-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

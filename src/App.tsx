@@ -16,6 +16,7 @@ import {
   dateFromDayIndex,
 } from "./utils/dateUtils";
 import { AppProvider } from "./contexts/AppProvider";
+import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 
 const DEFAULT_LEASE_COLOR = "#14b8a6";
 
@@ -50,9 +51,11 @@ function App() {
   const [viewContext, setViewContext] = useState<string>("3D");
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
   const [sunTime, setSunTime] = useState<number>(12);
+  const [isLoading, setIsLoading] = useState(true);
   const [themeMode, setThemeMode] = useState<"light" | "dark">(() => {
     const saved = localStorage.getItem("themeMode");
-    return saved === "dark" ? "dark" : "light";
+    // Default to dark on first visit; only switch to light if explicitly saved
+    return saved === "light" ? "light" : "dark";
   });
 
   const sunLighting = useMemo(() => {
@@ -144,6 +147,7 @@ function App() {
       <div
         className={`table-view-shell ${themeMode === "dark" ? "theme-dark" : ""}`}
       >
+        {isLoading && <LoadingScreen onDone={() => setIsLoading(false)} />}
         <div className="table-view-topbar">
           <div className="table-view-header">
             <div className="table-view-title">Lease Visualizer</div>
@@ -169,6 +173,7 @@ function App() {
       <div
         className={`canvas-container ${themeMode === "dark" ? "theme-dark" : ""}`}
       >
+        {isLoading && <LoadingScreen onDone={() => setIsLoading(false)} />}
         <ModeSelection
           setMode={setMode}
           mode={mode}
