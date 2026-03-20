@@ -5,9 +5,9 @@
 
 .color-box {
   pointer-events: auto;
-  width: 20px;
-  height: 20px;
-  border: var(--border-width) solid var(--color-border);
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   background-color: var(--color-bg-primary);
@@ -16,11 +16,16 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-sm);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
+  padding: 0;
 }
 
 .color-box:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--color-accent) 24%, transparent);
   transform: scale(1.05);
 }
 
@@ -31,38 +36,91 @@
   transition: all var(--transition-fast);
 }
 
+.color-box.active {
+  border-color: var(--color-accent-dark);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--color-accent) 26%, transparent);
+}
+
+.color-default-option {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
 .color-selection-group {
   display: flex;
   flex-direction: row;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   flex-wrap: wrap;
+  align-items: center;
 }
 
-.bucket-selection {
-  background-color: var(--color-bg-primary);
+.color-wheel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 3px 8px;
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  font-size: var(--font-size-base);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.color-wheel:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.color-wheel.active {
+  border-color: var(--color-accent-dark);
+  box-shadow: 0 0 0 2px
+    color-mix(in oklab, var(--color-accent) 24%, transparent);
+}
+
+.color-wheel input[type="color"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.color-wheel input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-wheel input[type="color"]::-webkit-color-swatch {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.color-wheel-text {
+  line-height: 1;
+}
+
+.hud-bucket-selector {
+  border-top: var(--border-width) solid var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-normal);
+  gap: var(--space-xs);
 }
 
-.bucket-selection:hover {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-lg);
-}
-
-.bucket-selection-title {
+.hud-bucket-title {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
 }
 
-.bucket-selection-title span {
+.hud-bucket-title span {
   color: var(--color-success);
   font-weight: var(--font-weight-bold);
 }
@@ -78,7 +136,7 @@
 .HUD {
   position: absolute;
   right: var(--space-lg);
-  top: var(--space-lg);
+  top: 84px;
   text-align: left;
   width: 300px;
   pointer-events: auto;
@@ -130,7 +188,12 @@
   border-radius: var(--radius-md);
   padding: var(--space-sm);
   font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
   transition: all var(--transition-normal);
+}
+
+.unit-detail > div {
+  color: var(--color-text-primary);
 }
 
 .unit-detail:hover,
@@ -144,6 +207,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  color: var(--color-text-primary);
+}
+
+.color-selection-title {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
 }
 
 /* Level Selector - integrated into HUD */
@@ -191,51 +261,6 @@
   border-color: var(--color-accent);
 }
 
-/* Mode Selection - integrated into HUD */
-.hud-mode-selector {
-  border-top: var(--border-width) solid var(--color-border);
-  padding-top: var(--space-md);
-  margin-top: var(--space-md);
-}
-
-.hud-mode-title {
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-sm);
-}
-
-.hud-mode-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: var(--space-xs);
-}
-
-.hud-mode-btn {
-  padding: var(--space-xs) var(--space-md);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-  cursor: pointer;
-  font-size: var(--font-size-xs);
-  font-family: var(--font-family);
-  font-weight: var(--font-weight-medium);
-  transition: all var(--transition-normal);
-  flex: 1;
-}
-
-.hud-mode-btn:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-accent);
-}
-
-.hud-mode-btn.active {
-  background-color: var(--color-accent);
-  color: white;
-  border-color: var(--color-accent);
-}
-
 /* View Context Selector - 2D/3D integrated into HUD */
 .hud-view-selector {
   border-top: var(--border-width) solid var(--color-border);
@@ -254,6 +279,25 @@
   display: flex;
   flex-direction: row;
   gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.hud-view-toggle-btn {
+  padding: var(--space-xs) var(--space-md);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+}
+
+.hud-view-toggle-btn:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
 }
 
 /* Time Slider - integrated into HUD */
@@ -290,6 +334,7 @@
   gap: var(--space-sm);
   padding: var(--space-xs) 0;
   font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
 }
 
 /* Responsive mobile adjustments */
@@ -323,10 +368,6 @@
     height: var(--space-xl);
   }
 
-  .bucket-selection {
-    padding: var(--space-md);
-  }
-
   .hud-level-buttons {
     gap: var(--space-sm);
   }
@@ -341,7 +382,7 @@
 @media (min-width: 640px) and (max-width: 1023px) {
   .HUD {
     right: var(--space-md);
-    top: var(--space-md);
+    top: 74px;
     width: 280px;
     padding: var(--space-md);
     max-height: 80vh;

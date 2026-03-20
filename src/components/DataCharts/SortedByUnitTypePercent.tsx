@@ -109,7 +109,7 @@ export default function SortedByUnitTypePercent({
           const hPct = (b.pct / maxPct) * 100;
           const labelPct = `${Math.round(b.pct)}%`;
 
-          const wrapPx = 68;
+          const wrapPx = 57;
           const px = (hPct / 100) * wrapPx;
           const pxClamped = b.count > 0 ? Math.max(6, px) : 0;
 

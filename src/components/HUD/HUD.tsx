@@ -12,19 +12,20 @@ type HUDProps = {
   mode: string;
   viewContext: string;
   setViewContext: React.Dispatch<React.SetStateAction<string>>;
+  selectedLeaseColor: string;
+  defaultLeaseColor: string;
   setSelectedLeaseColor: React.Dispatch<React.SetStateAction<string>>;
   bucketCount: number;
   setBucketCount: React.Dispatch<React.SetStateAction<number>>;
   level: string;
   setLevel: React.Dispatch<React.SetStateAction<string>>;
-  setMode: React.Dispatch<React.SetStateAction<string>>;
   showData: boolean;
   setShowData: React.Dispatch<React.SetStateAction<boolean>>;
   days: number;
   currentDay: number;
   setCurrentDay: React.Dispatch<React.SetStateAction<number>>;
 };
-const colors = ["#E23D3D", "#2BB673", "#1B5EAA"];
+const presetColors = ["#6366f1", "#0ea5e9", "#f97316", "#ec4899"];
 
 const HUD = ({
   date,
@@ -34,12 +35,13 @@ const HUD = ({
   mode,
   viewContext,
   setViewContext,
+  selectedLeaseColor,
+  defaultLeaseColor,
   setSelectedLeaseColor,
   bucketCount,
   setBucketCount,
   level,
   setLevel,
-  setMode,
   showData,
   setShowData,
   days,
@@ -50,6 +52,9 @@ const HUD = ({
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
   const selectedIsLeasedNow =
     !!selectedUnit && leasedUnits.includes(selectedUnit);
+  const isCustomColor =
+    selectedLeaseColor !== defaultLeaseColor &&
+    !presetColors.includes(selectedLeaseColor.toLowerCase());
 
   return (
     <div className="HUD">
@@ -57,31 +62,58 @@ const HUD = ({
       <div className="color-selection">
         <div className="color-selection-title">Select a Unit Display Color</div>
         <div className="color-selection-group">
-          {colors.map((color) => {
+          {presetColors.map((color) => {
             return (
-              <div
-                className="color-box"
+              <button
+                type="button"
+                className={`color-box ${selectedLeaseColor.toLowerCase() === color.toLowerCase() ? "active" : ""}`}
                 key={color}
                 style={{ backgroundColor: color }}
                 onClick={() => setSelectedLeaseColor(color)}
-              ></div>
+                aria-label={`Select color ${color}`}
+                title={`Select color ${color}`}
+              />
             );
           })}
+
+          <button
+            type="button"
+            className={`color-box color-default-option ${selectedLeaseColor.toLowerCase() === defaultLeaseColor.toLowerCase() ? "active" : ""}`}
+            style={{ backgroundColor: defaultLeaseColor }}
+            onClick={() => setSelectedLeaseColor(defaultLeaseColor)}
+            aria-label="Reset to default lease color"
+            title="Reset to default lease color"
+          >
+            D
+          </button>
+
+          <label
+            className={`color-wheel ${isCustomColor ? "active" : ""}`}
+            title="Pick custom lease color"
+          >
+            <span className="color-wheel-text">Custom</span>
+            <input
+              type="color"
+              value={selectedLeaseColor}
+              onChange={(e) => setSelectedLeaseColor(e.target.value)}
+              aria-label="Choose custom lease color"
+            />
+          </label>
         </div>
       </div>
-      <div className="bucket-selection">
-        <div className="bucket-selection-title">
-          Gradient Buckets: <span>{bucketCount}</span>
+
+      {/* Time Slider - moved to top */}
+      {mode !== "table" && (
+        <div className="hud-time-slider-container">
+          <div className="hud-time-label">Timeline</div>
+          <TimeSlider
+            days={days}
+            currentDay={currentDay}
+            setCurrentDay={setCurrentDay}
+          />
         </div>
-        <input
-          type="range"
-          min="3"
-          max="7"
-          value={bucketCount}
-          onChange={(e) => setBucketCount(Number(e.target.value))}
-          className="bucket-slider"
-        />
-      </div>
+      )}
+
       {/* <div className="leased-units">
         {leasedUnits.map((unitId) => (
           <HUDUnit key={unitId} unit={unitData[unitId]} name={unitId} />
@@ -163,40 +195,6 @@ const HUD = ({
         </div>
       )}
 
-      {/* Mode Selection */}
-      <div className="hud-mode-selector">
-        <div className="hud-mode-title">View Mode</div>
-        <div className="hud-mode-buttons">
-          <button
-            className={`hud-mode-btn ${mode === "levels" ? "active" : ""}`}
-            onClick={() => setMode("levels")}
-          >
-            Levels
-          </button>
-          <button
-            className={`hud-mode-btn ${mode === "combined" ? "active" : ""}`}
-            onClick={() => setMode("combined")}
-          >
-            Combined
-          </button>
-          <button
-            className={`hud-mode-btn ${mode === "table" ? "active" : ""}`}
-            onClick={() => setMode("table")}
-          >
-            Table
-          </button>
-        </div>
-        {mode !== "table" && (
-          <button
-            className="hud-mode-btn"
-            onClick={() => setShowData(showData ? false : true)}
-            style={{ marginTop: "var(--space-xs)" }}
-          >
-            {showData ? "Hide Data" : "Show Data"}
-          </button>
-        )}
-      </div>
-
       {/* Time Slider and View Context */}
       {mode !== "table" && (
         <>
@@ -215,15 +213,27 @@ const HUD = ({
                 isDisabled={viewContext === "3D"}
                 isActive={viewContext === "3D"}
               />
+              <button
+                type="button"
+                className="hud-view-toggle-btn"
+                onClick={() => setShowData(!showData)}
+              >
+                {showData ? "Hide Data" : "Show Data"}
+              </button>
             </div>
           </div>
 
-          <div className="hud-time-slider-container">
-            <div className="hud-time-label">Timeline</div>
-            <TimeSlider
-              days={days}
-              currentDay={currentDay}
-              setCurrentDay={setCurrentDay}
+          <div className="hud-bucket-selector">
+            <div className="hud-bucket-title">
+              Gradient Buckets: <span>{bucketCount}</span>
+            </div>
+            <input
+              type="range"
+              min="3"
+              max="7"
+              value={bucketCount}
+              onChange={(e) => setBucketCount(Number(e.target.value))}
+              className="bucket-slider"
             />
           </div>
         </>

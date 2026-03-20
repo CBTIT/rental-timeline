@@ -28,11 +28,13 @@ const BaseMap = ({ level, viewContext, mode }: BaseMapProps) => {
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
     tex.needsUpdate = true;
-    return new THREE.MeshBasicMaterial({
+    return new THREE.MeshStandardMaterial({
       map: tex,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 0.5,
+      roughness: 1,
+      metalness: 0,
       depthWrite: false,
       depthTest: true,
     });
@@ -41,6 +43,8 @@ const BaseMap = ({ level, viewContext, mode }: BaseMapProps) => {
     baseMap.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
       o.material = mat;
+      o.castShadow = false;
+      o.receiveShadow = true;
       (o.material as THREE.Material).needsUpdate = true;
     });
   }, [baseMap, mat]);

@@ -93,9 +93,11 @@ const LevelUnits = ({
       );
     },
   );
+
+  // Add outlines only in Levels mode 2D view
   useEffect(() => {
-    if (viewContext === "2D" && mode === "combined") return;
-    // add outlines once
+    if (mode !== "levels" || viewContext !== "2D") return;
+    // add outlines for levels 2D only
     unitGeometry.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
 
@@ -103,31 +105,27 @@ const LevelUnits = ({
       const already = o.children.find((c) => c.name === "__outline__");
       if (already) return;
 
-      const edges = new THREE.EdgesGeometry(o.geometry, 25);
-      // ↑ thresholdAngle: bigger => fewer edges (try 5–30)
+      const edges = new THREE.EdgesGeometry(o.geometry, 15);
 
       const lines = new THREE.LineSegments(edges, materials.outline);
       lines.name = "__outline__";
 
       // keep outlines visible
       lines.renderOrder = (o.renderOrder ?? 0) + 1;
-
-      // IMPORTANT for your translucent combined mode:
-      // don't let outline write depth or it will kill stacking
       lines.material.depthWrite = false;
 
       o.add(lines);
     });
 
     return () => {
-      // cleanup if component unmounts
+      // cleanup when switching modes/views
       unitGeometry.traverse((o) => {
         if (!(o instanceof THREE.Mesh)) return;
         const lines = o.children.find((c) => c.name === "__outline__");
         if (lines) o.remove(lines);
       });
     };
-  }, [unitGeometry, materials]);
+  }, [unitGeometry, materials, viewContext, mode]);
 
   useEffect(() => {
     unitText.traverse((o) => {
@@ -165,6 +163,7 @@ const LevelUnits = ({
       }
     });
   }, [unitGeometry, level, mode, viewContext]);
+
   useEffect(() => {
     if (mode !== "combined") return;
 

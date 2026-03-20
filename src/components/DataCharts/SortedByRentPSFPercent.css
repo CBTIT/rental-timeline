@@ -6,25 +6,25 @@
 .psf-row {
   display: flex;
   justify-content: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   align-items: flex-end;
   width: 100%;
   overflow-x: auto;
   padding-bottom: var(--space-xs);
-  min-height: 160px;
+  min-height: 125px;
 }
 
 .psf-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   min-width: var(--space-lg);
   flex-shrink: 0;
 }
 
 .psf-bar-wrap {
-  height: 80px;
+  height: 62px;
   width: var(--space-lg);
   display: flex;
   align-items: flex-end;
@@ -55,8 +55,8 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-lg) var(--space-md);
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-sm);
   justify-content: center;
   align-items: center;
   background: linear-gradient(
@@ -86,12 +86,12 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
   min-height: 18px;
 }
 
 .psf-label {
-  margin-top: var(--space-xs);
+  margin-top: 2px;
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   text-align: center;

@@ -5,8 +5,10 @@
 
 .mode-selection {
   position: absolute;
-  left: var(--space-lg);
-  top: var(--space-xl);
+  right: var(--space-lg);
+  top: var(--space-lg);
+  left: auto;
+  width: 300px;
   text-align: left;
   pointer-events: auto;
   display: flex;
@@ -16,16 +18,26 @@
   background-color: var(--color-bg-primary);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-sm);
+  padding: 6px;
   box-shadow: var(--shadow-md);
   z-index: var(--z-dropdown);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.mode-selection-inline {
+  position: static;
+  left: auto;
+  right: auto;
+  top: auto;
+  margin-left: auto;
+  flex-wrap: nowrap;
 }
 
 .mode-selection button {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  padding: var(--space-md) var(--space-lg);
+  padding: 10px 14px;
   pointer-events: auto;
   cursor: pointer;
   border: var(--border-width) solid transparent;
@@ -36,10 +48,29 @@
   font-family: var(--font-family);
 }
 
+.mode-selection > button:not(.theme-toggle-mode-btn) {
+  flex: 1 1 auto;
+  min-width: max-content;
+}
+
 .mode-selection button:hover {
   background-color: var(--color-bg-secondary);
   color: var(--color-text-primary);
   border-color: var(--color-border);
+}
+
+.mode-selection .theme-toggle-mode-btn {
+  min-width: 36px;
+  margin-left: var(--space-sm);
+  padding: 10px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+.mode-selection .theme-toggle-mode-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .mode-selection button:disabled,
@@ -82,11 +113,13 @@
 /* Responsive tablet */
 @media (min-width: 640px) and (max-width: 1023px) {
   .mode-selection {
-    left: var(--space-md);
+    right: var(--space-md);
     top: var(--space-md);
+    left: auto;
+    width: 280px;
   }
 
   .mode-selection button {
-    padding: var(--space-md) var(--space-lg);
+    padding: 10px 12px;
   }
 }

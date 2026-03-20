@@ -44,7 +44,7 @@ export function createUnitMaterials(
   const combinedBase3D = new THREE.MeshStandardMaterial({
     color: "#f0efeb",
     transparent: true,
-    opacity: 0.12, // or 0
+    opacity: 0.28, // Increased from 0.12 for better architectural context in combined mode
     depthWrite: false,
     depthTest: true,
   });
@@ -74,7 +74,7 @@ export function createUnitMaterials(
     transparent: true,
     opacity: 0.25,
     depthTest: true,
-    depthWrite: true,
+    depthWrite: false, // Allow proper transparency stacking in combined mode
   });
 
   const affordable = new THREE.MeshStandardMaterial({
