@@ -5,6 +5,10 @@ type ModeSelectionProps = {
   mode: string;
   showData: boolean;
   setShowData: React.Dispatch<React.SetStateAction<boolean>>;
+  themeMode?: "light" | "dark";
+  toggleTheme?: () => void;
+  inline?: boolean;
+  showDataToggle?: boolean;
 };
 
 const ModeSelection = ({
@@ -12,9 +16,13 @@ const ModeSelection = ({
   mode,
   showData,
   setShowData,
+  themeMode,
+  toggleTheme,
+  inline,
+  showDataToggle = true,
 }: ModeSelectionProps) => {
   return (
-    <div className="mode-selection">
+    <div className={`mode-selection ${inline ? "mode-selection-inline" : ""}`}>
       <button
         disabled={mode === "levels"}
         onClick={() => setMode("levels")}
@@ -36,9 +44,28 @@ const ModeSelection = ({
       >
         Table
       </button>
-      {mode !== "table" && (
+      {showDataToggle && mode !== "table" && (
         <button onClick={() => setShowData(showData ? false : true)}>
           {showData ? "Hide Data" : "Show Data"}
+        </button>
+      )}
+      {toggleTheme && (
+        <button
+          type="button"
+          className="theme-toggle-mode-btn"
+          onClick={toggleTheme}
+          title={
+            themeMode === "dark"
+              ? "Switch to light mode"
+              : "Switch to dark mode"
+          }
+          aria-label={
+            themeMode === "dark"
+              ? "Switch to light mode"
+              : "Switch to dark mode"
+          }
+        >
+          {themeMode === "dark" ? "☀" : "☾"}
         </button>
       )}
     </div>

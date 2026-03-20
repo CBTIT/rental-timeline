@@ -5,7 +5,7 @@
 
 .ut-strip {
   width: 100%;
-  padding: var(--space-lg) var(--space-md);
+  padding: var(--space-md) var(--space-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,7 +17,7 @@
     var(--color-bg-primary) 0%,
     var(--color-bg-secondary) 100%
   );
-  gap: var(--space-md);
+  gap: var(--space-sm);
   box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
 }
@@ -31,10 +31,10 @@
   display: flex;
   width: 100%;
   justify-content: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   align-items: flex-end;
   flex-wrap: wrap;
-  min-height: 130px;
+  min-height: 115px;
 }
 
 .ut-col {
@@ -42,21 +42,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   flex: 0 0 auto;
   min-width: var(--space-lg);
 }
 
 .ut-count {
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
-  min-height: 18px;
+  min-height: 20px;
+  line-height: 1;
 }
 
 .ut-bar-wrap {
-  height: 50px;
+  height: 57px;
   width: var(--space-lg);
   display: flex;
   align-items: flex-end;
@@ -96,7 +97,7 @@
   color: var(--color-text-primary);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-xs);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }

@@ -6,8 +6,8 @@
 .data-charts {
   position: absolute;
   left: var(--space-lg);
-  top: var(--space-lg);
-  width: 320px;
+  top: 88px;
+  width: 280px;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
@@ -15,7 +15,7 @@
   font-family: var(--font-family);
   background-color: transparent;
   z-index: var(--z-dropdown);
-  max-height: calc(100vh - 100px);
+  max-height: calc(100vh - 190px);
   overflow-y: hidden;
 }
 
@@ -48,9 +48,9 @@
 @media (min-width: 640px) and (max-width: 1023px) {
   .data-charts {
     left: var(--space-md);
-    width: 300px;
-    top: var(--space-md);
-    max-height: calc(100vh - 160px);
+    width: 260px;
+    top: 82px;
+    max-height: calc(100vh - 210px);
     overflow-y: hidden;
   }
 }
