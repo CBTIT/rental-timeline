@@ -1,6 +1,6 @@
 /* ============================================================================
-   TIME SLIDER - Custom range input styling
-   Modern shadcn-style slider with design system colors
+   TIME SLIDER - Native range input styling
+   Matches bucket slider with browser's native appearance
    ============================================================================ */
 
 #time-slider {
@@ -9,120 +9,18 @@
   width: 100%;
   height: 40px;
   accent-color: var(--color-accent);
-  appearance: none;
-  -webkit-appearance: none;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: linear-gradient(
-    to right,
-    var(--color-accent) 0%,
-    var(--color-accent) var(--value),
-    var(--color-bg-secondary) var(--value),
-    var(--color-bg-secondary) 100%
-  );
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm) inset;
-}
-
-/* Webkit (Chrome, Safari, Edge) - thumb styling */
-#time-slider::-webkit-slider-thumb {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-accent);
-  border: 2px solid var(--color-bg-primary);
-  cursor: pointer;
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-fast);
-}
-
-#time-slider::-webkit-slider-thumb:hover {
-  background-color: var(--color-accent-hover);
-  box-shadow: var(--shadow-lg);
-  transform: scale(1.1);
-}
-
-#time-slider::-webkit-slider-thumb:active {
-  background-color: var(--color-accent-dark);
-  box-shadow: var(--shadow-md);
-  transform: scale(0.98);
-}
-
-/* Firefox - thumb styling */
-#time-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-accent);
-  border: 2px solid var(--color-bg-primary);
-  cursor: pointer;
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-fast);
-}
-
-#time-slider::-moz-range-thumb:hover {
-  background-color: var(--color-accent-hover);
-  box-shadow: var(--shadow-lg);
-  transform: scale(1.1);
-}
-
-#time-slider::-moz-range-thumb:active {
-  background-color: var(--color-accent-dark);
-  box-shadow: var(--shadow-md);
-  transform: scale(0.98);
-}
-
-/* Track styling - Webkit */
-#time-slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: var(--space-sm);
-  border-radius: var(--radius-full);
-  background: var(--color-border);
-  border: none;
-}
-
-/* Track styling - Firefox */
-#time-slider::-moz-range-track {
-  background: var(--color-border);
-  border: none;
-  border-radius: var(--radius-full);
-}
-
-#time-slider::-moz-range-progress {
-  background-color: var(--color-accent-light);
-  height: var(--space-sm);
-  border-radius: var(--radius-full);
-}
-
-/* Focus state */
-#time-slider:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--color-accent-light);
 }
 
 /* Responsive adjustments */
 @media (max-width: 639px) {
   #time-slider {
-    height: var(--space-4xl);
-    min-height: 44px;
-  }
-
-  #time-slider::-webkit-slider-thumb {
-    width: calc(var(--space-md) + 4px);
-    height: calc(var(--space-md) + 4px);
-  }
-
-  #time-slider::-moz-range-thumb {
-    width: calc(var(--space-md) + 4px);
-    height: calc(var(--space-md) + 4px);
+    height: 44px;
   }
 }
 
 /* Tablet optimizations */
 @media (min-width: 640px) and (max-width: 1023px) {
   #time-slider {
-    height: 36px;
+    height: 40px;
   }
 }
