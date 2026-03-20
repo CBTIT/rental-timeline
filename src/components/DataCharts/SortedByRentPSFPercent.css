@@ -5,40 +5,41 @@
 
 .psf-row {
   display: flex;
-  justify-content: flex-start;
-  gap: 2px;
+  justify-content: center;
+  gap: var(--space-md);
   align-items: flex-end;
   width: 100%;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding-bottom: var(--space-xs);
 }
 
 .psf-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-width: var(--space-md);
+  gap: var(--space-xs);
+  min-width: var(--space-lg);
   flex-shrink: 0;
 }
 
 .psf-bar-wrap {
   height: 60px;
-  width: var(--space-md);
+  width: var(--space-lg);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 2px;
+  gap: var(--space-xs);
 }
 
 .psf-bar {
-  width: var(--space-sm);
+  width: var(--space-md);
   display: block;
   background: var(--color-info);
   border-radius: var(--radius-sm);
   opacity: 0.8;
   transition: all var(--transition-fast);
   min-height: 2px;
+  box-shadow: var(--shadow-sm);
 }
 
 .psf-bar:hover {
@@ -53,8 +54,8 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: var(--space-sm);
+  gap: var(--space-md);
+  padding: var(--space-md);
   justify-content: center;
   align-items: center;
   background: linear-gradient(
@@ -74,8 +75,8 @@
 
 .psf-title {
   color: var(--color-text-primary);
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);\n  font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  align-self: center;
 }
