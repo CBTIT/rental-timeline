@@ -1,46 +1,100 @@
+/* ============================================================================
+   SORTED BY RENT PSF PERCENT - Bar chart visualization
+   Modernized with design system colors and spacing
+   ============================================================================ */
+
 .psf-row {
   display: flex;
-  justify-content: start;
-  gap: 5px;
-  align-items: start;
+  justify-content: center;
+  gap: var(--space-md);
+  align-items: flex-end;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: var(--space-xs);
+  min-height: 160px;
 }
 
 .psf-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-width: 38px;
+  gap: var(--space-sm);
+  min-width: var(--space-lg);
+  flex-shrink: 0;
 }
 
 .psf-bar-wrap {
-  height: 68px; /* REQUIRED */
-  width: 10px;
-  display: flex; /* REQUIRED */
-  align-items: flex-end; /* REQUIRED */
+  height: 80px;
+  width: var(--space-lg);
+  display: flex;
+  align-items: flex-end;
   justify-content: center;
+  gap: var(--space-xs);
 }
 
 .psf-bar {
-  width: 8px;
-  display: block; /* IMPORTANT */
-  background: rgba(122, 43, 43, 0.45);
-  outline: 1px solid rgba(122, 43, 43, 0.55);
-  border-radius: 2px;
+  width: var(--space-md);
+  display: block;
+  background: var(--color-info);
+  border-radius: var(--radius-sm);
+  opacity: 0.8;
+  transition: all var(--transition-fast);
+  min-height: 2px;
+  box-shadow: var(--shadow-sm);
 }
+
+.psf-bar:hover {
+  opacity: 1;
+  box-shadow: var(--shadow-md);
+  filter: brightness(1.15);
+}
+
 .psf-strip {
-  border: 3px solid brown;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 10px;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-md);
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-primary) 0%,
+    var(--color-bg-secondary) 100%
+  );
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
 }
+
+.psf-strip:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
+}
+
 .psf-title {
-  color: brown;
-  font-weight: bold;
-  font-size: 16px;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: center;
+}
+
+.psf-count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-sm);
+  min-height: 18px;
+}
+
+.psf-label {
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  word-break: break-word;
+  font-weight: var(--font-weight-medium);
 }

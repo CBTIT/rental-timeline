@@ -1,22 +1,54 @@
+/* ============================================================================
+   LEASED KPI - Key Performance Indicator display
+   Modernized card styling with design system variables
+   ============================================================================ */
+
 .kpi-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 10px;
-  border: 3px solid brown;
-  background-color: white;
-  width: 300px;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-primary) 0%,
+    var(--color-bg-secondary) 100%
+  );
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
 }
+
+.kpi-container:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
+}
+
 .kpi {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-bottom: var(--border-width) solid var(--color-border-light);
 }
+
+.kpi:last-child {
+  border-bottom: none;
+}
+
 .kpi-label {
-  color: black;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
 .kpi-value {
-  font-weight: bold;
-  color: brown;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
 }

@@ -1,11 +1,56 @@
+/* ============================================================================
+   DATA CHARTS - Container for chart visualizations
+   Responsive positioning and modern styling
+   ============================================================================ */
+
 .data-charts {
   position: absolute;
-  left: 25px;
-  top: 100px;
-  width: 300px;
-  pointer-events: none;
+  left: var(--space-lg);
+  top: var(--space-lg);
+  width: 320px;
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-family: Arial, Helvetica, sans-serif;
+  gap: var(--space-xs);
+  font-family: var(--font-family);
+  background-color: transparent;
+  z-index: var(--z-dropdown);
+  max-height: calc(100vh - 100px);
+  overflow-y: hidden;
+}
+
+/* Responsive mobile - hide by default on small screens */
+@media (max-width: 639px) {
+  .data-charts {
+    display: none;
+    position: fixed;
+    bottom: var(--space-4xl);
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    max-height: calc(100vh - var(--space-4xl) - var(--space-lg));
+    overflow-y: auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background-color: var(--color-bg-primary);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-lg);
+    gap: var(--space-lg);
+    z-index: var(--z-modal);
+  }
+
+  .data-charts.visible {
+    display: flex;
+  }
+}
+
+/* Responsive tablet adjustments */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .data-charts {
+    left: var(--space-md);
+    width: 300px;
+    top: var(--space-md);
+    max-height: calc(100vh - 160px);
+    overflow-y: hidden;
+  }
 }

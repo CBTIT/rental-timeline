@@ -1,0 +1,492 @@
+/** ============================================================================
+    RESPONSIVE CSS
+    Media queries and responsive utilities for mobile, tablet, and desktop layouts
+    ============================================================================ */
+
+/* ============================================================================
+   RESPONSIVE BREAKPOINTS
+   Mobile: < 640px | Tablet: 640px - 1024px | Desktop: > 1024px
+   ============================================================================ */
+
+/* ============================================================================
+   MOBILE FIRST - DEFAULT (< 640px)
+   ============================================================================ */
+
+@media (max-width: 639px) {
+  /**
+   * Mobile utilities - single column, stacked layout
+   * Touch-friendly (44px minimum hit targets)
+   * Limited horizontal space
+   */
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .mobile-full-width {
+    width: 100% !important;
+  }
+
+  .mobile-stack {
+    flex-direction: column;
+  }
+
+  .mobile-center {
+    text-align: center;
+  }
+
+  .mobile-padding-lg {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  /**
+   * Touch target minimum (44px x 44px)
+   * For buttons, inputs, and interactive elements
+   */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .button.mobile-touch-target {
+    padding: var(--space-lg) var(--space-xl);
+    font-size: var(--font-size-base);
+  }
+
+  /**
+   * Typography scaling for mobile
+   * Reduce max sizes to fit smaller screens
+   */
+  .text-xl {
+    font-size: var(--font-size-lg);
+  }
+
+  .text-2xl {
+    font-size: var(--font-size-xl);
+  }
+
+  /**
+   * Spacing adjustments for mobile
+   * Reduce excessive gaps
+   */
+  .mobile-gap-sm {
+    gap: var(--space-sm) !important;
+  }
+
+  .mobile-p-md {
+    padding: var(--space-md) !important;
+  }
+
+  /**
+   * Overflow handling for mobile
+   * Scrollable containers on small screens
+   */
+  .mobile-scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-scroll-y {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /**
+   * Grid collapse for mobile
+   * Single column on mobile
+   */
+  .grid-mobile-1 {
+    grid-template-columns: 1fr;
+  }
+
+  /**
+   * Flexbox direction for mobile
+   * Stack elements vertically
+   */
+  .flex-mobile-col {
+    flex-direction: column;
+  }
+
+  .flex-mobile-center {
+    justify-content: center;
+    align-items: center;
+  }
+
+  /**
+   * Margin reduction for mobile
+   * Reduce between-section spacing
+   */
+  .mobile-mx-0 {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .mobile-my-sm {
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+}
+
+/* ============================================================================
+   TABLET LAYOUT - Medium Screens (640px - 1024px)
+   ============================================================================ */
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  /**
+   * Tablet utilities - adjusted proportions
+   * 2-column layouts where possible
+   * Balanced spacing
+   */
+
+  .hide-tablet {
+    display: none !important;
+  }
+
+  .tablet-full-width {
+    width: 100% !important;
+  }
+
+  .tablet-half-width {
+    width: 50%;
+  }
+
+  /**
+   * Grid for tablet - 2 columns by default
+   */
+  .grid-tablet-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-tablet-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /**
+   * Flexbox adjustments for tablet
+   * Can use flex-wrap better on tablet
+   */
+  .flex-tablet-wrap {
+    flex-wrap: wrap;
+  }
+
+  /**
+   * Spacing adjustments for tablet
+   * More breathing room than mobile, less than desktop
+   */
+  .tablet-gap-md {
+    gap: var(--space-md);
+  }
+
+  .tablet-p-lg {
+    padding: var(--space-lg);
+  }
+
+  /**
+   * Typography sizing for tablet
+   * Slightly larger than mobile
+   */
+  .text-lg {
+    font-size: var(--font-size-lg);
+  }
+
+  .text-xl {
+    font-size: var(--font-size-xl);
+  }
+
+  /**
+   * Sidebar handling for tablet
+   * Allow sidebar layouts on wider tablets
+   */
+  .tablet-sidebar {
+    display: flex;
+    gap: var(--space-lg);
+  }
+
+  .tablet-sidebar-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tablet-sidebar-aside {
+    width: 250px;
+    flex-shrink: 0;
+  }
+}
+
+/* ============================================================================
+   DESKTOP LAYOUT - Large Screens (> 1024px)
+   ============================================================================ */
+
+@media (min-width: 1024px) {
+  /**
+   * Desktop utilities - full layout capability
+   * Multi-column layouts
+   * Full feature visibility
+   */
+
+  .hide-desktop {
+    display: none !important;
+  }
+
+  /**
+   * Grid for desktop - 3+ columns
+   */
+  .grid-desktop-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-desktop-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /**
+   * Maximum widths on desktop
+   * Prevent content from stretching too wide
+   */
+  .max-w-screen {
+    max-width: 100%;
+  }
+
+  /**
+   * Full spacing on desktop
+   * Proper breathing room
+   */
+  .desktop-gap-lg {
+    gap: var(--space-lg);
+  }
+
+  .desktop-p-2xl {
+    padding: var(--space-2xl);
+  }
+}
+
+/* ============================================================================
+   WIDE SCREENS (> 1280px)
+   ============================================================================ */
+
+@media (min-width: 1280px) {
+  /**
+   * Wide screen optimizations
+   * Enhanced spacing
+   * Multi-panel layouts
+   */
+
+  .hide-wide {
+    display: none !important;
+  }
+
+  /**
+   * Grid for wide screens
+   */
+  .grid-wide-5 {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  /**
+   * Enhanced spacing on wide screens
+   */
+  .wide-gap-xl {
+    gap: var(--space-xl);
+  }
+
+  .wide-p-3xl {
+    padding: var(--space-3xl);
+  }
+}
+
+/* ============================================================================
+   ORIENTATION-SPECIFIC STYLES
+   ============================================================================ */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  /**
+   * Landscape on small height devices
+   * Reduce vertical space usage
+   */
+  .landscape-compact {
+    padding: var(--space-md) !important;
+  }
+
+  .landscape-hide {
+    display: none !important;
+  }
+}
+
+@media (orientation: portrait) {
+  /**
+   * Portrait-specific styles
+   * Full width layouts
+   */
+  .portrait-full-width {
+    width: 100% !important;
+  }
+}
+
+/* ============================================================================
+   HIGH DPI / RETINA DISPLAYS
+   ============================================================================ */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /**
+   * Sharper elements on high DPI screens
+   * Adjust border widths if needed
+   */
+  .retina-border {
+    border-width: 0.5px;
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT (if implemented later)
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  /**
+   * Placeholder for dark mode styles
+   * Can be extended with --dark-* CSS variables
+   */
+}
+
+/* ============================================================================
+   REDUCED MOTION (Accessibility)
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  /**
+   * Remove animations and transitions for users with motion sensitivity
+   */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================================
+   PRINTING STYLES
+   ============================================================================ */
+
+@media print {
+  /**
+   * Print-friendly styles
+   * Hide interactive elements
+   * Optimize for paper
+   */
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break-before {
+    page-break-before: always;
+  }
+
+  .print-break-after {
+    page-break-after: always;
+  }
+
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+/* ============================================================================
+   CONTAINER QUERIES (Modern browsers)
+   For responsive components independent of viewport
+   ============================================================================ */
+
+@supports (container-type: inline-size) {
+  /**
+   * Example: Component-level responsiveness
+   * Can be used in specific components
+   */
+
+  .container-responsive {
+    container-type: inline-size;
+  }
+
+  @container (max-width: 300px) {
+    .compact-layout {
+      flex-direction: column;
+    }
+  }
+
+  @container (min-width: 301px) {
+    .expanded-layout {
+      flex-direction: row;
+    }
+  }
+}
+
+/* ============================================================================
+   UTILITY HELPERS - BREAKPOINT SPECIFIC DISPLAY
+   ============================================================================ */
+
+/* Only show on mobile */
+.sm-only {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .sm-only {
+    display: block;
+  }
+}
+
+/* Only show on tablet */
+.md-only {
+  display: none;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .md-only {
+    display: block;
+  }
+}
+
+/* Only show on desktop and wider */
+.lg-only {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .lg-only {
+    display: block;
+  }
+}
+
+/* ============================================================================
+   UTILITY HELPERS - RESPONSIVE SIZING
+   ============================================================================ */
+
+@media (max-width: 639px) {
+  .responsive-text-lg {
+    font-size: var(--font-size-base);
+  }
+
+  .responsive-gap-lg {
+    gap: var(--space-md);
+  }
+
+  .responsive-p-lg {
+    padding: var(--space-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text-lg {
+    font-size: var(--font-size-lg);
+  }
+
+  .responsive-gap-lg {
+    gap: var(--space-lg);
+  }
+
+  .responsive-p-lg {
+    padding: var(--space-lg);
+  }
+}
