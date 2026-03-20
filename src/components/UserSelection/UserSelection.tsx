@@ -5,22 +5,16 @@ import "./UserSelection.css";
 type UserSelectionTypes = {
   setViewContext: React.Dispatch<React.SetStateAction<string>>;
   viewContext: string;
-  setLevel: React.Dispatch<React.SetStateAction<string>>;
   days: number;
   currentDay: number;
   setCurrentDay: React.Dispatch<React.SetStateAction<number>>;
-  mode: string;
-  level: string;
 };
 const UserSelection = ({
   setViewContext,
   viewContext,
-  setLevel,
   days,
   currentDay,
   setCurrentDay,
-  mode,
-  level,
 }: UserSelectionTypes) => {
   return (
     <div className="user-selection">

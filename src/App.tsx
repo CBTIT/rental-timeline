@@ -7,6 +7,7 @@ import CamerasAndControls from "./components/CamerasAndControls/CamerasAndContro
 import DataCharts from "./components/DataCharts/DataCharts";
 import BaseMap from "./components/BaseMap/BaseMap";
 import DataTable from "./components/DataTable/DataTable";
+import ModeSelection from "./components/ModeSelection/ModeSelection";
 import type { LeaseData } from "./types/lease";
 import {
   parseLeaseDate,
