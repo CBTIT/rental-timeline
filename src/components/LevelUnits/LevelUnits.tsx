@@ -1,5 +1,5 @@
 import { useLoader, type ThreeEvent } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useCallback } from "react";
 import { Rhino3dmLoader } from "three-stdlib";
 import * as THREE from "three";
 import type {} from "../../App";
@@ -51,21 +51,26 @@ const LevelUnits = ({
   //unit selection logic
   const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
   const maxPointerDelta = 6;
-  const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
+  
+  const onPointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
     pointerDownRef.current = { x: e.clientX, y: e.clientY };
     e.stopPropagation();
-  };
-  const onPointerUp = (e: ThreeEvent<PointerEvent>) => {
-    const down = pointerDownRef.current;
-    pointerDownRef.current = null;
-    if (!down) return;
-    const dx = e.clientX - down.x;
-    const dy = e.clientY - down.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist > maxPointerDelta) return;
-    const name = e.object.name;
-    setSelectedUnit(name);
-  };
+  }, []);
+  
+  const onPointerUp = useCallback(
+    (e: ThreeEvent<PointerEvent>) => {
+      const down = pointerDownRef.current;
+      pointerDownRef.current = null;
+      if (!down) return;
+      const dx = e.clientX - down.x;
+      const dy = e.clientY - down.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > maxPointerDelta) return;
+      const name = e.object.name;
+      setSelectedUnit(name);
+    },
+    [setSelectedUnit],
+  );
 
   //loading unit geometries
   const unitGeometry = useLoader(
