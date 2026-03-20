@@ -220,8 +220,6 @@ const LevelUnits = ({
     currentDate,
     selectedUnit,
     materials,
-    setLeasedUnits,
-    level,
     mode,
     viewContext,
     firstLeaseDate,
