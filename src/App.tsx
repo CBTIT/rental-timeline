@@ -34,7 +34,6 @@ function App() {
   const [currentDay, setCurrentDay] = useState<number>(-1);
   const [viewContext, setViewContext] = useState<string>("3D");
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
-  console.log(days);
   useEffect(() => {
     if (mode === "combined" && viewContext === "2D") {
       setSelectedUnit(null);

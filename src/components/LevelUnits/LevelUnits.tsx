@@ -148,11 +148,9 @@ const LevelUnits = ({
       if (o instanceof THREE.Mesh) {
         o.castShadow = true;
         o.receiveShadow = true;
-        o.material = materials.base;
         if (mode == "levels") {
           if (o.name.startsWith(level)) {
             o.visible = true;
-
             o.raycast = THREE.Mesh.prototype.raycast;
           } else {
             o.visible = false;
@@ -160,14 +158,13 @@ const LevelUnits = ({
           }
         } else if (mode == "combined") {
           o.visible = true;
-
           o.raycast = in2D
             ? (o.raycast = () => null)
             : THREE.Mesh.prototype.raycast;
         }
       }
     });
-  }, [unitGeometry, materials.base, level, mode, viewContext]);
+  }, [unitGeometry, level, mode, viewContext]);
   useEffect(() => {
     if (mode !== "combined") return;
 
@@ -225,6 +222,7 @@ const LevelUnits = ({
     firstLeaseDate,
     totalDays,
     bucketCount,
+    level,
   ]);
 
   return (

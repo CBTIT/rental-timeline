@@ -28,7 +28,6 @@ const HUD = ({
 }: HUDProps) => {
   const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
-  console.log(selectedRow);
   const selectedIsLeasedNow =
     !!selectedUnit && leasedUnits.includes(selectedUnit);
 
