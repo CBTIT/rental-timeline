@@ -1,5 +1,7 @@
 import type { LeaseData } from "../../types/lease";
 import { memo } from "react";
+import TimeSlider from "../TimeSlider/TimeSlider";
+import ViewContextButton from "../ViewContextButton/ViewContextButton";
 import "./HUD.css";
 
 type HUDProps = {
@@ -9,6 +11,7 @@ type HUDProps = {
   selectedUnit: string | null;
   mode: string;
   viewContext: string;
+  setViewContext: React.Dispatch<React.SetStateAction<string>>;
   setSelectedLeaseColor: React.Dispatch<React.SetStateAction<string>>;
   bucketCount: number;
   setBucketCount: React.Dispatch<React.SetStateAction<number>>;
@@ -17,6 +20,9 @@ type HUDProps = {
   setMode: React.Dispatch<React.SetStateAction<string>>;
   showData: boolean;
   setShowData: React.Dispatch<React.SetStateAction<boolean>>;
+  days: number;
+  currentDay: number;
+  setCurrentDay: React.Dispatch<React.SetStateAction<number>>;
 };
 const colors = ["#E23D3D", "#2BB673", "#1B5EAA"];
 
@@ -27,6 +33,7 @@ const HUD = ({
   selectedUnit,
   mode,
   viewContext,
+  setViewContext,
   setSelectedLeaseColor,
   bucketCount,
   setBucketCount,
@@ -35,6 +42,9 @@ const HUD = ({
   setMode,
   showData,
   setShowData,
+  days,
+  currentDay,
+  setCurrentDay,
 }: HUDProps) => {
   const inCombined2D = mode === "combined" && viewContext === "2D";
   const selectedRow = selectedUnit ? unitData[selectedUnit] : undefined;
@@ -186,6 +196,36 @@ const HUD = ({
           </button>
         )}
       </div>
+
+      {/* Time Slider and View Context */}
+      {mode !== "table" && (
+        <>
+          <div className="hud-view-selector">
+            <div className="hud-view-title">View</div>
+            <div className="hud-view-buttons">
+              <ViewContextButton
+                text={"2D"}
+                onClick={setViewContext}
+                isDisabled={viewContext === "2D"}
+              />
+              <ViewContextButton
+                text={"3D"}
+                onClick={setViewContext}
+                isDisabled={viewContext === "3D"}
+              />
+            </div>
+          </div>
+
+          <div className="hud-time-slider-container">
+            <div className="hud-time-label">Timeline</div>
+            <TimeSlider
+              days={days}
+              currentDay={currentDay}
+              setCurrentDay={setCurrentDay}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };

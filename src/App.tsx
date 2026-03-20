@@ -3,7 +3,6 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState } from "react";
 import LevelUnits from "./components/LevelUnits/LevelUnits";
 import HUD from "./components/HUD/HUD";
-import UserSelection from "./components/UserSelection/UserSelection";
 import CamerasAndControls from "./components/CamerasAndControls/CamerasAndControls";
 import DataCharts from "./components/DataCharts/DataCharts";
 import BaseMap from "./components/BaseMap/BaseMap";
@@ -134,6 +133,7 @@ function App() {
             selectedUnit={selectedUnit}
             mode={mode}
             viewContext={viewContext}
+            setViewContext={setViewContext}
             setSelectedLeaseColor={setSelectedLeaseColor}
             bucketCount={bucketCount}
             setBucketCount={setBucketCount}
@@ -142,18 +142,11 @@ function App() {
             setMode={setMode}
             showData={showData}
             setShowData={setShowData}
+            days={days}
+            currentDay={currentDay}
+            setCurrentDay={setCurrentDay}
           />
         )}
-        <UserSelection
-          setViewContext={setViewContext}
-          viewContext={viewContext}
-          setLevel={setLevel}
-          days={days}
-          currentDay={currentDay}
-          setCurrentDay={setCurrentDay}
-          mode={mode}
-          level={level}
-        />
         <DataCharts
           showData={showData}
           leasedUnits={leasedUnits}

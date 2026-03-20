@@ -12,8 +12,12 @@
   justify-content: center;
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
-  background-color: var(--color-bg-primary);
-  gap: 2px;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-primary) 0%,
+    var(--color-bg-secondary) 100%
+  );
+  gap: 4px;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
 }
@@ -21,6 +25,7 @@
 .ut-strip:hover {
   box-shadow: var(--shadow-lg);
   border-color: var(--color-accent);
+  transform: translateY(-2px);
 }
 
 .ut-row {
@@ -46,7 +51,7 @@
   margin-bottom: 0;
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
 }
 
 .ut-bar-wrap {
@@ -59,11 +64,16 @@
 
 .ut-bar {
   width: 100%;
-  background: var(--color-warning);
+  background: linear-gradient(
+    180deg,
+    var(--color-warning) 0%,
+    var(--color-warning-dark, rgba(240, 169, 28, 0.7)) 100%
+  );
   border-radius: var(--radius-sm);
   opacity: 0.85;
   transition: all var(--transition-fast);
   min-height: 1px;
+  box-shadow: var(--shadow-sm);
 }
 
 .ut-bar:hover {
@@ -78,11 +88,14 @@
   color: var(--color-text-secondary);
   text-align: center;
   word-break: break-word;
+  font-weight: var(--font-weight-medium);
 }
 
 .ut-title {
   color: var(--color-text-primary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   font-size: var(--font-size-xs);
   margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }

@@ -236,6 +236,46 @@
   border-color: var(--color-accent);
 }
 
+/* View Context Selector - 2D/3D integrated into HUD */
+.hud-view-selector {
+  border-top: var(--border-width) solid var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.hud-view-title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.hud-view-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-xs);
+}
+
+/* Time Slider - integrated into HUD */
+.hud-time-slider-container {
+  border-top: var(--border-width) solid var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.hud-time-label {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.hud-time-slider-container #time-slider {
+  width: 100%;
+  height: 32px;
+  cursor: pointer;
+}
+
 .value {
   font-weight: var(--font-weight-bold);
   color: var(--color-accent);
