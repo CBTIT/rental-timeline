@@ -6,7 +6,7 @@
 .psf-row {
   display: flex;
   justify-content: flex-start;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   align-items: flex-end;
   width: 100%;
   overflow-x: auto;
@@ -18,21 +18,21 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-xs);
-  min-width: 40px;
+  min-width: var(--space-xl);
   flex-shrink: 0;
 }
 
 .psf-bar-wrap {
   height: 80px;
-  width: 12px;
+  width: var(--space-md);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 2px;
+  gap: var(--space-xs);
 }
 
 .psf-bar {
-  width: 10px;
+  width: var(--space-md);
   display: block;
   background: var(--color-info);
   border-radius: var(--radius-sm);

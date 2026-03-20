@@ -55,7 +55,7 @@
 
 .fl-bar-wrap {
   height: 80px;
-  width: 16px;
+  width: var(--space-lg);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -67,7 +67,7 @@
   border-radius: var(--radius-sm);
   opacity: 0.85;
   transition: all var(--transition-fast);
-  min-height: 4px;
+  min-height: var(--space-xs);
 }
 
 .fl-bar:hover {

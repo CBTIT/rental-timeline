@@ -28,6 +28,7 @@
   border-color: var(--color-accent-dark);
   box-shadow: var(--shadow-sm);
   transform: scale(0.98);
+  transition: all var(--transition-fast);
 }
 
 .color-selection-group {
@@ -170,6 +171,8 @@
     max-width: calc(100% - var(--space-lg) * 2);
     padding: var(--space-md);
     font-size: var(--font-size-sm);
+    max-height: 50vh;
+    overflow-y: auto;
   }
 
   .date {
@@ -177,7 +180,17 @@
   }
 
   .leased-units {
-    height: 150px;
+    height: 160px;
+    max-height: 40vh;
+  }
+
+  .color-box {
+    width: var(--space-xl);
+    height: var(--space-xl);
+  }
+
+  .bucket-selection {
+    padding: var(--space-md);
   }
 }
 
@@ -186,7 +199,12 @@
   .HUD {
     right: var(--space-md);
     top: var(--space-md);
-    width: 250px;
+    width: 260px;
     padding: var(--space-md);
+    max-height: 70vh;
+  }
+
+  .leased-units {
+    height: 200px;
   }
 }

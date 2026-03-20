@@ -54,6 +54,19 @@ body,
     width: 100%;
     height: 100%;
   }
+
+  /* Reduce z-index stacking on mobile */
+  .control-panel {
+    z-index: var(--z-modal);
+  }
+}
+
+/* Tablet - adjust panel positioning */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .canvas-container {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 /* ============================================================================

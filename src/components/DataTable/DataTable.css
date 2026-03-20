@@ -50,9 +50,9 @@ thead th:first-child {
   left: 0;
   z-index: 20;
   background: var(--color-bg-secondary);
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
+  width: var(--space-4xl);
+  min-width: var(--space-4xl);
+  max-width: var(--space-4xl);
   border-right: var(--border-width) solid var(--color-border);
   box-shadow: var(--shadow-sm);
 }
@@ -62,11 +62,11 @@ tbody td:first-child {
   left: 0;
   z-index: 5;
   background: var(--color-bg-primary);
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
+  width: var(--space-4xl);
+  min-width: var(--space-4xl);
+  max-width: var(--space-4xl);
   border-right: var(--border-width) solid var(--color-border-light);
-  box-shadow: 2px 0 0 rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
 }
@@ -84,15 +84,58 @@ thead th[role="button"] {
 thead th[role="button"]:hover {
   background: var(--color-bg-tertiary);
   color: var(--color-accent);
+  transition: all var(--transition-normal);
+}
+
+tbody tr:hover {
+  background-color: var(--color-bg-secondary);
+  transition: background-color var(--transition-normal);
 }
 
 th.sortable {
   cursor: pointer;
   user-select: none;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
 }
 
 th.sortable:hover {
   background: var(--color-accent-light);
   color: var(--color-accent);
+  transition: all var(--transition-normal);
+}
+
+/* Responsive mobile */
+@media (max-width: 639px) {
+  .table-container {
+    margin: 100px var(--space-sm) var(--space-lg) var(--space-sm);
+    border-radius: var(--radius-md);
+    height: calc(100vh - 140px);
+    max-height: 50vh;
+  }
+
+  thead th,
+  tbody td {
+    padding: var(--space-sm);
+    font-size: var(--font-size-xs);
+  }
+
+  thead th:first-child,
+  tbody td:first-child {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+  }
+}
+
+/* Responsive tablet */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .table-container {
+    margin: 120px var(--space-md) var(--space-lg) var(--space-md);
+    height: calc(100vh - 140px);
+  }
+
+  thead th,
+  tbody td {
+    padding: var(--space-md);
+  }
 }

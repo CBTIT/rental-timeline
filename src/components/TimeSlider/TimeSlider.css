@@ -27,11 +27,11 @@
 #time-slider::-webkit-slider-thumb {
   appearance: none;
   -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: var(--radius-full);
   background-color: var(--color-accent);
-  border: 2px solid var(--color-bg-primary);
+  border: var(--border-width) solid var(--color-bg-primary);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
@@ -51,11 +51,11 @@
 
 /* Firefox - thumb styling */
 #time-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: var(--radius-full);
   background-color: var(--color-accent);
-  border: 2px solid var(--color-bg-primary);
+  border: var(--border-width) solid var(--color-bg-primary);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
@@ -76,7 +76,7 @@
 /* Track styling - Webkit */
 #time-slider::-webkit-slider-runnable-track {
   width: 100%;
-  height: 8px;
+  height: var(--space-sm);
   border-radius: var(--radius-full);
   background: var(--color-border);
   border: none;
@@ -91,7 +91,7 @@
 
 #time-slider::-moz-range-progress {
   background-color: var(--color-accent-light);
-  height: 8px;
+  height: var(--space-sm);
   border-radius: var(--radius-full);
 }
 
@@ -104,16 +104,24 @@
 /* Responsive adjustments */
 @media (max-width: 639px) {
   #time-slider {
-    height: 44px;
+    height: var(--space-4xl);
+    min-height: 44px;
   }
 
   #time-slider::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
+    width: calc(var(--space-md) + 4px);
+    height: calc(var(--space-md) + 4px);
   }
 
   #time-slider::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
+    width: calc(var(--space-md) + 4px);
+    height: calc(var(--space-md) + 4px);
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 640px) and (max-width: 1023px) {
+  #time-slider {
+    height: 36px;
   }
 }

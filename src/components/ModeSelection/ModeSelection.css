@@ -51,8 +51,9 @@
 }
 
 .mode-selection button:focus {
-  outline: 2px solid var(--color-accent);
+  outline: calc(var(--border-width) * 2) solid var(--color-accent);
   outline-offset: 2px;
+  transition: outline var(--transition-fast);
 }
 
 /* Responsive mobile */
@@ -61,15 +62,30 @@
     position: fixed;
     bottom: var(--space-lg);
     left: var(--space-lg);
-    right: auto;
+    right: var(--space-lg);
     top: auto;
     width: auto;
     gap: var(--space-sm);
+    background-color: var(--color-bg-primary);
+    z-index: var(--z-fixed);
   }
 
   .mode-selection button {
     padding: var(--space-md);
-    min-height: 44px;
+    min-height: var(--space-xl);
     min-width: 44px;
+    flex: 1;
+  }
+}
+
+/* Responsive tablet */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .mode-selection {
+    left: var(--space-md);
+    top: var(--space-md);
+  }
+
+  .mode-selection button {
+    padding: var(--space-md) var(--space-lg);
   }
 }
