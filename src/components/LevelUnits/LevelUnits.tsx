@@ -51,12 +51,12 @@ const LevelUnits = ({
   //unit selection logic
   const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
   const maxPointerDelta = 6;
-  
+
   const onPointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
     pointerDownRef.current = { x: e.clientX, y: e.clientY };
     e.stopPropagation();
   }, []);
-  
+
   const onPointerUp = useCallback(
     (e: ThreeEvent<PointerEvent>) => {
       const down = pointerDownRef.current;

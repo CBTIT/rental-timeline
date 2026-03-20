@@ -1,4 +1,5 @@
 import type { LeaseData } from "../../types/lease";
+import { memo } from "react";
 import "./HUD.css";
 
 type HUDProps = {
@@ -128,4 +129,4 @@ const HUD = ({
   );
 };
 
-export default HUD;
+export default memo(HUD);

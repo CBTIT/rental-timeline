@@ -1,6 +1,7 @@
 import TimeSlider from "../TimeSlider/TimeSlider";
 import LevelSelector from "../LevelSelector/LevelSelector";
 import ViewContextButton from "../ViewContextButton/ViewContextButton";
+import { memo } from "react";
 import "./UserSelection.css";
 type UserSelectionTypes = {
   setViewContext: React.Dispatch<React.SetStateAction<string>>;
@@ -47,4 +48,4 @@ const UserSelection = ({
   );
 };
 
-export default UserSelection;
+export default memo(UserSelection);

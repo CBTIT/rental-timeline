@@ -1,5 +1,6 @@
 import type {} from "../../App";
 import type { LeaseData } from "../../types/lease";
+import { memo } from "react";
 import "./DataCharts.css";
 import LeasedKPI from "./LeasedKPI";
 import SortedByFloorLeasePercent from "./SortedByFloorLeasePercent";
@@ -48,4 +49,4 @@ const DataCharts = ({
   );
 };
 
-export default DataCharts;
+export default memo(DataCharts);

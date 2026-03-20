@@ -47,7 +47,10 @@ export function daysBetween(a: Date, b: Date): number {
  * @param dayIndex - Number of days to add
  * @returns Date string in format "YYYY-MM-DD"
  */
-export function stringDateFromDayIndex(firstDate: Date, dayIndex: number): string {
+export function stringDateFromDayIndex(
+  firstDate: Date,
+  dayIndex: number,
+): string {
   const d = new Date(firstDate);
   d.setDate(d.getDate() + dayIndex);
   return d.toDateString();
