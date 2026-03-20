@@ -1,5 +1,119 @@
+/* ============================================================================
+   TIME SLIDER - Custom range input styling
+   Modern shadcn-style slider with design system colors
+   ============================================================================ */
+
 #time-slider {
   cursor: pointer;
   pointer-events: auto;
   width: 100%;
+  height: 40px;
+  accent-color: var(--color-accent);
+  appearance: none;
+  -webkit-appearance: none;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    to right,
+    var(--color-accent-light) 0%,
+    var(--color-accent-light) var(--value),
+    var(--color-border) var(--value),
+    var(--color-border) 100%
+  );
+  transition: all var(--transition-fast);
+}
+
+/* Webkit (Chrome, Safari, Edge) - thumb styling */
+#time-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  border: 2px solid var(--color-bg-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+}
+
+#time-slider::-webkit-slider-thumb:hover {
+  background-color: var(--color-accent-hover);
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.1);
+}
+
+#time-slider::-webkit-slider-thumb:active {
+  background-color: var(--color-accent-dark);
+  box-shadow: var(--shadow-md);
+  transform: scale(0.98);
+}
+
+/* Firefox - thumb styling */
+#time-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  border: 2px solid var(--color-bg-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+}
+
+#time-slider::-moz-range-thumb:hover {
+  background-color: var(--color-accent-hover);
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.1);
+}
+
+#time-slider::-moz-range-thumb:active {
+  background-color: var(--color-accent-dark);
+  box-shadow: var(--shadow-md);
+  transform: scale(0.98);
+}
+
+/* Track styling - Webkit */
+#time-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  border: none;
+}
+
+/* Track styling - Firefox */
+#time-slider::-moz-range-track {
+  background: var(--color-border);
+  border: none;
+  border-radius: var(--radius-full);
+}
+
+#time-slider::-moz-range-progress {
+  background-color: var(--color-accent-light);
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+/* Focus state */
+#time-slider:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 639px) {
+  #time-slider {
+    height: 44px;
+  }
+
+  #time-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+
+  #time-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
 }

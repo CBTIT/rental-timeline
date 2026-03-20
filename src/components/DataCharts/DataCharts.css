@@ -1,11 +1,51 @@
+/* ============================================================================
+   DATA CHARTS - Container for chart visualizations
+   Responsive positioning and modern styling
+   ============================================================================ */
+
 .data-charts {
   position: absolute;
-  left: 25px;
+  left: var(--space-lg);
   top: 100px;
-  width: 300px;
-  pointer-events: none;
+  width: 320px;
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-family: Arial, Helvetica, sans-serif;
+  gap: var(--space-md);
+  font-family: var(--font-family);
+  background-color: transparent;
+  z-index: var(--z-dropdown);
+}
+
+/* Responsive mobile - hide by default on small screens */
+@media (max-width: 639px) {
+  .data-charts {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    max-height: 50vh;
+    overflow-y: auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background-color: var(--color-bg-primary);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-lg);
+    gap: var(--space-lg);
+  }
+
+  .data-charts.visible {
+    display: flex;
+  }
+}
+
+/* Responsive tablet adjustments */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .data-charts {
+    left: var(--space-md);
+    width: 280px;
+    top: 80px;
+  }
 }

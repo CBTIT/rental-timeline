@@ -1,5 +1,59 @@
+/* ============================================================================
+   VIEW CONTEXT BUTTON - Toggle button for view context
+   Modern button styling with state management
+   ============================================================================ */
+
 .view-button {
-  padding: 10px;
+  padding: var(--space-md) var(--space-lg);
   cursor: pointer;
   pointer-events: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+  min-height: 40px;
+  min-width: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-button:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.view-button:active {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(0);
+}
+
+.view-button:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.view-button.active {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive mobile */
+@media (max-width: 639px) {
+  .view-button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: var(--space-md);
+  }
 }

@@ -1,54 +1,85 @@
+/* ============================================================================
+   SORTED BY FLOOR LEASE PERCENT - Bar chart visualization
+   Modernized with design system colors and spacing
+   ============================================================================ */
+
 .fl-strip {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--space-sm);
   align-items: center;
   justify-content: center;
-  padding: 8px 10px;
-  border: 3px solid brown;
-  background-color: white;
+  padding: var(--space-lg);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-primary);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.fl-strip:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
 }
 
 .fl-title {
-  color: brown;
-  font-weight: bold;
-  font-size: 16px;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--space-md);
 }
 
 .fl-row {
   display: flex;
   justify-content: space-between;
-  gap: 2px;
+  gap: var(--space-xs);
   align-items: flex-end;
+  width: 100%;
 }
 
 .fl-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 38px;
+  gap: var(--space-xs);
+  flex: 1;
+  min-width: 0;
 }
 
 .fl-count {
-  font-size: 12px;
-  margin-bottom: 6px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 .fl-bar-wrap {
-  height: 68px;
-  width: 14px;
+  height: 80px;
+  width: 16px;
   display: flex;
   align-items: flex-end;
+  justify-content: center;
 }
 
 .fl-bar {
   width: 100%;
-  background: #a26666;
-  border-radius: 2px;
-  opacity: 0.75;
+  background: var(--color-accent);
+  border-radius: var(--radius-sm);
+  opacity: 0.85;
+  transition: all var(--transition-fast);
+  min-height: 4px;
+}
+
+.fl-bar:hover {
+  opacity: 1;
+  box-shadow: var(--shadow-md);
+  filter: brightness(1.1);
 }
 
 .fl-label {
-  margin-top: 8px;
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  word-break: break-word;
 }
