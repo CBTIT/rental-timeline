@@ -195,7 +195,11 @@ function App() {
           }
           showDataToggle={false}
         />
-        <Canvas shadows dpr={[1, 2]} onPointerMissed={() => setSelectedUnit(null)}>
+        <Canvas
+          shadows
+          dpr={[1, 2]}
+          onPointerMissed={() => setSelectedUnit(null)}
+        >
           <Suspense fallback={null}>
             <LevelUnits
               level={level}
@@ -292,14 +296,16 @@ function App() {
             />
           </div>
         )}
-        {showFloorPlan && selectedUnit && leasedUnits.includes(selectedUnit) && (
-          <FloorPlanView
-            selectedUnit={selectedUnit}
-            unitData={unitData}
-            onClose={() => setShowFloorPlan(false)}
-            base={base}
-          />
-        )}
+        {showFloorPlan &&
+          selectedUnit &&
+          leasedUnits.includes(selectedUnit) && (
+            <FloorPlanView
+              selectedUnit={selectedUnit}
+              unitData={unitData}
+              onClose={() => setShowFloorPlan(false)}
+              base={base}
+            />
+          )}
       </div>
     );
   }

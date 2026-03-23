@@ -80,12 +80,18 @@ const FloorPlanView = ({
           <button
             type="button"
             className="floor-plan-overlay-close"
-            onClick={(e) => { e.stopPropagation(); setFullscreen(false); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setFullscreen(false);
+            }}
             aria-label="Close fullscreen floor plan"
           >
             ✕
           </button>
-          <div className="floor-plan-overlay-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="floor-plan-overlay-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={imageSrc}
               alt={`Floor plan for unit type ${unitType}`}
@@ -103,11 +109,17 @@ const FloorPlanView = ({
               </div>
               <div className="fp-detail-row">
                 <span className="fp-detail-label">Area</span>
-                <span className="fp-detail-value">{unitRow?.unitArea ? `${unitRow.unitArea.toLocaleString()} SF` : "—"}</span>
+                <span className="fp-detail-value">
+                  {unitRow?.unitArea
+                    ? `${unitRow.unitArea.toLocaleString()} SF`
+                    : "—"}
+                </span>
               </div>
               <div className="fp-detail-row">
                 <span className="fp-detail-label">Rent</span>
-                <span className="fp-detail-value fp-detail-accent">{unitRow?.rent ? `$${unitRow.rent.toLocaleString()}` : "—"}</span>
+                <span className="fp-detail-value fp-detail-accent">
+                  {unitRow?.rent ? `$${unitRow.rent.toLocaleString()}` : "—"}
+                </span>
               </div>
             </div>
           </div>
