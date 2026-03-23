@@ -17,6 +17,7 @@ import {
 } from "./utils/dateUtils";
 import { AppProvider } from "./contexts/AppProvider";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
+import FloorPlanView from "./components/FloorPlanView/FloorPlanView";
 
 const DEFAULT_LEASE_COLOR = "#14b8a6";
 
@@ -50,6 +51,7 @@ function App() {
   const [currentDay, setCurrentDay] = useState<number>(-1);
   const [viewContext, setViewContext] = useState<string>("3D");
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
+  const [showFloorPlan, setShowFloorPlan] = useState<boolean>(false);
   const [sunTime, setSunTime] = useState<number>(12);
   const [isLoading, setIsLoading] = useState(true);
   const [themeMode, setThemeMode] = useState<"light" | "dark">(() => {
@@ -111,6 +113,14 @@ function App() {
       setSelectedUnit(null);
     }
   }, [viewContext, mode]);
+
+  useEffect(() => {
+    if (selectedUnit !== null && leasedUnits.includes(selectedUnit)) {
+      setShowFloorPlan(true);
+    } else {
+      setShowFloorPlan(false);
+    }
+  }, [selectedUnit, leasedUnits]);
   useEffect(() => {
     fetch(base + "data/lease_data.json")
       .then((r) => r.json())
@@ -185,7 +195,7 @@ function App() {
           }
           showDataToggle={false}
         />
-        <Canvas shadows dpr={[1, 2]}>
+        <Canvas shadows dpr={[1, 2]} onPointerMissed={() => setSelectedUnit(null)}>
           <Suspense fallback={null}>
             <LevelUnits
               level={level}
@@ -281,6 +291,14 @@ function App() {
               className="sun-control-slider"
             />
           </div>
+        )}
+        {showFloorPlan && selectedUnit && leasedUnits.includes(selectedUnit) && (
+          <FloorPlanView
+            selectedUnit={selectedUnit}
+            unitData={unitData}
+            onClose={() => setShowFloorPlan(false)}
+            base={base}
+          />
         )}
       </div>
     );
