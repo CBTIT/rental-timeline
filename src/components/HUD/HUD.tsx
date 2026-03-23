@@ -1,7 +1,8 @@
 import type { LeaseData } from "../../types/lease";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import TimeSlider from "../TimeSlider/TimeSlider";
 import ViewContextButton from "../ViewContextButton/ViewContextButton";
+import { generateGradient } from "../../utils/colorGradient";
 import "./HUD.css";
 
 type HUDProps = {
@@ -55,6 +56,10 @@ const HUD = ({
   const isCustomColor =
     selectedLeaseColor !== defaultLeaseColor &&
     !presetColors.includes(selectedLeaseColor.toLowerCase());
+  const bucketColors = useMemo(
+    () => generateGradient(selectedLeaseColor, bucketCount),
+    [selectedLeaseColor, bucketCount],
+  );
 
   return (
     <div className="HUD">
@@ -225,7 +230,7 @@ const HUD = ({
 
           <div className="hud-bucket-selector">
             <div className="hud-bucket-title">
-              Gradient Buckets: <span>{bucketCount}</span>
+              Popularity Spread: <span>{bucketCount}</span>
             </div>
             <input
               type="range"
@@ -235,6 +240,31 @@ const HUD = ({
               onChange={(e) => setBucketCount(Number(e.target.value))}
               className="bucket-slider"
             />
+            <div className="hud-bucket-legend" aria-hidden="true">
+              <div className="hud-bucket-band">
+                {bucketColors.map((color, idx) => (
+                  <div
+                    key={`bucket-color-${idx}`}
+                    className="hud-bucket-band-segment"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+              <div className="hud-bucket-marks">
+                {bucketColors.map((_, idx) => (
+                  <div
+                    key={`bucket-mark-${idx}`}
+                    className="hud-bucket-mark-item"
+                  >
+                    <span className="hud-bucket-mark-dot" />
+                  </div>
+                ))}
+              </div>
+              <div className="hud-bucket-end-labels">
+                <span className="hud-bucket-end-label">High</span>
+                <span className="hud-bucket-end-label">Low</span>
+              </div>
+            </div>
           </div>
         </>
       )}

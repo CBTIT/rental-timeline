@@ -133,6 +133,65 @@
   accent-color: var(--color-accent);
 }
 
+.hud-bucket-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.hud-bucket-band {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: 100%;
+  height: 12px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-color: var(--color-bg-secondary);
+}
+
+.hud-bucket-band-segment {
+  width: 100%;
+  height: 100%;
+}
+
+.hud-bucket-marks {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: start;
+}
+
+.hud-bucket-mark-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-bucket-mark-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--color-border-light);
+}
+
+.hud-bucket-end-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.hud-bucket-end-label {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+}
+
 .HUD {
   position: absolute;
   right: var(--space-lg);

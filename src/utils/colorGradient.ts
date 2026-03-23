@@ -93,13 +93,13 @@ function rgbToHex(r: number, g: number, b: number): string {
  * Generate a gradient of colors from dark to light
  * @param baseHexColor - Base hex color (e.g., "#56ae57")
  * @param bucketCount - Number of gradient colors to generate (default: 5)
- * @param minLightness - Minimum lightness value (0-1, default: 0.3 for 30%)
+ * @param minLightness - Minimum lightness value (0-1, default: 0.2 for stronger contrast)
  * @returns Array of hex colors from dark to light
  */
 export function generateGradient(
   baseHexColor: string,
   bucketCount: number = 5,
-  minLightness: number = 0.3,
+  minLightness: number = 0.2,
 ): string[] {
   const rgb = hexToRgb(baseHexColor);
   if (!rgb) {
@@ -109,14 +109,24 @@ export function generateGradient(
 
   const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
 
-  // Generate lightness values from minLightness to 80%
-  const lightnesses = Array.from({ length: bucketCount }, (_, i) => {
-    const maxLight = 0.8;
-    return minLightness + (maxLight - minLightness) * (i / (bucketCount - 1));
+  const maxLight = 0.9;
+  const safeCount = Math.max(1, bucketCount);
+
+  // Non-linear spacing spreads middle buckets slightly for better visual separation.
+  const steps = Array.from({ length: safeCount }, (_, i) => {
+    if (safeCount === 1) return 0;
+    const t = i / (safeCount - 1);
+    return Math.pow(t, 0.82);
   });
 
-  return lightnesses.map((l) => {
-    const newRgb = hslToRgb(hsl.h, hsl.s, l);
+  const lightnesses = steps.map((t) => {
+    return minLightness + (maxLight - minLightness) * t;
+  });
+
+  return lightnesses.map((l, i) => {
+    const t = safeCount === 1 ? 0 : i / (safeCount - 1);
+    const saturation = Math.min(1, Math.max(0, hsl.s + 0.12 - t * 0.18));
+    const newRgb = hslToRgb(hsl.h, saturation, l);
     return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
   });
 }

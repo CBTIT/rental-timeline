@@ -19,13 +19,15 @@ const FloorPlanView = ({
   const [fullscreen, setFullscreen] = useState(false);
 
   const unitRow = selectedUnit ? unitData?.[selectedUnit] : null;
-  const unitType = unitRow?.unitType;
-  const imageSrc = unitType ? `${base}unit_plans/${unitType}.jpg` : null;
+  const unitNumber = selectedUnit?.trim() ?? null;
+  const imageSrc = unitNumber
+    ? `${base}unit_plans/${encodeURIComponent(unitNumber)}.jpg`
+    : null;
 
   useEffect(() => {
     setImageError(false);
     setFullscreen(false);
-  }, [unitType]);
+  }, [unitNumber]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -40,7 +42,7 @@ const FloorPlanView = ({
       <div className="floor-plan-view">
         <div className="floor-plan-header">
           <span className="floor-plan-title">
-            Floor Plan{unitType ? ` — ${unitType}` : ""}
+            Floor Plan{unitNumber ? ` — ${unitNumber}` : ""}
           </span>
           <button
             type="button"
@@ -55,7 +57,7 @@ const FloorPlanView = ({
           {imageSrc && !imageError ? (
             <img
               src={imageSrc}
-              alt={`Floor plan for unit type ${unitType}`}
+              alt={`Floor plan for unit ${unitNumber}`}
               className="floor-plan-image floor-plan-image-clickable"
               onClick={() => setFullscreen(true)}
               onError={() => setImageError(true)}
@@ -94,7 +96,7 @@ const FloorPlanView = ({
           >
             <img
               src={imageSrc}
-              alt={`Floor plan for unit type ${unitType}`}
+              alt={`Floor plan for unit ${unitNumber}`}
               className="floor-plan-overlay-image"
             />
             <div className="floor-plan-overlay-details">
