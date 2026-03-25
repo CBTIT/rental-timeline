@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import { generateGradient } from "../../utils/colorGradient";
+import {
+  type UnitTypeCategory,
+  UNIT_TYPE_ORDER,
+} from "../../types/coloring";
 
 export type UnitMaterialSet = {
   outline: THREE.LineBasicMaterial;
@@ -13,10 +17,14 @@ export type UnitMaterialSet = {
   combinedBase3D: THREE.MeshStandardMaterial;
   bucketMaterials: THREE.MeshStandardMaterial[];
   bucketOverlayMaterials: THREE.MeshStandardMaterial[];
+  unitTypeMaterials: Record<UnitTypeCategory, THREE.MeshStandardMaterial>;
+  unitTypeOverlayMaterials: Record<UnitTypeCategory, THREE.MeshStandardMaterial>;
 };
 
 export function createUnitMaterials(
   selectedLeaseColor: string,
+  unitTypeColors: Record<UnitTypeCategory, string>,
+  affordableColor: string,
   bucketCount: number = 5,
   minLightness: number = 0.3,
 ): UnitMaterialSet {
@@ -78,7 +86,7 @@ export function createUnitMaterials(
   });
 
   const affordable = new THREE.MeshStandardMaterial({
-    color: "#a7bed3",
+    color: affordableColor,
     depthWrite: true,
     depthTest: true,
   });
@@ -105,8 +113,34 @@ export function createUnitMaterials(
         transparent: true,
         opacity: 0.25,
         depthTest: true,
-        depthWrite: true,
+        depthWrite: false,
       }),
+  );
+
+  const unitTypeMaterials = UNIT_TYPE_ORDER.reduce(
+    (acc, category) => {
+      acc[category] = new THREE.MeshStandardMaterial({
+        color: unitTypeColors[category],
+        depthWrite: true,
+        depthTest: true,
+      });
+      return acc;
+    },
+    {} as Record<UnitTypeCategory, THREE.MeshStandardMaterial>,
+  );
+
+  const unitTypeOverlayMaterials = UNIT_TYPE_ORDER.reduce(
+    (acc, category) => {
+      acc[category] = new THREE.MeshStandardMaterial({
+        color: unitTypeColors[category],
+        transparent: true,
+        opacity: 0.25,
+        depthTest: true,
+        depthWrite: false,
+      });
+      return acc;
+    },
+    {} as Record<UnitTypeCategory, THREE.MeshStandardMaterial>,
   );
 
   return {
@@ -121,6 +155,8 @@ export function createUnitMaterials(
     combinedBase3D,
     bucketMaterials,
     bucketOverlayMaterials,
+    unitTypeMaterials,
+    unitTypeOverlayMaterials,
   };
 }
 
@@ -133,6 +169,9 @@ export function disposeUnitMaterials(materials: UnitMaterialSet) {
   materials.overlayBase.dispose();
   materials.overlayLeased.dispose();
   materials.affordable.dispose();
+  materials.combinedBase3D.dispose();
   materials.bucketMaterials.forEach((m) => m.dispose());
   materials.bucketOverlayMaterials.forEach((m) => m.dispose());
+  Object.values(materials.unitTypeMaterials).forEach((m) => m.dispose());
+  Object.values(materials.unitTypeOverlayMaterials).forEach((m) => m.dispose());
 }

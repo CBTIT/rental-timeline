@@ -1,16 +1,21 @@
 import { useMemo } from "react";
 import "./SortedByUnitTypePercent.css";
 import type { LeaseData } from "../../types/lease";
+import type { UnitTypeLegendCategory } from "../../types/coloring";
+import { classifyUnitTypeCategory } from "../../utils/unitTypeCategory";
 
 type Props = {
   unitData: LeaseData | null;
   leasedUnits: string[]; // leased at currentDate
   mode: string; // "levels" | "combined"
   level: string; // selected level (only used when mode="levels")
+  selectedUnitTypeFilter: UnitTypeLegendCategory | null;
+  setSelectedUnitTypeFilter: React.Dispatch<
+    React.SetStateAction<UnitTypeLegendCategory | null>
+  >;
 };
 
-type UnitBucket = "Studio" | "1B" | "2B" | "3B";
-const ORDER: UnitBucket[] = ["Studio", "1B", "2B", "3B"];
+const ORDER: UnitTypeLegendCategory[] = ["Studio", "1B", "2B", "3B"];
 
 function levelFromUnitId(unitId: string): string {
   const t = String(unitId).trim();
@@ -18,33 +23,13 @@ function levelFromUnitId(unitId: string): string {
   return m ? m[1] : "unknown";
 }
 
-function bucketFromRow(row: {
-  unitType?: string;
-  description?: string;
-}): UnitBucket | null {
-  const desc = (row.description ?? "").toLowerCase();
-
-  // description-based
-  if (desc.includes("studio")) return "Studio";
-  if (desc.includes("3") && desc.includes("bed")) return "3B";
-  if (desc.includes("2") && desc.includes("bed")) return "2B";
-  if (desc.includes("1") && desc.includes("bed")) return "1B";
-
-  // fallback: unitType prefix (based on your dataset)
-  const ut = (row.unitType ?? "").trim().toUpperCase();
-  if (ut.startsWith("S")) return "Studio";
-  if (ut.startsWith("A")) return "1B";
-  if (ut.startsWith("B")) return "2B";
-  if (ut.startsWith("C")) return "3B";
-
-  return null;
-}
-
 export default function SortedByUnitTypePercent({
   unitData,
   leasedUnits,
   mode,
   level,
+  selectedUnitTypeFilter,
+  setSelectedUnitTypeFilter,
 }: Props) {
   // ✅ STATIC denominator: total units in dataset for that context
   const denomStatic = useMemo(() => {
@@ -63,7 +48,7 @@ export default function SortedByUnitTypePercent({
   }, [unitData, mode, level]);
 
   const { buckets, maxPct } = useMemo(() => {
-    const counts: Record<UnitBucket, number> = {
+    const counts: Record<UnitTypeLegendCategory, number> = {
       Studio: 0,
       "1B": 0,
       "2B": 0,
@@ -84,8 +69,8 @@ export default function SortedByUnitTypePercent({
         if (levelFromUnitId(unitId) !== level) continue;
       }
 
-      const b = bucketFromRow(row);
-      if (!b) continue;
+      const b = classifyUnitTypeCategory(row);
+      if (b === "Unknown") continue;
 
       counts[b] += 1;
     }
@@ -114,7 +99,16 @@ export default function SortedByUnitTypePercent({
           const pxClamped = b.count > 0 ? Math.max(6, px) : 0;
 
           return (
-            <div key={b.k} className="ut-col">
+            <button
+              key={b.k}
+              type="button"
+              className={`ut-col ${selectedUnitTypeFilter === b.k ? "active" : ""}`}
+              onClick={() =>
+                setSelectedUnitTypeFilter((prev) => (prev === b.k ? null : b.k))
+              }
+              aria-pressed={selectedUnitTypeFilter === b.k}
+              title={`Filter leased units by ${b.k}`}
+            >
               <div className="ut-count">{labelPct}</div>
 
               <div className="ut-bar-wrap">
@@ -122,7 +116,7 @@ export default function SortedByUnitTypePercent({
               </div>
 
               <div className="ut-label">{b.k}</div>
-            </div>
+            </button>
           );
         })}
       </div>

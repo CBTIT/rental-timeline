@@ -6,6 +6,11 @@ import type {} from "../../App";
 import type { LeaseData } from "../../types/lease";
 import { createUnitMaterials, disposeUnitMaterials } from "./materials";
 import { getUnitMaterial, getUnitVisualState } from "./leaseUtils";
+import type {
+  ColorMode,
+  UnitTypeCategory,
+  UnitTypeLegendCategory,
+} from "../../types/coloring";
 
 type LevelUnitsProp = {
   level: string;
@@ -17,6 +22,10 @@ type LevelUnitsProp = {
   mode: string;
   viewContext: string;
   selectedLeasedColor: string;
+  colorMode: ColorMode;
+  unitTypeColors: Record<UnitTypeCategory, string>;
+  affordableColor: string;
+  unitTypeFilter: UnitTypeLegendCategory | null;
   firstLeaseDate: Date | null;
   totalDays: number;
   bucketCount: number;
@@ -32,14 +41,24 @@ const LevelUnits = ({
   mode,
   viewContext,
   selectedLeasedColor,
+  colorMode,
+  unitTypeColors,
+  affordableColor,
+  unitTypeFilter,
   firstLeaseDate,
   totalDays,
   bucketCount,
 }: LevelUnitsProp) => {
   //getting material set and disposing older material
   const materials = useMemo(
-    () => createUnitMaterials(selectedLeasedColor, bucketCount),
-    [selectedLeasedColor, bucketCount],
+    () =>
+      createUnitMaterials(
+        selectedLeasedColor,
+        unitTypeColors,
+        affordableColor,
+        bucketCount,
+      ),
+    [selectedLeasedColor, unitTypeColors, affordableColor, bucketCount],
   );
   useEffect(() => {
     return () => disposeUnitMaterials(materials);
@@ -185,7 +204,7 @@ const LevelUnits = ({
       if (!o.visible) return;
 
       const unitId = o.name;
-      const { isLeased, isSelected, isAffordable, bucketIndex } =
+      const { isLeased, isSelected, isAffordable, bucketIndex, unitTypeCategory } =
         getUnitVisualState({
           unitId,
           leaseData,
@@ -198,13 +217,19 @@ const LevelUnits = ({
 
       if (isLeased) next.add(unitId);
 
+      const matchesTypeFilter =
+        !unitTypeFilter || unitTypeCategory === unitTypeFilter;
+      const isLeasedInFilteredView = isLeased && matchesTypeFilter;
+
       o.material = getUnitMaterial({
         mode,
         viewContext,
+        colorMode,
         isSelected,
-        isLeased,
-        isAffordable,
+        isLeased: isLeasedInFilteredView,
+        isAffordable: isAffordable && isLeasedInFilteredView,
         bucketIndex,
+        unitTypeCategory,
         materials,
       });
     });
@@ -218,6 +243,8 @@ const LevelUnits = ({
     materials,
     mode,
     viewContext,
+    colorMode,
+    unitTypeFilter,
     firstLeaseDate,
     totalDays,
     bucketCount,
