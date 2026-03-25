@@ -18,6 +18,13 @@ import {
 import { AppProvider } from "./contexts/AppProvider";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import FloorPlanView from "./components/FloorPlanView/FloorPlanView";
+import {
+  DEFAULT_AFFORDABLE_COLOR,
+  DEFAULT_UNIT_TYPE_COLORS,
+  type ColorMode,
+  type UnitTypeCategory,
+  type UnitTypeLegendCategory,
+} from "./types/coloring";
 
 const DEFAULT_LEASE_COLOR = "#14b8a6";
 
@@ -38,6 +45,15 @@ function App() {
   const base = import.meta.env.BASE_URL;
   const [selectedLeaseColor, setSelectedLeaseColor] =
     useState<string>(DEFAULT_LEASE_COLOR);
+  const [colorMode, setColorMode] = useState<ColorMode>("lease-date");
+  const [unitTypeColors, setUnitTypeColors] = useState<
+    Record<UnitTypeCategory, string>
+  >(() => ({ ...DEFAULT_UNIT_TYPE_COLORS }));
+  const [affordableColor, setAffordableColor] = useState<string>(
+    DEFAULT_AFFORDABLE_COLOR,
+  );
+  const [selectedUnitTypeFilter, setSelectedUnitTypeFilter] =
+    useState<UnitTypeLegendCategory | null>(null);
   const [bucketCount, setBucketCount] = useState<number>(5);
   const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
@@ -211,6 +227,10 @@ function App() {
               mode={mode}
               viewContext={viewContext}
               selectedLeasedColor={selectedLeaseColor}
+              colorMode={colorMode}
+              unitTypeColors={unitTypeColors}
+              affordableColor={affordableColor}
+              unitTypeFilter={selectedUnitTypeFilter}
               firstLeaseDate={firstLease}
               totalDays={days}
               bucketCount={bucketCount}
@@ -259,6 +279,12 @@ function App() {
             selectedLeaseColor={selectedLeaseColor}
             defaultLeaseColor={DEFAULT_LEASE_COLOR}
             setSelectedLeaseColor={setSelectedLeaseColor}
+            colorMode={colorMode}
+            setColorMode={setColorMode}
+            unitTypeColors={unitTypeColors}
+            setUnitTypeColors={setUnitTypeColors}
+            affordableColor={affordableColor}
+            setAffordableColor={setAffordableColor}
             bucketCount={bucketCount}
             setBucketCount={setBucketCount}
             level={level}
@@ -276,6 +302,8 @@ function App() {
           mode={mode}
           unitData={unitData}
           level={level}
+          selectedUnitTypeFilter={selectedUnitTypeFilter}
+          setSelectedUnitTypeFilter={setSelectedUnitTypeFilter}
         />
         <div className="lease-visualizer-header">
           <div className="lease-visualizer-title">Lease Visualizer</div>

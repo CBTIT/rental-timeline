@@ -3,6 +3,7 @@ import { memo, useMemo } from "react";
 import TimeSlider from "../TimeSlider/TimeSlider";
 import ViewContextButton from "../ViewContextButton/ViewContextButton";
 import { generateGradient } from "../../utils/colorGradient";
+import { type ColorMode, type UnitTypeCategory } from "../../types/coloring";
 import "./HUD.css";
 
 type HUDProps = {
@@ -16,6 +17,14 @@ type HUDProps = {
   selectedLeaseColor: string;
   defaultLeaseColor: string;
   setSelectedLeaseColor: React.Dispatch<React.SetStateAction<string>>;
+  colorMode: ColorMode;
+  setColorMode: React.Dispatch<React.SetStateAction<ColorMode>>;
+  unitTypeColors: Record<UnitTypeCategory, string>;
+  setUnitTypeColors: React.Dispatch<
+    React.SetStateAction<Record<UnitTypeCategory, string>>
+  >;
+  affordableColor: string;
+  setAffordableColor: React.Dispatch<React.SetStateAction<string>>;
   bucketCount: number;
   setBucketCount: React.Dispatch<React.SetStateAction<number>>;
   level: string;
@@ -27,6 +36,18 @@ type HUDProps = {
   setCurrentDay: React.Dispatch<React.SetStateAction<number>>;
 };
 const presetColors = ["#6366f1", "#0ea5e9", "#f97316", "#ec4899"];
+const unitTypeLabels: Record<Exclude<UnitTypeCategory, "Unknown">, string> = {
+  Studio: "Studio",
+  "1B": "1 Bed",
+  "2B": "2 Bed",
+  "3B": "3 Bed",
+};
+const HUD_UNIT_TYPE_ORDER: Exclude<UnitTypeCategory, "Unknown">[] = [
+  "Studio",
+  "1B",
+  "2B",
+  "3B",
+];
 
 const HUD = ({
   date,
@@ -39,6 +60,12 @@ const HUD = ({
   selectedLeaseColor,
   defaultLeaseColor,
   setSelectedLeaseColor,
+  colorMode,
+  setColorMode,
+  unitTypeColors,
+  setUnitTypeColors,
+  affordableColor,
+  setAffordableColor,
   bucketCount,
   setBucketCount,
   level,
@@ -61,50 +88,106 @@ const HUD = ({
     [selectedLeaseColor, bucketCount],
   );
 
+  const setUnitTypeColor = (category: UnitTypeCategory, color: string) => {
+    setUnitTypeColors((prev) => ({ ...prev, [category]: color }));
+  };
+
   return (
     <div className="HUD">
       <div className="date">{date}</div>
       <div className="color-selection">
-        <div className="color-selection-title">Select a Unit Display Color</div>
-        <div className="color-selection-group">
-          {presetColors.map((color) => {
-            return (
-              <button
-                type="button"
-                className={`color-box ${selectedLeaseColor.toLowerCase() === color.toLowerCase() ? "active" : ""}`}
-                key={color}
-                style={{ backgroundColor: color }}
-                onClick={() => setSelectedLeaseColor(color)}
-                aria-label={`Select color ${color}`}
-                title={`Select color ${color}`}
-              />
-            );
-          })}
-
+        <div className="color-selection-title">Color Mode</div>
+        <div className="hud-color-mode-toggle">
           <button
             type="button"
-            className={`color-box color-default-option ${selectedLeaseColor.toLowerCase() === defaultLeaseColor.toLowerCase() ? "active" : ""}`}
-            style={{ backgroundColor: defaultLeaseColor }}
-            onClick={() => setSelectedLeaseColor(defaultLeaseColor)}
-            aria-label="Reset to default lease color"
-            title="Reset to default lease color"
+            className={`hud-color-mode-btn ${colorMode === "lease-date" ? "active" : ""}`}
+            onClick={() => setColorMode("lease-date")}
           >
-            D
+            Lease Date
           </button>
-
-          <label
-            className={`color-wheel ${isCustomColor ? "active" : ""}`}
-            title="Pick custom lease color"
+          <button
+            type="button"
+            className={`hud-color-mode-btn ${colorMode === "unit-type" ? "active" : ""}`}
+            onClick={() => setColorMode("unit-type")}
           >
-            <span className="color-wheel-text">Custom</span>
-            <input
-              type="color"
-              value={selectedLeaseColor}
-              onChange={(e) => setSelectedLeaseColor(e.target.value)}
-              aria-label="Choose custom lease color"
-            />
-          </label>
+            Unit Type
+          </button>
         </div>
+
+        {colorMode === "lease-date" && (
+          <>
+            <div className="color-selection-title">
+              Select a Unit Display Color
+            </div>
+            <div className="color-selection-group">
+              {presetColors.map((color) => {
+                return (
+                  <button
+                    type="button"
+                    className={`color-box ${selectedLeaseColor.toLowerCase() === color.toLowerCase() ? "active" : ""}`}
+                    key={color}
+                    style={{ backgroundColor: color }}
+                    onClick={() => setSelectedLeaseColor(color)}
+                    aria-label={`Select color ${color}`}
+                    title={`Select color ${color}`}
+                  />
+                );
+              })}
+
+              <button
+                type="button"
+                className={`color-box color-default-option ${selectedLeaseColor.toLowerCase() === defaultLeaseColor.toLowerCase() ? "active" : ""}`}
+                style={{ backgroundColor: defaultLeaseColor }}
+                onClick={() => setSelectedLeaseColor(defaultLeaseColor)}
+                aria-label="Reset to default lease color"
+                title="Reset to default lease color"
+              >
+                D
+              </button>
+
+              <label
+                className={`color-wheel ${isCustomColor ? "active" : ""}`}
+                title="Pick custom lease color"
+              >
+                <span className="color-wheel-text">Custom</span>
+                <input
+                  type="color"
+                  value={selectedLeaseColor}
+                  onChange={(e) => setSelectedLeaseColor(e.target.value)}
+                  aria-label="Choose custom lease color"
+                />
+              </label>
+            </div>
+          </>
+        )}
+
+        {colorMode === "unit-type" && (
+          <div className="unit-type-color-list">
+            {HUD_UNIT_TYPE_ORDER.map((category) => (
+              <label className="unit-type-color-item" key={category}>
+                <span className="unit-type-color-label">
+                  {unitTypeLabels[category]}
+                </span>
+                <input
+                  type="color"
+                  value={unitTypeColors[category]}
+                  onChange={(e) => setUnitTypeColor(category, e.target.value)}
+                  aria-label={`Select ${unitTypeLabels[category]} color`}
+                />
+              </label>
+            ))}
+
+            <label className="unit-type-color-item" key="affordable">
+              <span className="unit-type-color-label">Affordable</span>
+              <input
+                type="color"
+                value={affordableColor}
+                onChange={(e) => setAffordableColor(e.target.value)}
+                aria-label="Select Affordable color"
+              />
+            </label>
+          </div>
+        )}
       </div>
 
       {/* Time Slider - moved to top */}
@@ -228,44 +311,46 @@ const HUD = ({
             </div>
           </div>
 
-          <div className="hud-bucket-selector">
-            <div className="hud-bucket-title">
-              Popularity Spread: <span>{bucketCount}</span>
+          {colorMode === "lease-date" && (
+            <div className="hud-bucket-selector">
+              <div className="hud-bucket-title">
+                Popularity Spread: <span>{bucketCount}</span>
+              </div>
+              <input
+                type="range"
+                min="3"
+                max="7"
+                value={bucketCount}
+                onChange={(e) => setBucketCount(Number(e.target.value))}
+                className="bucket-slider"
+              />
+              <div className="hud-bucket-legend" aria-hidden="true">
+                <div className="hud-bucket-band">
+                  {bucketColors.map((color, idx) => (
+                    <div
+                      key={`bucket-color-${idx}`}
+                      className="hud-bucket-band-segment"
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+                <div className="hud-bucket-marks">
+                  {bucketColors.map((_, idx) => (
+                    <div
+                      key={`bucket-mark-${idx}`}
+                      className="hud-bucket-mark-item"
+                    >
+                      <span className="hud-bucket-mark-dot" />
+                    </div>
+                  ))}
+                </div>
+                <div className="hud-bucket-end-labels">
+                  <span className="hud-bucket-end-label">High</span>
+                  <span className="hud-bucket-end-label">Low</span>
+                </div>
+              </div>
             </div>
-            <input
-              type="range"
-              min="3"
-              max="7"
-              value={bucketCount}
-              onChange={(e) => setBucketCount(Number(e.target.value))}
-              className="bucket-slider"
-            />
-            <div className="hud-bucket-legend" aria-hidden="true">
-              <div className="hud-bucket-band">
-                {bucketColors.map((color, idx) => (
-                  <div
-                    key={`bucket-color-${idx}`}
-                    className="hud-bucket-band-segment"
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-              <div className="hud-bucket-marks">
-                {bucketColors.map((_, idx) => (
-                  <div
-                    key={`bucket-mark-${idx}`}
-                    className="hud-bucket-mark-item"
-                  >
-                    <span className="hud-bucket-mark-dot" />
-                  </div>
-                ))}
-              </div>
-              <div className="hud-bucket-end-labels">
-                <span className="hud-bucket-end-label">High</span>
-                <span className="hud-bucket-end-label">Low</span>
-              </div>
-            </div>
-          </div>
+          )}
         </>
       )}
     </div>

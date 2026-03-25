@@ -1,6 +1,7 @@
 import type {} from "../../App";
 import type { LeaseData } from "../../types/lease";
 import { memo } from "react";
+import type { UnitTypeLegendCategory } from "../../types/coloring";
 import "./DataCharts.css";
 import LeasedKPI from "./LeasedKPI";
 import SortedByFloorLeasePercent from "./SortedByFloorLeasePercent";
@@ -13,6 +14,10 @@ type DataChartsType = {
   unitData: LeaseData | null;
   level: string;
   showData: boolean;
+  selectedUnitTypeFilter: UnitTypeLegendCategory | null;
+  setSelectedUnitTypeFilter: React.Dispatch<
+    React.SetStateAction<UnitTypeLegendCategory | null>
+  >;
 };
 
 const DataCharts = ({
@@ -21,6 +26,8 @@ const DataCharts = ({
   unitData,
   level,
   showData,
+  selectedUnitTypeFilter,
+  setSelectedUnitTypeFilter,
 }: DataChartsType) => {
   return (
     showData && (
@@ -37,6 +44,8 @@ const DataCharts = ({
           leasedUnits={leasedUnits}
           mode={mode}
           level={level}
+          selectedUnitTypeFilter={selectedUnitTypeFilter}
+          setSelectedUnitTypeFilter={setSelectedUnitTypeFilter}
         />
         {mode === "combined" && (
           <SortedByFloorLeasePercent

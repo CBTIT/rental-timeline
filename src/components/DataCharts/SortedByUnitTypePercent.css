@@ -38,6 +38,12 @@
 }
 
 .ut-col {
+  appearance: none;
+  border: var(--border-width) solid transparent;
+  background: transparent;
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -45,6 +51,17 @@
   gap: var(--space-xs);
   flex: 0 0 auto;
   min-width: var(--space-lg);
+  transition: all var(--transition-fast);
+}
+
+.ut-col:hover {
+  border-color: var(--color-accent);
+  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+}
+
+.ut-col.active {
+  border-color: var(--color-accent);
+  background-color: color-mix(in oklab, var(--color-accent) 16%, transparent);
 }
 
 .ut-count {
@@ -82,6 +99,12 @@
   opacity: 1;
   box-shadow: var(--shadow-md);
   filter: brightness(1.1);
+}
+
+.ut-col.active .ut-bar {
+  opacity: 1;
+  box-shadow: var(--shadow-md);
+  filter: brightness(1.08);
 }
 
 .ut-label {

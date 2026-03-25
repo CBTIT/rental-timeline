@@ -2,14 +2,18 @@ import type { LeaseData } from "../../types/lease";
 import type { UnitMaterialSet } from "./materials";
 import { getBucketIndex } from "../../utils/leaseBuckets";
 import { parseLeaseDate } from "../../utils/dateUtils";
+import type { ColorMode, UnitTypeCategory } from "../../types/coloring";
+import { classifyUnitTypeCategory } from "../../utils/unitTypeCategory";
 
 type GetUnitMaterialProps = {
   mode: string;
   viewContext: string;
+  colorMode: ColorMode;
   isSelected: boolean;
   isLeased: boolean;
   isAffordable: boolean;
   bucketIndex: number;
+  unitTypeCategory: UnitTypeCategory | null;
   materials: UnitMaterialSet;
 };
 type GetUnitVisualStateProps = {
@@ -28,39 +32,55 @@ type UnitVisualState = {
   isSelected: boolean;
   isAffordable: boolean;
   bucketIndex: number;
+  unitTypeCategory: UnitTypeCategory | null;
 };
 
 export function getUnitMaterial({
   mode,
   viewContext,
+  colorMode,
   isSelected,
   isLeased,
   isAffordable,
   bucketIndex,
+  unitTypeCategory,
   materials,
 }: GetUnitMaterialProps) {
   const inCombined = mode === "combined";
   const in2DCombined = inCombined && viewContext === "2D";
   const in3DCombined = inCombined && viewContext === "3D";
 
+  const leasedMaterial3D =
+    colorMode === "unit-type" && unitTypeCategory
+      ? materials.unitTypeMaterials[unitTypeCategory]
+      : bucketIndex >= 0
+        ? materials.bucketMaterials[bucketIndex]
+        : null;
+
+  const leasedMaterial2D =
+    colorMode === "unit-type" && unitTypeCategory
+      ? materials.unitTypeOverlayMaterials[unitTypeCategory]
+      : bucketIndex >= 0
+        ? materials.bucketOverlayMaterials[bucketIndex]
+        : null;
+
   if (in2DCombined) {
     if (isSelected) return materials.selected;
-    if (isLeased && bucketIndex >= 0)
-      return materials.bucketOverlayMaterials[bucketIndex];
+    if (isAffordable) return materials.affordable;
+    if (isLeased && leasedMaterial2D) return leasedMaterial2D;
     return materials.combinedBase3D;
   }
 
   if (in3DCombined) {
     if (isSelected) return materials.selected;
-    if (isLeased && bucketIndex >= 0)
-      return materials.bucketMaterials[bucketIndex];
+    if (isAffordable) return materials.affordable;
+    if (isLeased && leasedMaterial3D) return leasedMaterial3D;
     return materials.combinedBase3D;
   }
 
   if (isSelected) return materials.selected;
-  if (isLeased && bucketIndex >= 0)
-    return materials.bucketMaterials[bucketIndex];
   if (isAffordable) return materials.affordable;
+  if (isLeased && leasedMaterial3D) return leasedMaterial3D;
   return materials.base;
 }
 export function getUnitVisualState({
@@ -78,6 +98,7 @@ export function getUnitVisualState({
   const isLeased = !!(start && start <= currentDate);
   const isSelected = selectedUnit === unitId;
   const isAffordable = !!row?.affordable;
+  const unitTypeCategory = row ? classifyUnitTypeCategory(row) : null;
 
   let bucketIndex = -1;
   if (isLeased && start && firstLeaseDate) {
@@ -91,5 +112,6 @@ export function getUnitVisualState({
     isSelected,
     isAffordable,
     bucketIndex,
+    unitTypeCategory,
   };
 }
