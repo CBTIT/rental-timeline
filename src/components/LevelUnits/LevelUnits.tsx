@@ -204,16 +204,21 @@ const LevelUnits = ({
       if (!o.visible) return;
 
       const unitId = o.name;
-      const { isLeased, isSelected, isAffordable, bucketIndex, unitTypeCategory } =
-        getUnitVisualState({
-          unitId,
-          leaseData,
-          currentDate,
-          selectedUnit,
-          firstLeaseDate,
-          totalDays,
-          bucketCount,
-        });
+      const {
+        isLeased,
+        isSelected,
+        isAffordable,
+        bucketIndex,
+        unitTypeCategory,
+      } = getUnitVisualState({
+        unitId,
+        leaseData,
+        currentDate,
+        selectedUnit,
+        firstLeaseDate,
+        totalDays,
+        bucketCount,
+      });
 
       if (isLeased) next.add(unitId);
 

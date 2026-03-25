@@ -49,8 +49,9 @@ function App() {
   const [unitTypeColors, setUnitTypeColors] = useState<
     Record<UnitTypeCategory, string>
   >(() => ({ ...DEFAULT_UNIT_TYPE_COLORS }));
-  const [affordableColor, setAffordableColor] =
-    useState<string>(DEFAULT_AFFORDABLE_COLOR);
+  const [affordableColor, setAffordableColor] = useState<string>(
+    DEFAULT_AFFORDABLE_COLOR,
+  );
   const [selectedUnitTypeFilter, setSelectedUnitTypeFilter] =
     useState<UnitTypeLegendCategory | null>(null);
   const [bucketCount, setBucketCount] = useState<number>(5);

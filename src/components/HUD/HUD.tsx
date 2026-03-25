@@ -116,7 +116,9 @@ const HUD = ({
 
         {colorMode === "lease-date" && (
           <>
-            <div className="color-selection-title">Select a Unit Display Color</div>
+            <div className="color-selection-title">
+              Select a Unit Display Color
+            </div>
             <div className="color-selection-group">
               {presetColors.map((color) => {
                 return (
@@ -163,7 +165,9 @@ const HUD = ({
           <div className="unit-type-color-list">
             {HUD_UNIT_TYPE_ORDER.map((category) => (
               <label className="unit-type-color-item" key={category}>
-                <span className="unit-type-color-label">{unitTypeLabels[category]}</span>
+                <span className="unit-type-color-label">
+                  {unitTypeLabels[category]}
+                </span>
                 <input
                   type="color"
                   value={unitTypeColors[category]}
@@ -309,42 +313,42 @@ const HUD = ({
 
           {colorMode === "lease-date" && (
             <div className="hud-bucket-selector">
-            <div className="hud-bucket-title">
-              Popularity Spread: <span>{bucketCount}</span>
-            </div>
-            <input
-              type="range"
-              min="3"
-              max="7"
-              value={bucketCount}
-              onChange={(e) => setBucketCount(Number(e.target.value))}
-              className="bucket-slider"
-            />
-            <div className="hud-bucket-legend" aria-hidden="true">
-              <div className="hud-bucket-band">
-                {bucketColors.map((color, idx) => (
-                  <div
-                    key={`bucket-color-${idx}`}
-                    className="hud-bucket-band-segment"
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
+              <div className="hud-bucket-title">
+                Popularity Spread: <span>{bucketCount}</span>
               </div>
-              <div className="hud-bucket-marks">
-                {bucketColors.map((_, idx) => (
-                  <div
-                    key={`bucket-mark-${idx}`}
-                    className="hud-bucket-mark-item"
-                  >
-                    <span className="hud-bucket-mark-dot" />
-                  </div>
-                ))}
+              <input
+                type="range"
+                min="3"
+                max="7"
+                value={bucketCount}
+                onChange={(e) => setBucketCount(Number(e.target.value))}
+                className="bucket-slider"
+              />
+              <div className="hud-bucket-legend" aria-hidden="true">
+                <div className="hud-bucket-band">
+                  {bucketColors.map((color, idx) => (
+                    <div
+                      key={`bucket-color-${idx}`}
+                      className="hud-bucket-band-segment"
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+                <div className="hud-bucket-marks">
+                  {bucketColors.map((_, idx) => (
+                    <div
+                      key={`bucket-mark-${idx}`}
+                      className="hud-bucket-mark-item"
+                    >
+                      <span className="hud-bucket-mark-dot" />
+                    </div>
+                  ))}
+                </div>
+                <div className="hud-bucket-end-labels">
+                  <span className="hud-bucket-end-label">High</span>
+                  <span className="hud-bucket-end-label">Low</span>
+                </div>
               </div>
-              <div className="hud-bucket-end-labels">
-                <span className="hud-bucket-end-label">High</span>
-                <span className="hud-bucket-end-label">Low</span>
-              </div>
-            </div>
             </div>
           )}
         </>

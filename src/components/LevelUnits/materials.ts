@@ -1,9 +1,6 @@
 import * as THREE from "three";
 import { generateGradient } from "../../utils/colorGradient";
-import {
-  type UnitTypeCategory,
-  UNIT_TYPE_ORDER,
-} from "../../types/coloring";
+import { type UnitTypeCategory, UNIT_TYPE_ORDER } from "../../types/coloring";
 
 export type UnitMaterialSet = {
   outline: THREE.LineBasicMaterial;
@@ -18,7 +15,10 @@ export type UnitMaterialSet = {
   bucketMaterials: THREE.MeshStandardMaterial[];
   bucketOverlayMaterials: THREE.MeshStandardMaterial[];
   unitTypeMaterials: Record<UnitTypeCategory, THREE.MeshStandardMaterial>;
-  unitTypeOverlayMaterials: Record<UnitTypeCategory, THREE.MeshStandardMaterial>;
+  unitTypeOverlayMaterials: Record<
+    UnitTypeCategory,
+    THREE.MeshStandardMaterial
+  >;
 };
 
 export function createUnitMaterials(
