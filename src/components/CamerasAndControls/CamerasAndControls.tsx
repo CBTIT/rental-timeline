@@ -23,8 +23,6 @@ import {
 
 type CameraAndControlsProps = {
   viewContext: string;
-  level: string;
-  mode: string;
 };
 
 type CameraFit = {
@@ -50,11 +48,7 @@ const DEFAULT_PERSPECTIVE_DIRECTION = new THREE.Vector3(
   0.828,
 ).normalize();
 
-const CamerasAndControls = ({
-  viewContext,
-  level,
-  mode,
-}: CameraAndControlsProps) => {
+const CamerasAndControls = ({ viewContext }: CameraAndControlsProps) => {
   const [fit, setFit] = useState<CameraFit | null>(null);
 
   const boundsKeyRef = useRef<string>("");
@@ -62,6 +56,10 @@ const CamerasAndControls = ({
   const lastDevPublishRef = useRef(0);
   const frameCountRef = useRef(0);
   const floorPadding = 1;
+
+  /** Only snap perspective camera when 2D↔3D changes or first real bounds — not on level or levels↔combined (same 3D orbit). */
+  const lastPerspectiveSnapReasonRef = useRef<string>("");
+  const prevHadRealPerspectiveFitRef = useRef(false);
 
   const orbitRef = useRef<any>(null);
   const perspectiveCamRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -90,6 +88,12 @@ const CamerasAndControls = ({
   );
 
   const activeFit = fit ?? fallbackFit;
+
+  useEffect(() => {
+    if (viewContext === "2D") {
+      lastPerspectiveSnapReasonRef.current = "";
+    }
+  }, [viewContext]);
 
   const computeFit = useMemo(
     () =>
@@ -243,6 +247,19 @@ const CamerasAndControls = ({
     const ctrls = orbitRef.current;
     if (!cam || !ctrls) return;
 
+    const reason = viewContext;
+    const reasonChanged = lastPerspectiveSnapReasonRef.current !== reason;
+    if (reasonChanged) {
+      lastPerspectiveSnapReasonRef.current = reason;
+    }
+
+    const hasRealFit = !!(fit && fit.key !== "fallback");
+    const fitJustRealized =
+      hasRealFit && !prevHadRealPerspectiveFitRef.current;
+    prevHadRealPerspectiveFitRef.current = hasRealFit;
+
+    if (!reasonChanged && !fitJustRealized) return;
+
     cam.position.copy(activeFit.perspectivePosition);
     cam.near = activeFit.perspectiveNear;
     cam.far = activeFit.perspectiveFar;
@@ -251,7 +268,7 @@ const CamerasAndControls = ({
 
     ctrls.target.copy(activeFit.perspectiveTarget);
     ctrls.update();
-  }, [viewContext, level, mode, activeFit]);
+  }, [viewContext, fit, activeFit]);
 
   // ✅ Clamp only in 3D (OrbitControls active)
   useFrame(() => {

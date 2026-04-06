@@ -267,11 +267,7 @@ function App() {
             position={sunLighting.rimPosition}
             intensity={sunLighting.rimIntensity}
           />
-          <CamerasAndControls
-            viewContext={viewContext}
-            level={level}
-            mode={mode}
-          />
+          <CamerasAndControls viewContext={viewContext} />
         </Canvas>
         {unitData && (
           <HUD
