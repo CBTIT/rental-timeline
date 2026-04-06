@@ -1,59 +1,90 @@
-import { useTexture } from "@react-three/drei";
-import { useLoader } from "@react-three/fiber";
-import { useEffect, useMemo, memo } from "react";
+import { useEffect, memo, useState } from "react";
 import * as THREE from "three";
 import { Rhino3dmLoader } from "three-stdlib";
 
 type BaseMapProps = {
-  level: string;
   viewContext: string;
   mode: string;
 };
 
-const BaseMap = ({ level, viewContext, mode }: BaseMapProps) => {
+function ensureOpaqueMaterial(m: THREE.Material): void {
+  m.transparent = false;
+  m.opacity = 1;
+  m.depthWrite = true;
+  m.depthTest = true;
+  // Lets both faces participate in shadow map / self-shadowing for thick shells.
+  if (
+    m instanceof THREE.MeshStandardMaterial ||
+    m instanceof THREE.MeshPhysicalMaterial ||
+    m instanceof THREE.MeshLambertMaterial ||
+    m instanceof THREE.MeshPhongMaterial
+  ) {
+    m.shadowSide = THREE.DoubleSide;
+  }
+  m.needsUpdate = true;
+}
+
+function setShadowFlags(o: THREE.Mesh | THREE.InstancedMesh): void {
+  o.castShadow = true;
+  o.receiveShadow = true;
+  o.renderOrder = -1;
+}
+
+function prepareContextObject(obj: THREE.Object3D): void {
+  obj.traverse((child) => {
+    child.userData.excludeFromCameraFit = true;
+    if (child instanceof THREE.Mesh || child instanceof THREE.InstancedMesh) {
+      setShadowFlags(child);
+      const mats = Array.isArray(child.material)
+        ? child.material
+        : [child.material];
+      for (const mat of mats) {
+        if (!mat) continue;
+        ensureOpaqueMaterial(mat);
+      }
+    }
+  });
+}
+
+const BaseMap = ({ viewContext, mode }: BaseMapProps) => {
   const base = import.meta.env.BASE_URL;
-  const baseMap = useLoader(
-    Rhino3dmLoader,
-    base + "base_map/base.3dm",
-    (loader) => {
-      loader.setLibraryPath(
-        "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
-      );
-    },
-  );
-  const tex = useTexture(base + "textures/satellite.jpg");
-  const mat = useMemo(() => {
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.flipY = true;
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
-    tex.needsUpdate = true;
-    return new THREE.MeshStandardMaterial({
-      map: tex,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.5,
-      roughness: 1,
-      metalness: 0,
-      depthWrite: false,
-      depthTest: true,
-    });
-  }, [tex]);
+  const [contextModel, setContextModel] = useState<THREE.Object3D | null>(null);
+
   useEffect(() => {
-    baseMap.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      o.material = mat;
-      o.castShadow = false;
-      o.receiveShadow = true;
-      (o.material as THREE.Material).needsUpdate = true;
-    });
-  }, [baseMap, mat]);
-  const isLevel1 = level === "1";
+    let cancelled = false;
+    const loader = new Rhino3dmLoader();
+    loader.setLibraryPath("https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/");
+
+    loader.load(
+      base + "context.3dm",
+      (obj) => {
+        if (cancelled) return;
+        prepareContextObject(obj);
+        setContextModel(obj);
+      },
+      undefined,
+      (err) => {
+        console.error("Failed to load context.3dm", err);
+        if (cancelled) return;
+        setContextModel(null);
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [base]);
+
   const is3D = viewContext === "3D";
-  if (mode === "table") return;
-  if (is3D && mode === "levels" && !isLevel1) return;
-  if (!is3D && mode === "combined") return;
-  return <primitive object={baseMap} dispose={null} />;
+  const showContext = is3D && mode !== "table";
+
+  return (
+    <>
+      {showContext && contextModel && (
+        <primitive object={contextModel} dispose={null} />
+      )}
+    </>
+  );
 };
 
 export default memo(BaseMap);

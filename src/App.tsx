@@ -18,6 +18,7 @@ import {
 import { AppProvider } from "./contexts/AppProvider";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import FloorPlanView from "./components/FloorPlanView/FloorPlanView";
+import DevCameraDebugPanel from "./components/DevCameraDebugPanel/DevCameraDebugPanel";
 import {
   DEFAULT_AFFORDABLE_COLOR,
   DEFAULT_UNIT_TYPE_COLORS,
@@ -216,6 +217,8 @@ function App() {
           dpr={[1, 2]}
           onPointerMissed={() => setSelectedUnit(null)}
         >
+          {/* Outside Suspense so context.3dm loads in parallel with useLoader (units); inside Suspense it waited until after units resolved. */}
+          <BaseMap viewContext={viewContext} mode={mode} />
           <Suspense fallback={null}>
             <LevelUnits
               level={level}
@@ -235,7 +238,6 @@ function App() {
               totalDays={days}
               bucketCount={bucketCount}
             />
-            <BaseMap level={level} viewContext={viewContext} mode={mode} />
           </Suspense>
           {/* Soft overall fill */}
           <ambientLight intensity={sunLighting.ambientIntensity} />
@@ -253,7 +255,7 @@ function App() {
             shadow-camera-top={400000}
             shadow-camera-bottom={-400000}
             shadow-bias={-0.0002}
-            shadow-normalBias={0.02}
+            shadow-normalBias={0.002}
           />
           {/* Fill light (opposite side, weaker) */}
           <directionalLight
@@ -265,7 +267,11 @@ function App() {
             position={sunLighting.rimPosition}
             intensity={sunLighting.rimIntensity}
           />
-          <CamerasAndControls viewContext={viewContext} level={level} />
+          <CamerasAndControls
+            viewContext={viewContext}
+            level={level}
+            mode={mode}
+          />
         </Canvas>
         {unitData && (
           <HUD
@@ -334,6 +340,7 @@ function App() {
               base={base}
             />
           )}
+        <DevCameraDebugPanel />
       </div>
     );
   }

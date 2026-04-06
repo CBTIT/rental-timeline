@@ -1,5 +1,12 @@
 import { useLoader, type ThreeEvent } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useCallback } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useCallback,
+  useState,
+} from "react";
 import { Rhino3dmLoader } from "three-stdlib";
 import * as THREE from "three";
 import type {} from "../../App";
@@ -31,6 +38,67 @@ type LevelUnitsProp = {
   bucketCount: number;
 };
 
+const getNumericUnitToken = (name: string) => {
+  const token = name.match(/\d+/)?.[0];
+  return token ?? null;
+};
+
+const resolveUnitId = (name: string, leaseData: LeaseData | null) => {
+  if (!leaseData) return null;
+  if (Object.hasOwn(leaseData, name)) return name;
+  const numericToken = getNumericUnitToken(name);
+  if (!numericToken) return null;
+  if (Object.hasOwn(leaseData, numericToken)) return numericToken;
+  return null;
+};
+
+const isUnitOnLevel = (
+  name: string,
+  level: string,
+  leaseData: LeaseData | null,
+) => {
+  const resolved = resolveUnitId(name, leaseData);
+  if (resolved) return resolved.startsWith(level);
+  if (name.startsWith(level)) return true;
+  const numericToken = getNumericUnitToken(name);
+  return !!numericToken && numericToken.startsWith(level);
+};
+
+/** Matches HUD level buttons — used to prefetch all unit-number layers. */
+const LEVEL_UNIT_TEXT_IDS = ["1", "2", "3", "4", "5", "6", "7", "8"] as const;
+
+const unitTextLevelCache = new Map<string, THREE.Object3D>();
+const unitTextLevelInflight = new Map<string, Promise<THREE.Object3D>>();
+
+function loadUnitTextForLevel(levelKey: string, base: string): Promise<THREE.Object3D> {
+  const cached = unitTextLevelCache.get(levelKey);
+  if (cached) return Promise.resolve(cached);
+
+  const inflight = unitTextLevelInflight.get(levelKey);
+  if (inflight) return inflight;
+
+  const p = new Promise<THREE.Object3D>((resolve, reject) => {
+    const loader = new Rhino3dmLoader();
+    loader.setLibraryPath("https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/");
+    loader.load(
+      base + `unit_texts/level_${levelKey}.3dm`,
+      (obj) => {
+        unitTextLevelCache.set(levelKey, obj);
+        unitTextLevelInflight.delete(levelKey);
+        resolve(obj);
+      },
+      undefined,
+      (err) => {
+        unitTextLevelInflight.delete(levelKey);
+        console.error(`Failed to load unit text for level ${levelKey}`, err);
+        reject(err);
+      },
+    );
+  });
+  unitTextLevelInflight.set(levelKey, p);
+  return p;
+}
+
 const LevelUnits = ({
   level,
   leaseData,
@@ -49,6 +117,12 @@ const LevelUnits = ({
   totalDays,
   bucketCount,
 }: LevelUnitsProp) => {
+  // Stable key so materials useMemo does not invalidate when parent passes a new object ref with same contents (prevents lease effect ↔ setLeasedUnits loops).
+  const unitTypeColorsKey = useMemo(
+    () => JSON.stringify(unitTypeColors),
+    [unitTypeColors],
+  );
+
   //getting material set and disposing older material
   const materials = useMemo(
     () =>
@@ -58,7 +132,7 @@ const LevelUnits = ({
         affordableColor,
         bucketCount,
       ),
-    [selectedLeasedColor, unitTypeColors, affordableColor, bucketCount],
+    [selectedLeasedColor, unitTypeColorsKey, affordableColor, bucketCount],
   );
   useEffect(() => {
     return () => disposeUnitMaterials(materials);
@@ -102,27 +176,79 @@ const LevelUnits = ({
     },
   );
 
-  //loading unit texts
-  const unitText = useLoader(
-    Rhino3dmLoader,
-    base + `unit_texts/level_${level}.3dm`,
-    (loader) => {
-      loader.setLibraryPath(
-        "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
-      );
-    },
-  );
+  //loading unit texts (cached + prefetched so level switches align with geometry)
+  const [unitText, setUnitText] = useState<THREE.Object3D | null>(null);
+  const levelRef = useRef(level);
+  levelRef.current = level;
 
-  // Add outlines only in Levels mode 2D view
+  useLayoutEffect(() => {
+    if (mode !== "levels") {
+      setUnitText(null);
+      return;
+    }
+    const cached = unitTextLevelCache.get(level);
+    if (cached) {
+      setUnitText(cached);
+    } else {
+      setUnitText(null);
+    }
+  }, [mode, level]);
+
+  useEffect(() => {
+    if (mode !== "levels") return;
+
+    const levelForRequest = level;
+    let cancelled = false;
+
+    loadUnitTextForLevel(levelForRequest, base)
+      .then((obj) => {
+        if (cancelled) return;
+        if (levelRef.current !== levelForRequest) return;
+        setUnitText(obj);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        if (levelRef.current !== levelForRequest) return;
+        setUnitText(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [base, level, mode]);
+
+  useEffect(() => {
+    if (mode !== "levels") return;
+    for (const id of LEVEL_UNIT_TEXT_IDS) {
+      loadUnitTextForLevel(id, base).catch(() => {});
+    }
+  }, [mode, base]);
+
+  // Add outlines only for the active level in Levels mode 2D view.
   useEffect(() => {
     if (mode !== "levels" || viewContext !== "2D") return;
-    // add outlines for levels 2D only
+
+    let levelMatchCount = 0;
     unitGeometry.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
+      if (isUnitOnLevel(o.name, level, leaseData)) levelMatchCount += 1;
+    });
+
+    unitGeometry.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
+      const strictMatch = isUnitOnLevel(o.name, level, leaseData);
+      const shouldOutline = levelMatchCount > 0 ? strictMatch : true;
+      const existing = o.children.find((c) => c.name === "__outline__");
+
+      if (!shouldOutline) {
+        if (existing) {
+          o.remove(existing);
+        }
+        return;
+      }
 
       // avoid duplicating if effect reruns
-      const already = o.children.find((c) => c.name === "__outline__");
-      if (already) return;
+      if (existing) return;
 
       const edges = new THREE.EdgesGeometry(o.geometry, 15);
 
@@ -144,12 +270,25 @@ const LevelUnits = ({
         if (lines) o.remove(lines);
       });
     };
-  }, [unitGeometry, materials, viewContext, mode]);
+  }, [unitGeometry, materials, viewContext, mode, level, leaseData]);
 
   useEffect(() => {
+    if (!unitText) return;
+
+    const in2DLevels = viewContext === "2D" && mode === "levels";
+    const textMat = in2DLevels
+      ? (() => {
+          const m = materials.text.clone();
+          m.depthTest = false;
+          m.depthWrite = false;
+          m.needsUpdate = true;
+          return m;
+        })()
+      : materials.text;
+
     unitText.traverse((o) => {
       if (o instanceof THREE.Mesh) {
-        o.material = materials.text;
+        o.material = textMat;
 
         // ✅ never catch hover/click rays
         o.raycast = () => null;
@@ -158,15 +297,30 @@ const LevelUnits = ({
         o.renderOrder = 999;
       }
     });
-  }, [unitText, materials]);
+
+    return () => {
+      if (textMat !== materials.text) textMat.dispose();
+    };
+  }, [unitText, materials, viewContext, mode]);
   useEffect(() => {
     const in2D = viewContext === "2D";
+    let levelMatchCount = 0;
+
+    if (mode === "levels") {
+      unitGeometry.traverse((o) => {
+        if (!(o instanceof THREE.Mesh)) return;
+        if (isUnitOnLevel(o.name, level, leaseData)) levelMatchCount += 1;
+      });
+    }
+
     unitGeometry.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         o.castShadow = true;
         o.receiveShadow = true;
         if (mode == "levels") {
-          if (o.name.startsWith(level)) {
+          const strictMatch = isUnitOnLevel(o.name, level, leaseData);
+          const shouldShow = levelMatchCount > 0 ? strictMatch : true;
+          if (shouldShow) {
             o.visible = true;
             o.raycast = THREE.Mesh.prototype.raycast;
           } else {
@@ -181,7 +335,7 @@ const LevelUnits = ({
         }
       }
     });
-  }, [unitGeometry, level, mode, viewContext]);
+  }, [unitGeometry, level, mode, viewContext, leaseData]);
 
   useEffect(() => {
     if (mode !== "combined") return;
@@ -203,7 +357,7 @@ const LevelUnits = ({
       if (!(o instanceof THREE.Mesh)) return;
       if (!o.visible) return;
 
-      const unitId = o.name;
+      const unitId = resolveUnitId(o.name, leaseData) ?? o.name;
       const {
         isLeased,
         isSelected,
@@ -239,7 +393,23 @@ const LevelUnits = ({
       });
     });
 
-    setLeasedUnits(Array.from(next));
+    const nextArr = Array.from(next);
+    setLeasedUnits((prev) => {
+      if (
+        prev.length === nextArr.length &&
+        prev.every((u, i) => u === nextArr[i])
+      ) {
+        return prev;
+      }
+      const prevSet = new Set(prev);
+      if (
+        prevSet.size === next.size &&
+        nextArr.every((u) => prevSet.has(u))
+      ) {
+        return prev;
+      }
+      return nextArr;
+    });
   }, [
     unitGeometry,
     leaseData,
@@ -264,7 +434,9 @@ const LevelUnits = ({
         object={unitGeometry}
         dispose={null}
       />
-      {mode === "levels" && <primitive object={unitText} dispose={null} />}
+      {mode === "levels" && unitText && (
+        <primitive object={unitText} dispose={null} />
+      )}
     </>
   );
 };
