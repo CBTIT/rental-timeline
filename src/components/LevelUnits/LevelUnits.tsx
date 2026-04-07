@@ -1,4 +1,4 @@
-import { useLoader, type ThreeEvent } from "@react-three/fiber";
+import type { ThreeEvent } from "@react-three/fiber";
 import {
   useEffect,
   useLayoutEffect,
@@ -7,12 +7,13 @@ import {
   useCallback,
   useState,
 } from "react";
-import { Rhino3dmLoader } from "three-stdlib";
 import * as THREE from "three";
 import type {} from "../../App";
 import type { LeaseData } from "../../types/lease";
 import { createUnitMaterials, disposeUnitMaterials } from "./materials";
 import { getUnitMaterial, getUnitVisualState } from "./leaseUtils";
+import { perfLog, perfNow } from "../../utils/perf";
+import { getRhino3dmLibPath, getSharedRhino3dmLoader } from "../../utils/rhino3dm";
 import type {
   ColorMode,
   UnitTypeCategory,
@@ -70,6 +71,38 @@ const LEVEL_UNIT_TEXT_IDS = ["1", "2", "3", "4", "5", "6", "7", "8"] as const;
 const unitTextLevelCache = new Map<string, THREE.Object3D>();
 const unitTextLevelInflight = new Map<string, Promise<THREE.Object3D>>();
 
+let allUnitsCache: THREE.Object3D | null = null;
+let allUnitsInflight: Promise<THREE.Object3D> | null = null;
+
+function loadAllUnits(base: string): Promise<THREE.Object3D> {
+  if (allUnitsCache) return Promise.resolve(allUnitsCache);
+  if (allUnitsInflight) return allUnitsInflight;
+
+  const loader = getSharedRhino3dmLoader();
+  loader.setLibraryPath(getRhino3dmLibPath());
+  const start = perfNow();
+
+  allUnitsInflight = new Promise<THREE.Object3D>((resolve, reject) => {
+    loader.load(
+      base + "floor_units/allUnits.3dm",
+      (obj) => {
+        allUnitsCache = obj;
+        allUnitsInflight = null;
+        perfLog("floor_units/allUnits.3dm loader.load (download+parse)", start);
+        resolve(obj);
+      },
+      undefined,
+      (err) => {
+        allUnitsInflight = null;
+        perfLog("floor_units/allUnits.3dm loader.load (failed)", start);
+        reject(err);
+      },
+    );
+  });
+
+  return allUnitsInflight;
+}
+
 function loadUnitTextForLevel(levelKey: string, base: string): Promise<THREE.Object3D> {
   const cached = unitTextLevelCache.get(levelKey);
   if (cached) return Promise.resolve(cached);
@@ -78,19 +111,21 @@ function loadUnitTextForLevel(levelKey: string, base: string): Promise<THREE.Obj
   if (inflight) return inflight;
 
   const p = new Promise<THREE.Object3D>((resolve, reject) => {
-    const loader = new Rhino3dmLoader();
-    loader.setLibraryPath("https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/");
+    const loader = getSharedRhino3dmLoader();
+    const start = perfNow();
     loader.load(
       base + `unit_texts/level_${levelKey}.3dm`,
       (obj) => {
         unitTextLevelCache.set(levelKey, obj);
         unitTextLevelInflight.delete(levelKey);
+        perfLog(`unit_texts/level_${levelKey}.3dm loader.load (download+parse)`, start);
         resolve(obj);
       },
       undefined,
       (err) => {
         unitTextLevelInflight.delete(levelKey);
         console.error(`Failed to load unit text for level ${levelKey}`, err);
+        perfLog(`unit_texts/level_${levelKey}.3dm loader.load (failed)`, start);
         reject(err);
       },
     );
@@ -165,16 +200,27 @@ const LevelUnits = ({
     [setSelectedUnit],
   );
 
-  //loading unit geometries
-  const unitGeometry = useLoader(
-    Rhino3dmLoader,
-    base + `floor_units/allUnits.3dm`,
-    (loader) => {
-      loader.setLibraryPath(
-        "https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/",
-      );
-    },
-  );
+  // loading unit geometries (shared loader + shared cache to avoid duplicate rhino3dm runtime fetches)
+  const [unitGeometry, setUnitGeometry] = useState<THREE.Object3D | null>(() => allUnitsCache);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (unitGeometry) return;
+
+    loadAllUnits(base)
+      .then((obj) => {
+        if (cancelled) return;
+        setUnitGeometry(obj);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setUnitGeometry(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [base, unitGeometry]);
 
   //loading unit texts (cached + prefetched so level switches align with geometry)
   const [unitText, setUnitText] = useState<THREE.Object3D | null>(null);
@@ -219,16 +265,30 @@ const LevelUnits = ({
 
   useEffect(() => {
     if (mode !== "levels") return;
-    for (const id of LEVEL_UNIT_TEXT_IDS) {
-      loadUnitTextForLevel(id, base).catch(() => {});
-    }
-  }, [mode, base]);
+    // Startup optimization: don't immediately fetch+parse all unit text layers on first paint.
+    // Prefetch in idle time so initial load prioritizes core geometry + UI.
+    let cancelled = false;
+    const id = setTimeout(() => {
+      if (cancelled) return;
+      for (const levelId of LEVEL_UNIT_TEXT_IDS) {
+        if (levelId === level) continue; // current level is fetched on-demand by the other effect
+        loadUnitTextForLevel(levelId, base).catch(() => {});
+      }
+    }, 10000) as unknown as number;
+
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, [mode, base, level]);
 
   // Add outlines only for the active level in Levels mode 2D view.
   useEffect(() => {
     if (mode !== "levels" || viewContext !== "2D") return;
 
     let levelMatchCount = 0;
+    if (!unitGeometry) return;
+
     unitGeometry.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
       if (isUnitOnLevel(o.name, level, leaseData)) levelMatchCount += 1;
@@ -306,6 +366,7 @@ const LevelUnits = ({
     const in2D = viewContext === "2D";
     let levelMatchCount = 0;
 
+    if (!unitGeometry) return;
     if (mode === "levels") {
       unitGeometry.traverse((o) => {
         if (!(o instanceof THREE.Mesh)) return;
@@ -340,6 +401,7 @@ const LevelUnits = ({
   useEffect(() => {
     if (mode !== "combined") return;
 
+    if (!unitGeometry) return;
     let i = 0;
     unitGeometry.traverse((o) => {
       if (o instanceof THREE.Mesh) {
@@ -350,6 +412,7 @@ const LevelUnits = ({
 
   useEffect(() => {
     if (!leaseData || !currentDate) return;
+    if (!unitGeometry) return;
 
     const next = new Set<string>();
 
@@ -428,12 +491,14 @@ const LevelUnits = ({
 
   return (
     <>
-      <primitive
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        object={unitGeometry}
-        dispose={null}
-      />
+      {unitGeometry && (
+        <primitive
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          object={unitGeometry}
+          dispose={null}
+        />
+      )}
       {mode === "levels" && unitText && (
         <primitive object={unitText} dispose={null} />
       )}

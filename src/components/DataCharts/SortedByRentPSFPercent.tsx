@@ -103,34 +103,45 @@ export default function SortedByRentPSFPercent({
     return { buckets, maxPct };
   }, [unitData, leasedUnits, mode, level, denomStatic]);
 
+  const lowBuckets = buckets.filter((b) => b.k === "1" || b.k === "2" || b.k === "3");
+  const highBuckets = buckets.filter(
+    (b) => b.k === "4" || b.k === "5" || b.k === "6" || b.k === "7p",
+  );
+
+  const renderBucket = (b: { k: BucketKey; count: number; pct: number }) => {
+    const hPct = (b.pct / maxPct) * 100;
+
+    // show % label
+    const labelPct = `${Math.round(b.pct)}%`;
+
+    // ensure visible minimum for nonzero buckets
+    const wrapPx = 68;
+    const px = (hPct / 100) * wrapPx;
+    const pxClamped = b.count > 0 ? Math.max(6, px) : 0;
+
+    return (
+      <div key={b.k} className="psf-col">
+        <div className="psf-count">{labelPct}</div>
+
+        <div className="psf-bar-wrap">
+          <div className="psf-bar" style={{ height: `${pxClamped}px` }} />
+        </div>
+
+        <div className="psf-label">{bucketLabel(b.k)}</div>
+      </div>
+    );
+  };
+
   return (
     <div className="psf-strip">
       <div className="psf-title">Rent Distribution ($/SF)</div>
 
       <div className="psf-row">
-        {buckets.map((b) => {
-          const hPct = (b.pct / maxPct) * 100;
+        <div className="psf-group psf-group--low">{lowBuckets.map(renderBucket)}</div>
 
-          // show % label
-          const labelPct = `${Math.round(b.pct)}%`;
-
-          // ensure visible minimum for nonzero buckets
-          const wrapPx = 68;
-          const px = (hPct / 100) * wrapPx;
-          const pxClamped = b.count > 0 ? Math.max(6, px) : 0;
-
-          return (
-            <div key={b.k} className="psf-col">
-              <div className="psf-count">{labelPct}</div>
-
-              <div className="psf-bar-wrap">
-                <div className="psf-bar" style={{ height: `${pxClamped}px` }} />
-              </div>
-
-              <div className="psf-label">{bucketLabel(b.k)}</div>
-            </div>
-          );
-        })}
+        <div className="psf-group psf-group--high" aria-label="$4 and above">
+          {highBuckets.map(renderBucket)}
+        </div>
       </div>
     </div>
   );

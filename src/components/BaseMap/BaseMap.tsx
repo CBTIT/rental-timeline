@@ -1,6 +1,7 @@
 import { useEffect, memo, useState } from "react";
 import * as THREE from "three";
-import { Rhino3dmLoader } from "three-stdlib";
+import { perfLog, perfNow } from "../../utils/perf";
+import { getSharedRhino3dmLoader } from "../../utils/rhino3dm";
 
 type BaseMapProps = {
   viewContext: string;
@@ -52,20 +53,25 @@ const BaseMap = ({ viewContext, mode }: BaseMapProps) => {
 
   useEffect(() => {
     let cancelled = false;
-    const loader = new Rhino3dmLoader();
-    loader.setLibraryPath("https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/");
+    const loader = getSharedRhino3dmLoader();
 
+    const loadStart = perfNow();
     loader.load(
       base + "context.3dm",
       (obj) => {
         if (cancelled) return;
+        perfLog("context.3dm loader.load (download+parse)", loadStart);
+
+        const prepareStart = perfNow();
         prepareContextObject(obj);
+        perfLog("context.3dm prepareContextObject (traverse/material)", prepareStart);
         setContextModel(obj);
       },
       undefined,
       (err) => {
         console.error("Failed to load context.3dm", err);
         if (cancelled) return;
+        perfLog("context.3dm loader.load (failed)", loadStart);
         setContextModel(null);
       },
     );
