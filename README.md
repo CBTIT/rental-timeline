@@ -16,16 +16,6 @@ Interactive **lease timeline** and **3D floor-plan** viewer for multi-level resi
 
 ---
 
-## Screenshots
-
-**Main canvas (3D) with HUD, charts, and Sun/Time**
-
-Main view: 3D site with HUD panels and chart strip
-
-*Representative view of the dark-theme layout: mode bar, data charts, Sun/Time dock, and right-hand HUD over the 3D scene.*
-
----
-
 ## Features
 
 - **Timeline** — Day index mapped to calendar dates from the earliest lease in the dataset; slider in the HUD.
