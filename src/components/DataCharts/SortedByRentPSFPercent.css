@@ -60,8 +60,9 @@
 }
 
 .psf-col:hover {
-  border-color: var(--color-accent);
-  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
 }
 
 .psf-col.active {

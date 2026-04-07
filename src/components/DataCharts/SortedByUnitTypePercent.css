@@ -41,7 +41,7 @@
 
 .ut-toggle-btn {
   appearance: none;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -52,9 +52,11 @@
   transition: all var(--transition-fast);
 }
 
-.ut-toggle-btn:hover {
+.ut-toggle-btn:hover:not(.active) {
   color: var(--color-text-primary);
-  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  background: var(--button-hover-lit-gradient);
+  border: 1px solid var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
 }
 
 .ut-toggle-btn.active {
@@ -95,8 +97,9 @@
 }
 
 .ut-col:hover {
-  border-color: var(--color-accent);
-  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
 }
 
 .ut-col.active {

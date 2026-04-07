@@ -373,24 +373,31 @@ function App() {
             </div>
 
             {filterTags.length > 0 && (
-              <div className="active-filters-panel" aria-label="Active filters">
-                <div className="active-filters-title">Filters</div>
+              <div
+                className="sun-control-panel sun-control-panel--filters"
+                aria-label="Active filters"
+              >
+                <div className="sun-control-title">Filters</div>
                 <div className="active-filters-tags">
                   {filterTags.map((t) => (
-                    <span key={t.id} className="mode-selection-filter-tag">
+                    <button
+                      key={t.id}
+                      type="button"
+                      className="mode-selection-filter-tag"
+                      onClick={t.onClear}
+                      aria-label={`Remove filter ${t.label}`}
+                      title={`Remove filter: ${t.label}`}
+                    >
                       <span className="mode-selection-filter-tag-text">
                         {t.label}
                       </span>
-                      <button
-                        type="button"
-                        className="mode-selection-filter-tag-clear"
-                        onClick={t.onClear}
-                        aria-label={`Remove filter ${t.label}`}
-                        title={`Remove filter ${t.label}`}
+                      <span
+                        className="mode-selection-filter-tag-icon"
+                        aria-hidden="true"
                       >
                         ×
-                      </button>
-                    </span>
+                      </span>
+                    </button>
                   ))}
                 </div>
               </div>

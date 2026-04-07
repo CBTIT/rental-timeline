@@ -84,18 +84,19 @@ const ModeSelection = ({
             <div className="mode-selection-filters-label">Filters</div>
             <div className="mode-selection-filters-tags">
               {filterTags!.map((t) => (
-                <span key={t.id} className="mode-selection-filter-tag">
+                <button
+                  key={t.id}
+                  type="button"
+                  className="mode-selection-filter-tag"
+                  onClick={t.onClear}
+                  aria-label={`Remove filter ${t.label}`}
+                  title={`Remove filter: ${t.label}`}
+                >
                   <span className="mode-selection-filter-tag-text">{t.label}</span>
-                  <button
-                    type="button"
-                    className="mode-selection-filter-tag-clear"
-                    onClick={t.onClear}
-                    aria-label={`Remove filter ${t.label}`}
-                    title={`Remove filter ${t.label}`}
-                  >
+                  <span className="mode-selection-filter-tag-icon" aria-hidden="true">
                     ×
-                  </button>
-                </span>
+                  </span>
+                </button>
               ))}
             </div>
           </div>

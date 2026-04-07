@@ -1,0 +1,192 @@
+/** ============================================================================
+   LIGHT MODE UI — extra contrast for floating panels & controls
+   Scoped so `.theme-dark` (canvas / table shell) keeps existing dark tokens.
+   ============================================================================ */
+
+.canvas-container:not(.theme-dark),
+.table-view-shell:not(.theme-dark) {
+  --ui-panel-border: #cbd5e1;
+  --ui-panel-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    0 6px 20px rgba(15, 23, 42, 0.08);
+  --ui-button-idle-bg: #ffffff;
+  --ui-button-idle-border: #cbd5e1;
+}
+
+/* ----- Top mode bar: inactive tabs read as real buttons ----- */
+.canvas-container:not(.theme-dark) .mode-selection,
+.table-view-shell:not(.theme-dark) .mode-selection {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-color: var(--ui-panel-border);
+  box-shadow: var(--ui-panel-shadow);
+}
+
+.canvas-container:not(.theme-dark)
+  .mode-selection-row
+  > button:not(.theme-toggle-mode-btn):not(:disabled),
+.table-view-shell:not(.theme-dark)
+  .mode-selection-row
+  > button:not(.theme-toggle-mode-btn):not(:disabled) {
+  background-color: var(--ui-button-idle-bg);
+  border: 1px solid var(--ui-button-idle-border);
+  color: #0f172a;
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.canvas-container:not(.theme-dark)
+  .mode-selection-row
+  > button:not(.theme-toggle-mode-btn):not(:disabled):hover,
+.table-view-shell:not(.theme-dark)
+  .mode-selection-row
+  > button:not(.theme-toggle-mode-btn):not(:disabled):hover {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  color: #0f172a;
+  box-shadow: var(--button-hover-lit-shadow);
+}
+
+.canvas-container:not(.theme-dark) .mode-selection .theme-toggle-mode-btn,
+.table-view-shell:not(.theme-dark) .mode-selection .theme-toggle-mode-btn {
+  border: 1px solid var(--ui-button-idle-border);
+  background-color: #f8fafc;
+  cursor: pointer;
+}
+
+.canvas-container:not(.theme-dark) .mode-selection .theme-toggle-mode-btn:hover,
+.table-view-shell:not(.theme-dark) .mode-selection .theme-toggle-mode-btn:hover {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
+}
+
+.canvas-container:not(.theme-dark) .mode-selection-filter-tag,
+.table-view-shell:not(.theme-dark) .mode-selection-filter-tag {
+  background: #ffffff;
+  border-color: var(--ui-panel-border);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.canvas-container:not(.theme-dark) .mode-selection-filter-tag:hover,
+.table-view-shell:not(.theme-dark) .mode-selection-filter-tag:hover {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
+}
+
+/* ----- Chart cards (left column) ----- */
+.canvas-container:not(.theme-dark) .kpi-container {
+  background: #ffffff;
+  border-color: var(--ui-panel-border);
+  box-shadow: var(--ui-panel-shadow);
+}
+
+.canvas-container:not(.theme-dark) .ut-strip,
+.canvas-container:not(.theme-dark) .psf-strip,
+.canvas-container:not(.theme-dark) .fl-strip {
+  background: #ffffff;
+  border-color: var(--ui-panel-border);
+  box-shadow: var(--ui-panel-shadow);
+}
+
+.canvas-container:not(.theme-dark) .ut-strip:hover,
+.canvas-container:not(.theme-dark) .psf-strip:hover,
+.canvas-container:not(.theme-dark) .fl-strip:hover {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 1px 2px rgba(14, 165, 233, 0.12),
+    0 8px 24px rgba(15, 23, 42, 0.1);
+}
+
+/* Rent PSF: high-bucket tint stays visible on white */
+.canvas-container:not(.theme-dark) .psf-group--high::before {
+  background: color-mix(in srgb, var(--color-info) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--color-info) 35%, var(--ui-panel-border));
+}
+
+/* Unit type toggle */
+.canvas-container:not(.theme-dark) .ut-toggle {
+  border-color: var(--ui-panel-border);
+  background: #f1f5f9;
+}
+
+.canvas-container:not(.theme-dark) .ut-toggle-btn:not(.active) {
+  color: #334155;
+}
+
+/* ----- HUD: panel shell + segmented controls ----- */
+.canvas-container:not(.theme-dark) .HUD {
+  border-color: var(--ui-panel-border);
+  box-shadow: var(--ui-panel-shadow);
+  background-color: #ffffff;
+}
+
+.canvas-container:not(.theme-dark) .color-selection,
+.canvas-container:not(.theme-dark) .unit-detail {
+  background-color: #f8fafc;
+  border: 1px solid var(--ui-panel-border);
+}
+
+.canvas-container:not(.theme-dark) .color-selection:hover,
+.canvas-container:not(.theme-dark) .unit-detail:hover {
+  background-color: #f1f5f9;
+}
+
+.canvas-container:not(.theme-dark) .hud-color-mode-btn:not(.active),
+.canvas-container:not(.theme-dark) .hud-view-toggle-btn {
+  background-color: #ffffff;
+  border: 1px solid var(--ui-button-idle-border);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.canvas-container:not(.theme-dark) .hud-color-mode-btn:not(.active):hover,
+.canvas-container:not(.theme-dark) .hud-view-toggle-btn:hover {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
+}
+
+.canvas-container:not(.theme-dark) .hud-level-btn:not(.active) {
+  background-color: #ffffff;
+  border: 1px solid var(--ui-button-idle-border);
+  color: #334155;
+  font-weight: var(--font-weight-semibold);
+}
+
+.canvas-container:not(.theme-dark) .hud-level-btn:not(.active):hover {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
+}
+
+.canvas-container:not(.theme-dark) .view-button:not(:disabled):not(.active) {
+  background-color: #ffffff;
+  border: 1px solid var(--ui-button-idle-border);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.canvas-container:not(.theme-dark) .view-button:not(:disabled):not(.active):hover {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
+}
+
+/* ----- Top-left title + bottom sun / filters ----- */
+.canvas-container:not(.theme-dark) .lease-visualizer-header {
+  border-color: var(--ui-panel-border);
+  box-shadow: var(--ui-panel-shadow);
+  background-color: #ffffff;
+}
+
+.canvas-container:not(.theme-dark) .sun-control-panel {
+  border-color: var(--ui-panel-border);
+  box-shadow: var(--ui-panel-shadow);
+  background-color: #ffffff;
+}
+
+/* ----- Table view header card (light) ----- */
+.table-view-shell:not(.theme-dark) .table-view-header {
+  border-color: var(--ui-panel-border);
+  box-shadow: var(--ui-panel-shadow);
+  background-color: #ffffff;
+}

@@ -22,11 +22,10 @@
   justify-content: center;
 }
 
-.view-button:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+.view-button:hover:not(:disabled):not(.active) {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
 }
 
 .view-button:active {

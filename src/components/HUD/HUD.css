@@ -74,9 +74,10 @@
   transition: all var(--transition-normal);
 }
 
-.hud-color-mode-btn:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-accent);
+.hud-color-mode-btn:hover:not(.active) {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
 }
 
 .hud-color-mode-btn.active {
@@ -379,9 +380,10 @@
   transition: all var(--transition-normal);
 }
 
-.hud-level-btn:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-accent);
+.hud-level-btn:hover:not(.active) {
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
 }
 
 .hud-level-btn.active {
@@ -425,8 +427,9 @@
 }
 
 .hud-view-toggle-btn:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-accent);
+  background: var(--button-hover-lit-gradient);
+  border-color: var(--button-hover-lit-border);
+  box-shadow: var(--button-hover-lit-shadow);
 }
 
 /* Time Slider - integrated into HUD */
