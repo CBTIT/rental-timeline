@@ -6,11 +6,13 @@ Interactive **lease timeline** and **3D floor-plan** viewer for multi-level resi
 
 ## Overview
 
-| | |
-|--|--|
-| **What it does** | Binds `lease_data.json` to Rhino-exported **3DM** unit geometry, drives occupancy and styling from the selected calendar day, and surfaces KPIs and distribution charts. |
-| **Primary views** | **Levels** (per-floor 3D/2D), **Combined** (whole site), **Table** (tabular lease data). |
-| **Stack** | React 19, Vite 7, TypeScript, **React Three Fiber** + **three.js**, **@react-three/drei**. |
+
+|                   |                                                                                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **What it does**  | Binds `lease_data.json` to Rhino-exported **3DM** unit geometry, drives occupancy and styling from the selected calendar day, and surfaces KPIs and distribution charts. |
+| **Primary views** | **Levels** (per-floor 3D/2D), **Combined** (whole site), **Table** (tabular lease data).                                                                                 |
+| **Stack**         | React 19, Vite 7, TypeScript, **React Three Fiber** + **three.js**, **@react-three/drei**.                                                                               |
+
 
 ---
 
@@ -18,7 +20,7 @@ Interactive **lease timeline** and **3D floor-plan** viewer for multi-level resi
 
 **Main canvas (3D) with HUD, charts, and Sun/Time**
 
-![Main view: 3D site with HUD panels and chart strip](docs/screenshots/readme-3d-view.png)
+Main view: 3D site with HUD panels and chart strip
 
 *Representative view of the dark-theme layout: mode bar, data charts, Sun/Time dock, and right-hand HUD over the 3D scene.*
 
@@ -59,6 +61,8 @@ flowchart LR
   R3F --> DM
 ```
 
+
+
 ### Component map (simplified)
 
 ```mermaid
@@ -75,6 +79,8 @@ flowchart TB
   AppProvider --- App
 ```
 
+
+
 ### Data flow
 
 ```mermaid
@@ -90,6 +96,8 @@ flowchart LR
   Filtered --> Three
   Charts["Chart bars\nsetUnitFilters"] --> AppState
 ```
+
+
 
 ### UI regions (conceptual)
 
@@ -110,20 +118,24 @@ flowchart TB
   Title --- TB
 ```
 
+
+
 ---
 
 ## Project layout (high level)
 
-| Path | Role |
-|------|------|
-| `src/App.tsx` | Root UI, `Canvas`, chart/HUD wiring, theme, `unitFilters`, timeline state |
-| `src/components/LevelUnits/` | Loads **3DM**, applies lease/material rules and filters |
-| `src/components/HUD/` | Date, colors, level picker, timeline, view toggles |
-| `src/components/DataCharts/` | KPI + sortable/filter charts |
-| `src/utils/unitFilters.ts` | Filter predicates (unit type, rent PSF) |
-| `public/data/lease_data.json` | Per-unit lease rows keyed by unit id |
-| `public/data/*.json` | Aggregates (e.g. unit counts by type/floor) |
-| `public/context.3dm`, `public/floor_units/`, `public/unit_texts/` | Site context and unit geometry/text layers |
+
+| Path                                                              | Role                                                                      |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `src/App.tsx`                                                     | Root UI, `Canvas`, chart/HUD wiring, theme, `unitFilters`, timeline state |
+| `src/components/LevelUnits/`                                      | Loads **3DM**, applies lease/material rules and filters                   |
+| `src/components/HUD/`                                             | Date, colors, level picker, timeline, view toggles                        |
+| `src/components/DataCharts/`                                      | KPI + sortable/filter charts                                              |
+| `src/utils/unitFilters.ts`                                        | Filter predicates (unit type, rent PSF)                                   |
+| `public/data/lease_data.json`                                     | Per-unit lease rows keyed by unit id                                      |
+| `public/data/*.json`                                              | Aggregates (e.g. unit counts by type/floor)                               |
+| `public/context.3dm`, `public/floor_units/`, `public/unit_texts/` | Site context and unit geometry/text layers                                |
+
 
 ---
 
