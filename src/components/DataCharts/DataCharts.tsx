@@ -1,12 +1,12 @@
 import type {} from "../../App";
 import type { LeaseData } from "../../types/lease";
 import { memo } from "react";
-import type { UnitTypeLegendCategory } from "../../types/coloring";
 import "./DataCharts.css";
 import LeasedKPI from "./LeasedKPI";
 import SortedByFloorLeasePercent from "./SortedByFloorLeasePercent";
 import SortedByRentPSFPercent from "./SortedByRentPSFPercent";
 import SortedByUnitTypePercent from "./SortedByUnitTypePercent";
+import type { UnitFilters } from "../../utils/unitFilters";
 
 type DataChartsType = {
   leasedUnits: string[];
@@ -14,10 +14,8 @@ type DataChartsType = {
   unitData: LeaseData | null;
   level: string;
   showData: boolean;
-  selectedUnitTypeFilter: UnitTypeLegendCategory | null;
-  setSelectedUnitTypeFilter: React.Dispatch<
-    React.SetStateAction<UnitTypeLegendCategory | null>
-  >;
+  unitFilters: UnitFilters;
+  setUnitFilters: React.Dispatch<React.SetStateAction<UnitFilters>>;
 };
 
 const DataCharts = ({
@@ -26,8 +24,8 @@ const DataCharts = ({
   unitData,
   level,
   showData,
-  selectedUnitTypeFilter,
-  setSelectedUnitTypeFilter,
+  unitFilters,
+  setUnitFilters,
 }: DataChartsType) => {
   return (
     showData && (
@@ -38,14 +36,26 @@ const DataCharts = ({
           leasedUnits={leasedUnits}
           mode={mode}
           level={level}
+          selectedRentPsfFilter={unitFilters.rentPsf}
+          setSelectedRentPsfFilter={(next) =>
+            setUnitFilters((prev) => ({
+              ...prev,
+              rentPsf: typeof next === "function" ? next(prev.rentPsf) : next,
+            }))
+          }
         />
         <SortedByUnitTypePercent
           unitData={unitData}
           leasedUnits={leasedUnits}
           mode={mode}
           level={level}
-          selectedUnitTypeFilter={selectedUnitTypeFilter}
-          setSelectedUnitTypeFilter={setSelectedUnitTypeFilter}
+          selectedUnitTypeFilter={unitFilters.unitType}
+          setSelectedUnitTypeFilter={(next) =>
+            setUnitFilters((prev) => ({
+              ...prev,
+              unitType: typeof next === "function" ? next(prev.unitType) : next,
+            }))
+          }
         />
         {mode === "combined" && (
           <SortedByFloorLeasePercent

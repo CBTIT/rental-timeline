@@ -24,10 +24,20 @@ import {
   DEFAULT_UNIT_TYPE_COLORS,
   type ColorMode,
   type UnitTypeCategory,
-  type UnitTypeLegendCategory,
 } from "./types/coloring";
+import {
+  DEFAULT_UNIT_FILTERS,
+  type UnitFilters,
+  unitMatchesFilters,
+} from "./utils/unitFilters";
 
 const DEFAULT_LEASE_COLOR = "#14b8a6";
+
+function rentPsfFilterLabel(k: UnitFilters["rentPsf"]): string {
+  if (!k) return "";
+  if (k === "7p") return ">$7.0";
+  return `$${k}.x`;
+}
 
 function formatSunTime(time: number) {
   const clamped = Math.max(8, Math.min(16, time));
@@ -53,8 +63,7 @@ function App() {
   const [affordableColor, setAffordableColor] = useState<string>(
     DEFAULT_AFFORDABLE_COLOR,
   );
-  const [selectedUnitTypeFilter, setSelectedUnitTypeFilter] =
-    useState<UnitTypeLegendCategory | null>(null);
+  const [unitFilters, setUnitFilters] = useState<UnitFilters>(DEFAULT_UNIT_FILTERS);
   const [bucketCount, setBucketCount] = useState<number>(5);
   const [showData, setShowData] = useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
@@ -131,13 +140,48 @@ function App() {
     }
   }, [viewContext, mode]);
 
+  const filteredLeasedUnits = useMemo(() => {
+    if (!unitData) return leasedUnits;
+    if (!unitFilters.unitType && !unitFilters.rentPsf) return leasedUnits;
+    return leasedUnits.filter((unitId) =>
+      unitMatchesFilters(unitData[unitId], unitFilters),
+    );
+  }, [leasedUnits, unitData, unitFilters]);
+
   useEffect(() => {
-    if (selectedUnit !== null && leasedUnits.includes(selectedUnit)) {
+    if (selectedUnit !== null && filteredLeasedUnits.includes(selectedUnit)) {
       setShowFloorPlan(true);
     } else {
       setShowFloorPlan(false);
     }
-  }, [selectedUnit, leasedUnits]);
+  }, [selectedUnit, filteredLeasedUnits]);
+
+  const filterTags = useMemo(() => {
+    const tags: { id: string; label: string; onClear: () => void }[] = [];
+    if (unitFilters.unitType) {
+      tags.push({
+        id: "unitType",
+        label: `Unit type: ${unitFilters.unitType}`,
+        onClear: () =>
+          setUnitFilters((prev) => ({
+            ...prev,
+            unitType: null,
+          })),
+      });
+    }
+    if (unitFilters.rentPsf) {
+      tags.push({
+        id: "rentPsf",
+        label: `Rent $/SF: ${rentPsfFilterLabel(unitFilters.rentPsf)}`,
+        onClear: () =>
+          setUnitFilters((prev) => ({
+            ...prev,
+            rentPsf: null,
+          })),
+      });
+    }
+    return tags;
+  }, [unitFilters.unitType, unitFilters.rentPsf]);
   useEffect(() => {
     fetch(base + "data/lease_data.json")
       .then((r) => r.json())
@@ -190,6 +234,7 @@ function App() {
               setThemeMode((prev) => (prev === "light" ? "dark" : "light"))
             }
             inline
+            filterTags={filterTags}
           />
         </div>
         <DataTable unitData={unitData} />
@@ -233,7 +278,7 @@ function App() {
               colorMode={colorMode}
               unitTypeColors={unitTypeColors}
               affordableColor={affordableColor}
-              unitTypeFilter={selectedUnitTypeFilter}
+              unitFilters={unitFilters}
               firstLeaseDate={firstLease}
               totalDays={days}
               bucketCount={bucketCount}
@@ -272,7 +317,7 @@ function App() {
         {unitData && (
           <HUD
             date={currentDateString}
-            leasedUnits={leasedUnits}
+            leasedUnits={filteredLeasedUnits}
             unitData={unitData}
             selectedUnit={selectedUnit}
             mode={mode}
@@ -300,35 +345,61 @@ function App() {
         )}
         <DataCharts
           showData={showData}
-          leasedUnits={leasedUnits}
+          leasedUnits={filteredLeasedUnits}
           mode={mode}
           unitData={unitData}
           level={level}
-          selectedUnitTypeFilter={selectedUnitTypeFilter}
-          setSelectedUnitTypeFilter={setSelectedUnitTypeFilter}
+          unitFilters={unitFilters}
+          setUnitFilters={setUnitFilters}
         />
         <div className="lease-visualizer-header">
           <div className="lease-visualizer-title">Lease Visualizer</div>
           <div className="lease-visualizer-subtitle">Fenway Kilmarnock</div>
         </div>
         {mode !== "table" && (
-          <div className="sun-control-panel">
-            <div className="sun-control-title">Sun / Time</div>
-            <div className="sun-control-time">{formatSunTime(sunTime)}</div>
-            <input
-              type="range"
-              min="8"
-              max="16"
-              step="0.25"
-              value={sunTime}
-              onChange={(e) => setSunTime(Number(e.target.value))}
-              className="sun-control-slider"
-            />
+          <div className="sun-and-filters">
+            <div className="sun-control-panel">
+              <div className="sun-control-title">Sun / Time</div>
+              <div className="sun-control-time">{formatSunTime(sunTime)}</div>
+              <input
+                type="range"
+                min="8"
+                max="16"
+                step="0.25"
+                value={sunTime}
+                onChange={(e) => setSunTime(Number(e.target.value))}
+                className="sun-control-slider"
+              />
+            </div>
+
+            {filterTags.length > 0 && (
+              <div className="active-filters-panel" aria-label="Active filters">
+                <div className="active-filters-title">Filters</div>
+                <div className="active-filters-tags">
+                  {filterTags.map((t) => (
+                    <span key={t.id} className="mode-selection-filter-tag">
+                      <span className="mode-selection-filter-tag-text">
+                        {t.label}
+                      </span>
+                      <button
+                        type="button"
+                        className="mode-selection-filter-tag-clear"
+                        onClick={t.onClear}
+                        aria-label={`Remove filter ${t.label}`}
+                        title={`Remove filter ${t.label}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
         {showFloorPlan &&
           selectedUnit &&
-          leasedUnits.includes(selectedUnit) && (
+          filteredLeasedUnits.includes(selectedUnit) && (
             <FloorPlanView
               selectedUnit={selectedUnit}
               unitData={unitData}

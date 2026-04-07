@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./SortedByUnitTypePercent.css";
 import type { LeaseData } from "../../types/lease";
 import type { UnitTypeLegendCategory } from "../../types/coloring";
@@ -16,6 +16,12 @@ type Props = {
 };
 
 const ORDER: UnitTypeLegendCategory[] = ["Studio", "1B", "2B", "3B"];
+type DisplayMode = "leased" | "total";
+
+type UnitTypeCounts = Record<UnitTypeLegendCategory, number>;
+type UnitTypeCountsByLevel = Record<string, UnitTypeCounts>;
+
+const EMPTY_COUNTS: UnitTypeCounts = { Studio: 0, "1B": 0, "2B": 0, "3B": 0 };
 
 function levelFromUnitId(unitId: string): string {
   const t = String(unitId).trim();
@@ -31,6 +37,46 @@ export default function SortedByUnitTypePercent({
   selectedUnitTypeFilter,
   setSelectedUnitTypeFilter,
 }: Props) {
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("leased");
+  const [totalCountsByLevel, setTotalCountsByLevel] =
+    useState<UnitTypeCountsByLevel | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const base = import.meta.env.BASE_URL;
+    fetch(base + "data/uniTypeCount.json")
+      .then((r) => r.json())
+      .then(
+        (rows: Array<{
+          level: string;
+          studio: number;
+          "1b": number;
+          "2b": number;
+          "3b": number;
+        }>) => {
+        if (cancelled) return;
+        const byLevel: UnitTypeCountsByLevel = {};
+        for (const row of rows ?? []) {
+          byLevel[String(row.level)] = {
+            Studio: Number(row.studio) || 0,
+            "1B": Number(row["1b"]) || 0,
+            "2B": Number(row["2b"]) || 0,
+            "3B": Number(row["3b"]) || 0,
+          };
+        }
+        setTotalCountsByLevel(byLevel);
+      },
+      )
+      .catch(() => {
+        if (cancelled) return;
+        setTotalCountsByLevel(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // ✅ STATIC denominator: total units in dataset for that context
   const denomStatic = useMemo(() => {
     if (!unitData) return 0;
@@ -48,46 +94,80 @@ export default function SortedByUnitTypePercent({
   }, [unitData, mode, level]);
 
   const { buckets, maxPct } = useMemo(() => {
-    const counts: Record<UnitTypeLegendCategory, number> = {
-      Studio: 0,
-      "1B": 0,
-      "2B": 0,
-      "3B": 0,
-    };
+    const leasedCounts: UnitTypeCounts = { ...EMPTY_COUNTS };
 
-    if (!unitData || leasedUnits.length === 0) {
-      const buckets = ORDER.map((k) => ({ k, count: 0, pct: 0 }));
-      return { buckets, maxPct: 1 };
-    }
+    if (unitData && leasedUnits.length > 0) {
+      for (const unitId of leasedUnits) {
+        const row = unitData[unitId];
+        if (!row) continue;
 
-    // ✅ count leased-at-currentDate into buckets (dynamic)
-    for (const unitId of leasedUnits) {
-      const row = unitData[unitId];
-      if (!row) continue;
+        if (mode === "levels") {
+          if (levelFromUnitId(unitId) !== level) continue;
+        }
 
-      if (mode === "levels") {
-        if (levelFromUnitId(unitId) !== level) continue;
+        const b = classifyUnitTypeCategory(row);
+        if (b === "Unknown") continue;
+
+        leasedCounts[b] += 1;
       }
-
-      const b = classifyUnitTypeCategory(row);
-      if (b === "Unknown") continue;
-
-      counts[b] += 1;
     }
+
+    const totalCountsForContext = (() => {
+      if (!totalCountsByLevel) return null;
+      if (mode === "levels") {
+        return totalCountsByLevel[level] ?? null;
+      }
+      // combined: sum all known levels from the totals file
+      const sum: UnitTypeCounts = { ...EMPTY_COUNTS };
+      for (const v of Object.values(totalCountsByLevel)) {
+        sum.Studio += v.Studio;
+        sum["1B"] += v["1B"];
+        sum["2B"] += v["2B"];
+        sum["3B"] += v["3B"];
+      }
+      return sum;
+    })();
 
     const buckets = ORDER.map((k) => {
-      const c = counts[k];
-      const pct = denomStatic > 0 ? (c / denomStatic) * 100 : 0;
-      return { k, count: c, pct };
+      const leased = leasedCounts[k] ?? 0;
+
+      if (displayMode === "total" && totalCountsForContext) {
+        const totalForType = totalCountsForContext[k] ?? 0;
+        const pct = totalForType > 0 ? (leased / totalForType) * 100 : 0;
+        return { k, count: leased, pct };
+      }
+
+      const pct = denomStatic > 0 ? (leased / denomStatic) * 100 : 0;
+      return { k, count: leased, pct };
     });
 
     const maxPct = Math.max(1, ...buckets.map((b) => b.pct));
     return { buckets, maxPct };
-  }, [unitData, leasedUnits, mode, level, denomStatic]);
+  }, [unitData, leasedUnits, mode, level, denomStatic, displayMode, totalCountsByLevel]);
 
   return (
     <div className="ut-strip">
-      <div className="ut-title">Unit Type Distribution</div>
+      <div className="ut-title-row">
+        <div className="ut-title">Unit Type Distribution</div>
+        <div className="ut-toggle" role="group" aria-label="Unit type distribution mode">
+          <button
+            type="button"
+            className={`ut-toggle-btn ${displayMode === "leased" ? "active" : ""}`}
+            onClick={() => setDisplayMode("leased")}
+            aria-pressed={displayMode === "leased"}
+          >
+            Leased
+          </button>
+          <button
+            type="button"
+            className={`ut-toggle-btn ${displayMode === "total" ? "active" : ""}`}
+            onClick={() => setDisplayMode("total")}
+            aria-pressed={displayMode === "total"}
+          >
+            Total
+          </button>
+        </div>
+      </div>
 
       <div className="ut-row">
         {buckets.map((b) => {

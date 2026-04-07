@@ -22,6 +22,46 @@
   transition: all var(--transition-normal);
 }
 
+.ut-title-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.ut-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg-secondary);
+}
+
+.ut-toggle-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-fast);
+}
+
+.ut-toggle-btn:hover {
+  color: var(--color-text-primary);
+  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+}
+
+.ut-toggle-btn.active {
+  background-color: var(--color-accent);
+  color: #ffffff;
+}
+
 .ut-strip:hover {
   box-shadow: var(--shadow-lg);
   border-color: var(--color-accent);
@@ -120,7 +160,6 @@
   color: var(--color-text-primary);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-xs);
-  margin-bottom: var(--space-xs);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }

@@ -17,8 +17,9 @@ import { getRhino3dmLibPath, getSharedRhino3dmLoader } from "../../utils/rhino3d
 import type {
   ColorMode,
   UnitTypeCategory,
-  UnitTypeLegendCategory,
 } from "../../types/coloring";
+import type { UnitFilters } from "../../utils/unitFilters";
+import { unitMatchesFilters } from "../../utils/unitFilters";
 
 type LevelUnitsProp = {
   level: string;
@@ -33,7 +34,7 @@ type LevelUnitsProp = {
   colorMode: ColorMode;
   unitTypeColors: Record<UnitTypeCategory, string>;
   affordableColor: string;
-  unitTypeFilter: UnitTypeLegendCategory | null;
+  unitFilters: UnitFilters;
   firstLeaseDate: Date | null;
   totalDays: number;
   bucketCount: number;
@@ -147,7 +148,7 @@ const LevelUnits = ({
   colorMode,
   unitTypeColors,
   affordableColor,
-  unitTypeFilter,
+  unitFilters,
   firstLeaseDate,
   totalDays,
   bucketCount,
@@ -439,9 +440,8 @@ const LevelUnits = ({
 
       if (isLeased) next.add(unitId);
 
-      const matchesTypeFilter =
-        !unitTypeFilter || unitTypeCategory === unitTypeFilter;
-      const isLeasedInFilteredView = isLeased && matchesTypeFilter;
+      const matchesAllFilters = unitMatchesFilters(leaseData[unitId], unitFilters);
+      const isLeasedInFilteredView = isLeased && matchesAllFilters;
 
       o.material = getUnitMaterial({
         mode,
@@ -482,7 +482,7 @@ const LevelUnits = ({
     mode,
     viewContext,
     colorMode,
-    unitTypeFilter,
+    unitFilters,
     firstLeaseDate,
     totalDays,
     bucketCount,

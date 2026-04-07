@@ -7,6 +7,8 @@ type Props = {
   leasedUnits: string[]; // leased at currentDate (changes with slider)
   mode: string; // "levels" | "combined"
   level: string; // selected level for levels mode
+  selectedRentPsfFilter: BucketKey | null;
+  setSelectedRentPsfFilter: React.Dispatch<React.SetStateAction<BucketKey | null>>;
 };
 
 function parsePSF(psf: unknown): number | null {
@@ -18,7 +20,7 @@ function parsePSF(psf: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-type BucketKey = "1" | "2" | "3" | "4" | "5" | "6" | "7p";
+export type BucketKey = "1" | "2" | "3" | "4" | "5" | "6" | "7p";
 const ORDER: BucketKey[] = ["1", "2", "3", "4", "5", "6", "7p"];
 
 function bucketForPSF(psf: number): BucketKey {
@@ -46,6 +48,8 @@ export default function SortedByRentPSFPercent({
   leasedUnits,
   mode,
   level,
+  selectedRentPsfFilter,
+  setSelectedRentPsfFilter,
 }: Props) {
   // ✅ STATIC denominator from unitData (ever-lease inventory), per your rule
   const denomStatic = useMemo(() => {
@@ -120,7 +124,16 @@ export default function SortedByRentPSFPercent({
     const pxClamped = b.count > 0 ? Math.max(6, px) : 0;
 
     return (
-      <div key={b.k} className="psf-col">
+      <button
+        key={b.k}
+        type="button"
+        className={`psf-col ${selectedRentPsfFilter === b.k ? "active" : ""}`}
+        onClick={() =>
+          setSelectedRentPsfFilter((prev) => (prev === b.k ? null : b.k))
+        }
+        aria-pressed={selectedRentPsfFilter === b.k}
+        title={`Filter leased units by ${bucketLabel(b.k)}`}
+      >
         <div className="psf-count">{labelPct}</div>
 
         <div className="psf-bar-wrap">
@@ -128,7 +141,7 @@ export default function SortedByRentPSFPercent({
         </div>
 
         <div className="psf-label">{bucketLabel(b.k)}</div>
-      </div>
+      </button>
     );
   };
 
