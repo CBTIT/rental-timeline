@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useCompactViewport } from "../../hooks/useCompactViewport";
 import type { LeaseData } from "../../types/lease";
 import "./FloorPlanView.css";
 
@@ -16,7 +17,7 @@ const FloorPlanView = ({
   base,
 }: FloorPlanViewProps) => {
   const [imageError, setImageError] = useState(false);
-  const [fullscreen, setFullscreen] = useState(true);
+  const [fullscreen, setFullscreen] = useState(false);
 
   const unitRow = selectedUnit ? unitData?.[selectedUnit] : null;
   const unitNumber = selectedUnit?.trim() ?? null;
@@ -24,25 +25,67 @@ const FloorPlanView = ({
     ? `${base}unit_plans/${encodeURIComponent(unitNumber)}.jpg`
     : null;
 
+  const isCompact = useCompactViewport();
+
   useEffect(() => {
     setImageError(false);
-    setFullscreen(true);
-  }, [unitNumber]);
+    // Desktop: show small preview first. Compact: open fullscreen immediately.
+    setFullscreen(isCompact);
+  }, [unitNumber, isCompact]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (isCompact) {
+        onClose();
+      } else {
+        setFullscreen(false);
+      }
     };
     if (fullscreen) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [fullscreen, onClose]);
+  }, [fullscreen, isCompact, onClose]);
 
   return (
     <>
+      {!isCompact && (
+        <div className="floor-plan-view">
+          <div className="floor-plan-header">
+            <span className="floor-plan-title">
+              Floor Plan{unitNumber ? ` — ${unitNumber}` : ""}
+            </span>
+            <button
+              type="button"
+              className="floor-plan-close"
+              onClick={onClose}
+              aria-label="Close floor plan"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="floor-plan-image-container">
+            {imageSrc && !imageError ? (
+              <img
+                src={imageSrc}
+                alt={`Floor plan for unit ${unitNumber}`}
+                className="floor-plan-image floor-plan-image-clickable"
+                onClick={() => setFullscreen(true)}
+                onError={() => setImageError(true)}
+                title="Click to expand"
+              />
+            ) : (
+              <div className="floor-plan-unavailable">
+                Floor plan unavailable for this unit
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {fullscreen && imageSrc && !imageError && (
         <div
           className="floor-plan-overlay"
-          onClick={onClose}
+          onClick={isCompact ? onClose : () => setFullscreen(false)}
           role="dialog"
           aria-modal="true"
           aria-label="Floor plan fullscreen view"
@@ -52,7 +95,8 @@ const FloorPlanView = ({
             className="floor-plan-overlay-close"
             onClick={(e) => {
               e.stopPropagation();
-              onClose();
+              if (isCompact) onClose();
+              else setFullscreen(false);
             }}
             aria-label="Close fullscreen floor plan"
           >
@@ -157,7 +201,7 @@ const FloorPlanView = ({
       {fullscreen && (!imageSrc || imageError) && (
         <div
           className="floor-plan-overlay"
-          onClick={onClose}
+          onClick={isCompact ? onClose : () => setFullscreen(false)}
           role="dialog"
           aria-modal="true"
           aria-label="Floor plan unavailable"
@@ -167,7 +211,8 @@ const FloorPlanView = ({
             className="floor-plan-overlay-close"
             onClick={(e) => {
               e.stopPropagation();
-              onClose();
+              if (isCompact) onClose();
+              else setFullscreen(false);
             }}
             aria-label="Close floor plan"
           >

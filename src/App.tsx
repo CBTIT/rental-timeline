@@ -33,6 +33,8 @@ import {
   type UnitFilters,
   unitMatchesFilters,
 } from "./utils/unitFilters";
+import { useCompactViewport } from "./hooks/useCompactViewport";
+import WebglContextStability from "./components/WebglContextStability/WebglContextStability";
 
 const DEFAULT_LEASE_COLOR = "#14b8a6";
 const DEFAULT_CONCESSION_PALETTE = [
@@ -67,6 +69,8 @@ function rentPsfFilterLabel(k: UnitFilters["rentPsf"]): string {
 
 function App() {
   const base = import.meta.env.BASE_URL;
+  const compactViewport = useCompactViewport();
+  const shadowMapSize = compactViewport ? 1024 : 4096;
   const [selectedLeaseColor, setSelectedLeaseColor] =
     useState<string>(DEFAULT_LEASE_COLOR);
   const [colorMode, setColorMode] = useState<ColorMode>("lease-date");
@@ -781,9 +785,10 @@ function App() {
         />
         <Canvas
           shadows
-          dpr={[1, 2]}
+          dpr={compactViewport ? 1 : [1, 2]}
           onPointerMissed={() => setSelectedUnit(null)}
         >
+          <WebglContextStability />
           {/* Outside Suspense so context.3dm loads in parallel with useLoader (units); inside Suspense it waited until after units resolved. */}
           <BaseMap viewContext={viewContext} mode={mode} />
           <Suspense fallback={null}>
@@ -814,8 +819,8 @@ function App() {
             castShadow
             position={sunLighting.keyPosition}
             intensity={sunLighting.keyIntensity}
-            shadow-mapSize-width={4096}
-            shadow-mapSize-height={4096}
+            shadow-mapSize-width={shadowMapSize}
+            shadow-mapSize-height={shadowMapSize}
             shadow-camera-near={10}
             shadow-camera-far={100000}
             shadow-camera-left={-400000}
