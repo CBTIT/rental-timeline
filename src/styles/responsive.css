@@ -437,6 +437,17 @@
   }
 }
 
+/* Only show on compact screens (mobile + tablet) */
+.compact-only {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .compact-only {
+    display: block;
+  }
+}
+
 /* Only show on tablet */
 .md-only {
   display: none;

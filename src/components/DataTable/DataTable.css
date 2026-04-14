@@ -21,7 +21,7 @@ table {
 thead th {
   position: sticky !important;
   top: 0;
-  z-index: 10;
+  z-index: 30;
   background: var(--color-bg-secondary);
   border-bottom: var(--border-width) solid var(--color-border);
   padding: var(--space-md) var(--space-lg);
@@ -108,13 +108,11 @@ th.sortable:hover {
   transition: all var(--transition-normal);
 }
 
-/* Responsive mobile */
+/* Mobile: reduce top margin (title bar is smaller) */
 @media (max-width: 639px) {
   .table-container {
-    margin: 76px var(--space-sm) var(--space-lg) var(--space-sm);
-    border-radius: var(--radius-md);
-    height: calc(100vh - 116px);
-    max-height: 50vh;
+    margin: 52px var(--space-sm) var(--space-md) var(--space-sm);
+    height: calc(100vh - 84px);
   }
 
   thead th,
@@ -130,11 +128,11 @@ th.sortable:hover {
   }
 }
 
-/* Responsive tablet */
+/* Tablet: keep larger top margin so header isn't covered */
 @media (min-width: 640px) and (max-width: 1023px) {
   .table-container {
-    margin: 0 var(--space-md) var(--space-lg) var(--space-md);
-    height: calc(100vh - 96px);
+    margin: 56px var(--space-md) var(--space-lg) var(--space-md);
+    height: calc(100vh - 94px);
   }
 
   thead th,

@@ -530,8 +530,9 @@
 }
 
 /* Responsive mobile adjustments */
-@media (max-width: 639px) {
+@media (max-width: 1023px) {
   .HUD {
+    display: none !important;
     position: fixed;
     bottom: var(--space-lg);
     right: auto;

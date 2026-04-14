@@ -16,7 +16,7 @@ const FloorPlanView = ({
   base,
 }: FloorPlanViewProps) => {
   const [imageError, setImageError] = useState(false);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreen, setFullscreen] = useState(true);
 
   const unitRow = selectedUnit ? unitData?.[selectedUnit] : null;
   const unitNumber = selectedUnit?.trim() ?? null;
@@ -26,55 +26,23 @@ const FloorPlanView = ({
 
   useEffect(() => {
     setImageError(false);
-    setFullscreen(false);
+    setFullscreen(true);
   }, [unitNumber]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setFullscreen(false);
+      if (e.key === "Escape") onClose();
     };
     if (fullscreen) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [fullscreen]);
+  }, [fullscreen, onClose]);
 
   return (
     <>
-      <div className="floor-plan-view">
-        <div className="floor-plan-header">
-          <span className="floor-plan-title">
-            Floor Plan{unitNumber ? ` — ${unitNumber}` : ""}
-          </span>
-          <button
-            type="button"
-            className="floor-plan-close"
-            onClick={onClose}
-            aria-label="Close floor plan"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="floor-plan-image-container">
-          {imageSrc && !imageError ? (
-            <img
-              src={imageSrc}
-              alt={`Floor plan for unit ${unitNumber}`}
-              className="floor-plan-image floor-plan-image-clickable"
-              onClick={() => setFullscreen(true)}
-              onError={() => setImageError(true)}
-              title="Click to expand"
-            />
-          ) : (
-            <div className="floor-plan-unavailable">
-              Floor plan unavailable for this unit
-            </div>
-          )}
-        </div>
-      </div>
-
       {fullscreen && imageSrc && !imageError && (
         <div
           className="floor-plan-overlay"
-          onClick={() => setFullscreen(false)}
+          onClick={onClose}
           role="dialog"
           aria-modal="true"
           aria-label="Floor plan fullscreen view"
@@ -84,7 +52,7 @@ const FloorPlanView = ({
             className="floor-plan-overlay-close"
             onClick={(e) => {
               e.stopPropagation();
-              setFullscreen(false);
+              onClose();
             }}
             aria-label="Close fullscreen floor plan"
           >
@@ -98,31 +66,119 @@ const FloorPlanView = ({
               src={imageSrc}
               alt={`Floor plan for unit ${unitNumber}`}
               className="floor-plan-overlay-image"
+              onError={() => setImageError(true)}
             />
             <div className="floor-plan-overlay-details">
-              <div className="fp-detail-unit">{selectedUnit}</div>
-              <div className="fp-detail-row">
-                <span className="fp-detail-label">Type</span>
-                <span className="fp-detail-value">{unitRow?.unitType}</span>
+              <div className="fp-detail-unitheader">
+                <div className="fp-detail-unitheader-label">Unit number</div>
+                <div className="fp-detail-unitheader-value">{selectedUnit}</div>
               </div>
-              <div className="fp-detail-row">
-                <span className="fp-detail-label">Description</span>
-                <span className="fp-detail-value">{unitRow?.description}</span>
+              <div className="fp-detail-table" role="table" aria-label="Unit details">
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Type
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.unitType ?? "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Description
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.description ?? "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Area
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.unitArea
+                      ? `${unitRow.unitArea.toLocaleString()} SF`
+                      : "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Lease Start
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.leaseStartDate ?? "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Lease End
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.leaseEndDate ?? "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Rent
+                  </span>
+                  <span className="fp-detail-value fp-detail-accent" role="cell">
+                    {unitRow?.rent != null ? `$${String(unitRow.rent)}` : "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Free Months
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.freeMonths ?? "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Leasing Associate
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.leasingAssociate ?? "—"}
+                  </span>
+                </div>
+                <div className="fp-detail-row" role="row">
+                  <span className="fp-detail-label" role="cell">
+                    Affordable
+                  </span>
+                  <span className="fp-detail-value" role="cell">
+                    {unitRow?.affordable ? "Yes" : "No"}
+                  </span>
+                </div>
               </div>
-              <div className="fp-detail-row">
-                <span className="fp-detail-label">Area</span>
-                <span className="fp-detail-value">
-                  {unitRow?.unitArea
-                    ? `${unitRow.unitArea.toLocaleString()} SF`
-                    : "—"}
-                </span>
-              </div>
-              <div className="fp-detail-row">
-                <span className="fp-detail-label">Rent</span>
-                <span className="fp-detail-value fp-detail-accent">
-                  {unitRow?.rent ? `$${unitRow.rent.toLocaleString()}` : "—"}
-                </span>
-              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {fullscreen && (!imageSrc || imageError) && (
+        <div
+          className="floor-plan-overlay"
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Floor plan unavailable"
+        >
+          <button
+            type="button"
+            className="floor-plan-overlay-close"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Close floor plan"
+          >
+            ✕
+          </button>
+          <div
+            className="floor-plan-overlay-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="floor-plan-unavailable">
+              Floor plan unavailable for this unit
             </div>
           </div>
         </div>

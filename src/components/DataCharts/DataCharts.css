@@ -62,13 +62,8 @@
 
 /* Responsive tablet adjustments */
 @media (min-width: 640px) and (max-width: 1023px) {
+  /* Compact UI owns charts on <=1023px */
   .data-charts {
-    left: var(--space-md);
-    width: 280px;
-    top: 82px;
-    max-height: calc(100vh - 210px);
-    overflow-y: auto;
-    overflow-x: clip;
-    scrollbar-gutter: stable;
+    display: none;
   }
 }

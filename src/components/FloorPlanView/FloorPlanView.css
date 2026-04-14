@@ -147,17 +147,63 @@
   border-left: var(--border-width) solid var(--color-border);
 }
 
-.fp-detail-unit {
-  font-size: var(--font-size-2xl, 1.5rem);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
+/* Mobile: stack details below image */
+@media (max-width: 639px) {
+  .floor-plan-overlay-content {
+    flex-direction: column;
+    max-width: 94vw;
+    max-height: 92vh;
+  }
+
+  .floor-plan-overlay-image {
+    max-width: 94vw;
+    max-height: 52vh;
+  }
+
+  .floor-plan-overlay-details {
+    width: auto;
+    border-left: none;
+    border-top: var(--border-width) solid var(--color-border);
+    padding: var(--space-md);
+  }
+
+  .fp-detail-unitheader-value {
+    font-size: 1.25rem;
+  }
+}
+
+.fp-detail-unitheader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   margin-bottom: var(--space-sm);
 }
 
+.fp-detail-unitheader-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fp-detail-unitheader-value {
+  font-size: var(--font-size-2xl, 1.5rem);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.05;
+}
+
+.fp-detail-table {
+  display: grid;
+  gap: 10px;
+}
+
 .fp-detail-row {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  align-items: start;
+  gap: var(--space-sm);
 }
 
 .fp-detail-label {
@@ -166,12 +212,17 @@
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  line-height: 1.2;
+  padding-top: 1px;
 }
 
 .fp-detail-value {
   font-size: var(--font-size-sm, 0.875rem);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .fp-detail-accent {
@@ -186,6 +237,12 @@
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@media (max-width: 639px) {
+  .fp-detail-row {
+    grid-template-columns: 120px 1fr;
   }
 }
 
