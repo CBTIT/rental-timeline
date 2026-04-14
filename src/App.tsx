@@ -70,7 +70,7 @@ function rentPsfFilterLabel(k: UnitFilters["rentPsf"]): string {
 function App() {
   const base = import.meta.env.BASE_URL;
   const compactViewport = useCompactViewport();
-  const shadowMapSize = compactViewport ? 1024 : 4096;
+  // Shadows disabled globally for stability/perf across devices.
   const [selectedLeaseColor, setSelectedLeaseColor] =
     useState<string>(DEFAULT_LEASE_COLOR);
   const [colorMode, setColorMode] = useState<ColorMode>("lease-date");
@@ -784,7 +784,6 @@ function App() {
           showDataToggle={false}
         />
         <Canvas
-          shadows
           dpr={compactViewport ? 1 : [1, 2]}
           onPointerMissed={() => setSelectedUnit(null)}
         >
@@ -816,19 +815,8 @@ function App() {
           <ambientLight intensity={sunLighting.ambientIntensity} />
           {/* Key light */}
           <directionalLight
-            castShadow
             position={sunLighting.keyPosition}
             intensity={sunLighting.keyIntensity}
-            shadow-mapSize-width={shadowMapSize}
-            shadow-mapSize-height={shadowMapSize}
-            shadow-camera-near={10}
-            shadow-camera-far={100000}
-            shadow-camera-left={-400000}
-            shadow-camera-right={400000}
-            shadow-camera-top={400000}
-            shadow-camera-bottom={-400000}
-            shadow-bias={-0.0002}
-            shadow-normalBias={0.002}
           />
           {/* Fill light (opposite side, weaker) */}
           <directionalLight
