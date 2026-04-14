@@ -2,6 +2,7 @@ import { useEffect, memo, useState } from "react";
 import * as THREE from "three";
 import { perfLog, perfNow } from "../../utils/perf";
 import { getSharedRhino3dmLoader } from "../../utils/rhino3dm";
+import { useCompactViewport } from "../../hooks/useCompactViewport";
 
 type BaseMapProps = {
   viewContext: string;
@@ -50,8 +51,16 @@ function prepareContextObject(obj: THREE.Object3D): void {
 const BaseMap = ({ viewContext, mode }: BaseMapProps) => {
   const base = import.meta.env.BASE_URL;
   const [contextModel, setContextModel] = useState<THREE.Object3D | null>(null);
+  const compactViewport = useCompactViewport();
 
   useEffect(() => {
+    // Mobile/compact: skip loading the heavy context model to reduce GPU memory
+    // pressure and avoid WebGL context loss/reloads.
+    if (compactViewport) {
+      setContextModel(null);
+      return;
+    }
+
     let cancelled = false;
     const loader = getSharedRhino3dmLoader();
 
@@ -79,10 +88,10 @@ const BaseMap = ({ viewContext, mode }: BaseMapProps) => {
     return () => {
       cancelled = true;
     };
-  }, [base]);
+  }, [base, compactViewport]);
 
   const is3D = viewContext === "3D";
-  const showContext = is3D && mode !== "table";
+  const showContext = !compactViewport && is3D && mode !== "table";
 
   return (
     <>
