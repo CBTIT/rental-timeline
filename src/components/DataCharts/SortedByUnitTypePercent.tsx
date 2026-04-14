@@ -200,6 +200,12 @@ export default function SortedByUnitTypePercent({
           );
         })}
       </div>
+
+      {displayMode === "leased" ? (
+        <div className="chart-footnote">% = leased in type ÷ total units in view.</div>
+      ) : (
+        <div className="chart-footnote">% = leased in type ÷ total units of that type.</div>
+      )}
     </div>
   );
 }

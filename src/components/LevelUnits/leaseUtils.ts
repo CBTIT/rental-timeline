@@ -14,6 +14,7 @@ type GetUnitMaterialProps = {
   isAffordable: boolean;
   bucketIndex: number;
   unitTypeCategory: UnitTypeCategory | null;
+  concessionKey: string | null;
   materials: UnitMaterialSet;
 };
 type GetUnitVisualStateProps = {
@@ -33,6 +34,7 @@ type UnitVisualState = {
   isAffordable: boolean;
   bucketIndex: number;
   unitTypeCategory: UnitTypeCategory | null;
+  concessionKey: string | null;
 };
 
 export function getUnitMaterial({
@@ -44,6 +46,7 @@ export function getUnitMaterial({
   isAffordable,
   bucketIndex,
   unitTypeCategory,
+  concessionKey,
   materials,
 }: GetUnitMaterialProps) {
   const inCombined = mode === "combined";
@@ -51,18 +54,22 @@ export function getUnitMaterial({
   const in3DCombined = inCombined && viewContext === "3D";
 
   const leasedMaterial3D =
-    colorMode === "unit-type" && unitTypeCategory
-      ? materials.unitTypeMaterials[unitTypeCategory]
-      : bucketIndex >= 0
-        ? materials.bucketMaterials[bucketIndex]
-        : null;
+    colorMode === "concession" && concessionKey
+      ? materials.concessionMaterials[concessionKey] ?? null
+      : colorMode === "unit-type" && unitTypeCategory
+        ? materials.unitTypeMaterials[unitTypeCategory]
+        : bucketIndex >= 0
+          ? materials.bucketMaterials[bucketIndex]
+          : null;
 
   const leasedMaterial2D =
-    colorMode === "unit-type" && unitTypeCategory
-      ? materials.unitTypeOverlayMaterials[unitTypeCategory]
-      : bucketIndex >= 0
-        ? materials.bucketOverlayMaterials[bucketIndex]
-        : null;
+    colorMode === "concession" && concessionKey
+      ? materials.concessionOverlayMaterials[concessionKey] ?? null
+      : colorMode === "unit-type" && unitTypeCategory
+        ? materials.unitTypeOverlayMaterials[unitTypeCategory]
+        : bucketIndex >= 0
+          ? materials.bucketOverlayMaterials[bucketIndex]
+          : null;
 
   if (in2DCombined) {
     if (isSelected) return materials.selected;
@@ -99,6 +106,12 @@ export function getUnitVisualState({
   const isSelected = selectedUnit === unitId;
   const isAffordable = !!row?.affordable;
   const unitTypeCategory = row ? classifyUnitTypeCategory(row) : null;
+  const concessionKey =
+    row && typeof row.freeMonths === "number" && Number.isFinite(row.freeMonths)
+      ? String(row.freeMonths)
+      : row?.freeMonths !== undefined && row?.freeMonths !== null
+        ? "Unknown"
+        : null;
 
   let bucketIndex = -1;
   if (isLeased && start && firstLeaseDate) {
@@ -113,5 +126,6 @@ export function getUnitVisualState({
     isAffordable,
     bucketIndex,
     unitTypeCategory,
+    concessionKey,
   };
 }

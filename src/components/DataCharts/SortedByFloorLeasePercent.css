@@ -39,7 +39,7 @@
 .fl-row {
   display: flex;
   justify-content: center;
-  gap: var(--space-sm);
+  gap: clamp(4px, 1vw, var(--space-sm));
   align-items: flex-start;
   width: 100%;
   flex-wrap: wrap;
@@ -61,13 +61,13 @@
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
   margin-bottom: var(--space-xs);
-  min-height: 20px;
+  min-height: 16px;
   line-height: 1;
 }
 
 .fl-bar-wrap {
-  height: 59px;
-  width: var(--space-lg);
+  height: clamp(44px, 7vh, 59px);
+  width: clamp(24px, 8vw, var(--space-lg));
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -91,7 +91,7 @@
 
 .fl-label {
   margin-top: var(--space-xs);
-  font-size: var(--font-size-xs);
+  font-size: clamp(9px, 2.1vw, var(--font-size-xs));
   color: var(--color-text-secondary);
   text-align: center;
   word-break: break-word;

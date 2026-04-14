@@ -6,11 +6,13 @@ import type { BucketKey } from "../components/DataCharts/SortedByRentPSFPercent"
 export type UnitFilters = {
   unitType: UnitTypeLegendCategory | null;
   rentPsf: BucketKey | null;
+  concession: string | null;
 };
 
 export const DEFAULT_UNIT_FILTERS: UnitFilters = {
   unitType: null,
   rentPsf: null,
+  concession: null,
 };
 
 function parsePSF(psf: unknown): number | null {
@@ -47,6 +49,16 @@ export function unitMatchesFilters(
     const psf = parsePSF(row.psf);
     if (psf == null) return false;
     if (bucketForPSF(psf) !== filters.rentPsf) return false;
+  }
+
+  if (filters.concession) {
+    const key =
+      typeof row.freeMonths === "number" && Number.isFinite(row.freeMonths)
+        ? String(row.freeMonths)
+        : row.freeMonths !== undefined && row.freeMonths !== null
+          ? "Unknown"
+          : null;
+    if (key !== filters.concession) return false;
   }
 
   return true;

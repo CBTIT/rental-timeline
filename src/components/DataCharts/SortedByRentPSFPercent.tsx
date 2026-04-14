@@ -156,6 +156,10 @@ export default function SortedByRentPSFPercent({
           {highBuckets.map(renderBucket)}
         </div>
       </div>
+
+      <div className="chart-footnote">
+        % = leased in bucket ÷ total units in view (building/level).
+      </div>
     </div>
   );
 }

@@ -160,6 +160,14 @@
     box-shadow var(--transition-normal);
 }
 
+.mode-selection-filter-tag input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
 .mode-selection-filter-tag:hover {
   background: var(--button-hover-lit-gradient);
   border-color: var(--button-hover-lit-border);

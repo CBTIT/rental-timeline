@@ -34,6 +34,7 @@ type LevelUnitsProp = {
   colorMode: ColorMode;
   unitTypeColors: Record<UnitTypeCategory, string>;
   affordableColor: string;
+  concessionColors: Record<string, string>;
   unitFilters: UnitFilters;
   firstLeaseDate: Date | null;
   totalDays: number;
@@ -148,6 +149,7 @@ const LevelUnits = ({
   colorMode,
   unitTypeColors,
   affordableColor,
+  concessionColors,
   unitFilters,
   firstLeaseDate,
   totalDays,
@@ -158,6 +160,10 @@ const LevelUnits = ({
     () => JSON.stringify(unitTypeColors),
     [unitTypeColors],
   );
+  const concessionColorsKey = useMemo(
+    () => JSON.stringify(concessionColors),
+    [concessionColors],
+  );
 
   //getting material set and disposing older material
   const materials = useMemo(
@@ -166,9 +172,16 @@ const LevelUnits = ({
         selectedLeasedColor,
         unitTypeColors,
         affordableColor,
+        concessionColors,
         bucketCount,
       ),
-    [selectedLeasedColor, unitTypeColorsKey, affordableColor, bucketCount],
+    [
+      selectedLeasedColor,
+      unitTypeColorsKey,
+      affordableColor,
+      concessionColorsKey,
+      bucketCount,
+    ],
   );
   useEffect(() => {
     return () => disposeUnitMaterials(materials);
@@ -428,6 +441,7 @@ const LevelUnits = ({
         isAffordable,
         bucketIndex,
         unitTypeCategory,
+        concessionKey,
       } = getUnitVisualState({
         unitId,
         leaseData,
@@ -452,6 +466,7 @@ const LevelUnits = ({
         isAffordable: isAffordable && isLeasedInFilteredView,
         bucketIndex,
         unitTypeCategory,
+        concessionKey,
         materials,
       });
     });

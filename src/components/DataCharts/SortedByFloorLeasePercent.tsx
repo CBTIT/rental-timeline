@@ -78,6 +78,10 @@ export default function SortedByFloorLeasePercent({
           );
         })}
       </div>
+
+      <div className="chart-footnote">
+        % = leased on level ÷ total units in building.
+      </div>
     </div>
   );
 }

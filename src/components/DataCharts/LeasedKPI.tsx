@@ -63,13 +63,10 @@ export default function LeasedKPI({ leasedUnits, mode, level }: Props) {
   return (
     <div className="kpi-container">
       <div className="kpi">
-        <div className="kpi-label">TOTAL UNITS</div>
-        <div className="kpi-value">{totalUnitsContext}</div>
-      </div>
-
-      <div className="kpi">
-        <div className="kpi-label">LEASED NOW</div>
-        <div className="kpi-value">{leasedUnitsContext}</div>
+        <div className="kpi-label">LEASED UNITS</div>
+        <div className="kpi-value">
+          {leasedUnitsContext}/{totalUnitsContext}
+        </div>
       </div>
 
       <div className="kpi">

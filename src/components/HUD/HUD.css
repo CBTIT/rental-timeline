@@ -61,6 +61,66 @@
   flex-wrap: wrap;
 }
 
+.hud-color-mode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.hud-color-mode-select-input {
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  min-width: 140px;
+  padding: 6px 30px 6px 10px;
+  border: var(--border-width) solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  line-height: 1.2;
+  color-scheme: light dark;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 9px) 50%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+
+.hud-color-mode-select-input:hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.hud-color-mode-select-input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--color-accent) 24%, transparent);
+}
+
+.theme-dark .hud-color-mode-select-input {
+  border-color: color-mix(in oklab, var(--color-border-light) 70%, white 30%);
+  background-color: color-mix(in oklab, var(--color-bg-secondary) 70%, black 30%);
+}
+
+.theme-dark .hud-color-mode-select-input:hover {
+  background-color: color-mix(in oklab, var(--color-bg-secondary) 80%, white 20%);
+  border-color: color-mix(in oklab, var(--color-border-light) 60%, white 40%);
+  box-shadow: var(--shadow-md);
+}
+
 .hud-color-mode-btn {
   padding: var(--space-xs) var(--space-md);
   border: var(--border-width) solid var(--color-border);

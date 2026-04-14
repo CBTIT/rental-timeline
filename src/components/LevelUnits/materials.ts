@@ -19,12 +19,15 @@ export type UnitMaterialSet = {
     UnitTypeCategory,
     THREE.MeshStandardMaterial
   >;
+  concessionMaterials: Record<string, THREE.MeshStandardMaterial>;
+  concessionOverlayMaterials: Record<string, THREE.MeshStandardMaterial>;
 };
 
 export function createUnitMaterials(
   selectedLeaseColor: string,
   unitTypeColors: Record<UnitTypeCategory, string>,
   affordableColor: string,
+  concessionColors: Record<string, string>,
   bucketCount: number = 5,
   minLightness: number = 0.3,
 ): UnitMaterialSet {
@@ -143,6 +146,32 @@ export function createUnitMaterials(
     {} as Record<UnitTypeCategory, THREE.MeshStandardMaterial>,
   );
 
+  const concessionMaterials = Object.entries(concessionColors).reduce(
+    (acc, [key, color]) => {
+      acc[key] = new THREE.MeshStandardMaterial({
+        color,
+        depthWrite: true,
+        depthTest: true,
+      });
+      return acc;
+    },
+    {} as Record<string, THREE.MeshStandardMaterial>,
+  );
+
+  const concessionOverlayMaterials = Object.entries(concessionColors).reduce(
+    (acc, [key, color]) => {
+      acc[key] = new THREE.MeshStandardMaterial({
+        color,
+        transparent: true,
+        opacity: 0.25,
+        depthTest: true,
+        depthWrite: false,
+      });
+      return acc;
+    },
+    {} as Record<string, THREE.MeshStandardMaterial>,
+  );
+
   return {
     outline,
     text,
@@ -157,6 +186,8 @@ export function createUnitMaterials(
     bucketOverlayMaterials,
     unitTypeMaterials,
     unitTypeOverlayMaterials,
+    concessionMaterials,
+    concessionOverlayMaterials,
   };
 }
 
@@ -174,4 +205,6 @@ export function disposeUnitMaterials(materials: UnitMaterialSet) {
   materials.bucketOverlayMaterials.forEach((m) => m.dispose());
   Object.values(materials.unitTypeMaterials).forEach((m) => m.dispose());
   Object.values(materials.unitTypeOverlayMaterials).forEach((m) => m.dispose());
+  Object.values(materials.concessionMaterials).forEach((m) => m.dispose());
+  Object.values(materials.concessionOverlayMaterials).forEach((m) => m.dispose());
 }

@@ -4,6 +4,7 @@ import TimeSlider from "../TimeSlider/TimeSlider";
 import ViewContextButton from "../ViewContextButton/ViewContextButton";
 import { generateGradient } from "../../utils/colorGradient";
 import { type ColorMode, type UnitTypeCategory } from "../../types/coloring";
+import LeasedKPI from "../DataCharts/LeasedKPI";
 import "./HUD.css";
 
 type HUDProps = {
@@ -25,6 +26,9 @@ type HUDProps = {
   >;
   affordableColor: string;
   setAffordableColor: React.Dispatch<React.SetStateAction<string>>;
+  concessionKeys: string[];
+  concessionColors: Record<string, string>;
+  setConcessionColors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   bucketCount: number;
   setBucketCount: React.Dispatch<React.SetStateAction<number>>;
   level: string;
@@ -66,6 +70,9 @@ const HUD = ({
   setUnitTypeColors,
   affordableColor,
   setAffordableColor,
+  concessionKeys,
+  concessionColors,
+  setConcessionColors,
   bucketCount,
   setBucketCount,
   level,
@@ -91,27 +98,27 @@ const HUD = ({
   const setUnitTypeColor = (category: UnitTypeCategory, color: string) => {
     setUnitTypeColors((prev) => ({ ...prev, [category]: color }));
   };
+  const setConcessionColor = (key: string, color: string) => {
+    setConcessionColors((prev) => ({ ...prev, [key]: color }));
+  };
 
   return (
     <div className="HUD">
       <div className="date">{date}</div>
+      <LeasedKPI leasedUnits={leasedUnits} mode={mode} level={level} />
       <div className="color-selection">
-        <div className="color-selection-title">Color Mode</div>
-        <div className="hud-color-mode-toggle">
-          <button
-            type="button"
-            className={`hud-color-mode-btn ${colorMode === "lease-date" ? "active" : ""}`}
-            onClick={() => setColorMode("lease-date")}
+        <div className="hud-color-mode-row">
+          <div className="color-selection-title">Color Mode</div>
+          <select
+            className="hud-color-mode-select-input"
+            value={colorMode}
+            onChange={(e) => setColorMode(e.target.value as ColorMode)}
+            aria-label="Select color mode"
           >
-            Lease Date
-          </button>
-          <button
-            type="button"
-            className={`hud-color-mode-btn ${colorMode === "unit-type" ? "active" : ""}`}
-            onClick={() => setColorMode("unit-type")}
-          >
-            Unit Type
-          </button>
+            <option value="lease-date">Lease Date</option>
+            <option value="unit-type">Unit Type</option>
+            <option value="concession">Concession</option>
+          </select>
         </div>
 
         {colorMode === "lease-date" && (
@@ -188,6 +195,37 @@ const HUD = ({
             </label>
           </div>
         )}
+
+        {colorMode === "concession" && (
+          <div className="unit-type-color-list">
+            {concessionKeys.length === 0 && (
+              <div className="unit-type-color-item">
+                <span className="unit-type-color-label">No concession values</span>
+              </div>
+            )}
+
+            {concessionKeys.map((key) => {
+              const label =
+                key === "Unknown"
+                  ? "Unknown"
+                  : key === "0"
+                    ? "No Concession"
+                    : `${key} ${key === "1" ? "month" : "months"}`;
+              const value = concessionColors[key] ?? "#888888";
+              return (
+                <label className="unit-type-color-item" key={key}>
+                  <span className="unit-type-color-label">{label}</span>
+                  <input
+                    type="color"
+                    value={value}
+                    onChange={(e) => setConcessionColor(key, e.target.value)}
+                    aria-label={`Select ${label} concession color`}
+                  />
+                </label>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Time Slider - moved to top */}
@@ -253,6 +291,10 @@ const HUD = ({
           <div className="unit-detail-row">
             <div>Rent</div>
             <div className="value">{selectedRow.rent}</div>
+          </div>
+          <div className="unit-detail-row">
+            <div>Free Months</div>
+            <div className="value">{selectedRow.freeMonths}</div>
           </div>
           <div className="unit-detail-row">
             <div>Leasing Associate</div>

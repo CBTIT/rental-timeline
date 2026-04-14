@@ -32,24 +32,24 @@ import {
 } from "./utils/unitFilters";
 
 const DEFAULT_LEASE_COLOR = "#14b8a6";
+const DEFAULT_CONCESSION_PALETTE = [
+  "#6366f1", // indigo
+  "#0ea5e9", // sky
+  "#22c55e", // green
+  "#f97316", // orange
+  "#ec4899", // pink
+  "#f59e0b", // amber
+  "#14b8a6", // teal
+  "#8b5cf6", // violet
+  "#ef4444", // red
+  "#84cc16", // lime
+  "#06b6d4", // cyan
+] as const;
 
 function rentPsfFilterLabel(k: UnitFilters["rentPsf"]): string {
   if (!k) return "";
   if (k === "7p") return ">$7.0";
   return `$${k}.x`;
-}
-
-function formatSunTime(time: number) {
-  const clamped = Math.max(8, Math.min(16, time));
-  const hour = Math.floor(clamped) % 24;
-  const minute = Math.round((clamped - Math.floor(clamped)) * 60);
-  const normalizedMinute = minute === 60 ? 0 : minute;
-  const normalizedHour = minute === 60 ? (hour + 1) % 24 : hour;
-  const meridiem = normalizedHour >= 12 ? "PM" : "AM";
-  const hour12 = normalizedHour % 12 === 0 ? 12 : normalizedHour % 12;
-  const minuteText = String(normalizedMinute).padStart(2, "0");
-
-  return `${hour12}:${minuteText} ${meridiem}`;
 }
 
 function App() {
@@ -63,9 +63,18 @@ function App() {
   const [affordableColor, setAffordableColor] = useState<string>(
     DEFAULT_AFFORDABLE_COLOR,
   );
+  const [concessionColors, setConcessionColors] = useState<Record<string, string>>(
+    {},
+  );
   const [unitFilters, setUnitFilters] = useState<UnitFilters>(DEFAULT_UNIT_FILTERS);
   const [bucketCount, setBucketCount] = useState<number>(5);
   const [showData, setShowData] = useState<boolean>(true);
+  const [showRentDistribution, setShowRentDistribution] = useState<boolean>(true);
+  const [showUnitTypeDistribution, setShowUnitTypeDistribution] =
+    useState<boolean>(true);
+  const [showLevelDistribution, setShowLevelDistribution] = useState<boolean>(true);
+  const [showConcessionDistribution, setShowConcessionDistribution] =
+    useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
   const [firstLease, setFirstLease] = useState<Date | null>(null);
@@ -78,7 +87,6 @@ function App() {
   const [viewContext, setViewContext] = useState<string>("3D");
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
   const [showFloorPlan, setShowFloorPlan] = useState<boolean>(false);
-  const [sunTime, setSunTime] = useState<number>(12);
   const [isLoading, setIsLoading] = useState(true);
   const [themeMode, setThemeMode] = useState<"light" | "dark">(() => {
     const saved = localStorage.getItem("themeMode");
@@ -87,6 +95,8 @@ function App() {
   });
 
   const sunLighting = useMemo(() => {
+    // Sun/Time controls removed; keep a stable default midday lighting.
+    const sunTime = 12;
     const normalized = (sunTime - 6) / 12;
     const elevation = Math.sin(normalized * Math.PI);
     const daylight = Math.max(0, elevation);
@@ -116,7 +126,7 @@ function App() {
       fillIntensity: 0.22 + 0.45 * daylight,
       rimIntensity: 0.15 + 0.4 * daylight,
     };
-  }, [sunTime]);
+  }, []);
   useEffect(() => {
     localStorage.setItem("themeMode", themeMode);
   }, [themeMode]);
@@ -142,11 +152,55 @@ function App() {
 
   const filteredLeasedUnits = useMemo(() => {
     if (!unitData) return leasedUnits;
-    if (!unitFilters.unitType && !unitFilters.rentPsf) return leasedUnits;
+    if (!unitFilters.unitType && !unitFilters.rentPsf && !unitFilters.concession)
+      return leasedUnits;
     return leasedUnits.filter((unitId) =>
       unitMatchesFilters(unitData[unitId], unitFilters),
     );
   }, [leasedUnits, unitData, unitFilters]);
+
+  const concessionKeys = useMemo(() => {
+    if (!unitData) return [];
+    const numeric = new Set<number>();
+    let hasUnknown = false;
+
+    for (const row of Object.values(unitData)) {
+      const v = row?.freeMonths;
+      if (typeof v === "number" && Number.isFinite(v)) {
+        numeric.add(v);
+      } else if (v !== undefined && v !== null) {
+        hasUnknown = true;
+      }
+    }
+
+    const sorted = Array.from(numeric).sort((a, b) => a - b).map(String);
+    if (hasUnknown) sorted.push("Unknown");
+    return sorted;
+  }, [unitData]);
+
+  useEffect(() => {
+    if (!unitData) return;
+    if (concessionKeys.length === 0) return;
+
+    setConcessionColors((prev) => {
+      const next: Record<string, string> = {};
+
+      // Preserve existing overrides for keys that still exist.
+      for (const k of concessionKeys) {
+        const existing = prev[k];
+        if (existing) next[k] = existing;
+      }
+
+      // Fill missing keys with stable palette colors.
+      for (let i = 0; i < concessionKeys.length; i++) {
+        const k = concessionKeys[i];
+        if (next[k]) continue;
+        next[k] = DEFAULT_CONCESSION_PALETTE[i % DEFAULT_CONCESSION_PALETTE.length];
+      }
+
+      return next;
+    });
+  }, [unitData, concessionKeys]);
 
   useEffect(() => {
     if (selectedUnit !== null && filteredLeasedUnits.includes(selectedUnit)) {
@@ -180,8 +234,19 @@ function App() {
           })),
       });
     }
+    if (unitFilters.concession) {
+      tags.push({
+        id: "concession",
+        label: `Concession: ${unitFilters.concession}`,
+        onClear: () =>
+          setUnitFilters((prev) => ({
+            ...prev,
+            concession: null,
+          })),
+      });
+    }
     return tags;
-  }, [unitFilters.unitType, unitFilters.rentPsf]);
+  }, [unitFilters.unitType, unitFilters.rentPsf, unitFilters.concession]);
   useEffect(() => {
     fetch(base + "data/lease_data.json")
       .then((r) => r.json())
@@ -278,6 +343,7 @@ function App() {
               colorMode={colorMode}
               unitTypeColors={unitTypeColors}
               affordableColor={affordableColor}
+              concessionColors={concessionColors}
               unitFilters={unitFilters}
               firstLeaseDate={firstLease}
               totalDays={days}
@@ -332,6 +398,9 @@ function App() {
             setUnitTypeColors={setUnitTypeColors}
             affordableColor={affordableColor}
             setAffordableColor={setAffordableColor}
+            concessionKeys={concessionKeys}
+            concessionColors={concessionColors}
+            setConcessionColors={setConcessionColors}
             bucketCount={bucketCount}
             setBucketCount={setBucketCount}
             level={level}
@@ -349,6 +418,10 @@ function App() {
           mode={mode}
           unitData={unitData}
           level={level}
+          showRentDistribution={showRentDistribution}
+          showUnitTypeDistribution={showUnitTypeDistribution}
+          showLevelDistribution={showLevelDistribution}
+          showConcessionDistribution={showConcessionDistribution}
           unitFilters={unitFilters}
           setUnitFilters={setUnitFilters}
         />
@@ -358,18 +431,59 @@ function App() {
         </div>
         {mode !== "table" && (
           <div className="sun-and-filters">
-            <div className="sun-control-panel">
-              <div className="sun-control-title">Sun / Time</div>
-              <div className="sun-control-time">{formatSunTime(sunTime)}</div>
-              <input
-                type="range"
-                min="8"
-                max="16"
-                step="0.25"
-                value={sunTime}
-                onChange={(e) => setSunTime(Number(e.target.value))}
-                className="sun-control-slider"
-              />
+            <div
+              className="sun-control-panel sun-control-panel--data"
+              aria-label="Data chart visibility"
+            >
+              <div className="sun-control-title">Data to show</div>
+              <div className="active-filters-tags active-filters-tags--wrap">
+                <label className="mode-selection-filter-tag">
+                  <input
+                    type="checkbox"
+                    checked={showRentDistribution}
+                    onChange={(e) => setShowRentDistribution(e.target.checked)}
+                    aria-label="Toggle rent distribution"
+                  />
+                  <span className="mode-selection-filter-tag-text">
+                    Rent distribution
+                  </span>
+                </label>
+                <label className="mode-selection-filter-tag">
+                  <input
+                    type="checkbox"
+                    checked={showUnitTypeDistribution}
+                    onChange={(e) => setShowUnitTypeDistribution(e.target.checked)}
+                    aria-label="Toggle unit type distribution"
+                  />
+                  <span className="mode-selection-filter-tag-text">
+                    Unit type distribution
+                  </span>
+                </label>
+                <label className="mode-selection-filter-tag">
+                  <input
+                    type="checkbox"
+                    checked={showConcessionDistribution}
+                    onChange={(e) => setShowConcessionDistribution(e.target.checked)}
+                    aria-label="Toggle concession distribution"
+                  />
+                  <span className="mode-selection-filter-tag-text">
+                    Concession distribution
+                  </span>
+                </label>
+                {mode === "combined" && (
+                  <label className="mode-selection-filter-tag">
+                    <input
+                      type="checkbox"
+                      checked={showLevelDistribution}
+                      onChange={(e) => setShowLevelDistribution(e.target.checked)}
+                      aria-label="Toggle level distribution"
+                    />
+                    <span className="mode-selection-filter-tag-text">
+                      Level distribution
+                    </span>
+                  </label>
+                )}
+              </div>
             </div>
 
             {filterTags.length > 0 && (
@@ -410,7 +524,10 @@ function App() {
             <FloorPlanView
               selectedUnit={selectedUnit}
               unitData={unitData}
-              onClose={() => setShowFloorPlan(false)}
+              onClose={() => {
+                setShowFloorPlan(false);
+                setSelectedUnit(null);
+              }}
               base={base}
             />
           )}

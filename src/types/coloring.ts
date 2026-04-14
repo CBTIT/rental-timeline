@@ -1,4 +1,4 @@
-export type ColorMode = "lease-date" | "unit-type";
+export type ColorMode = "lease-date" | "unit-type" | "concession";
 
 export type UnitTypeCategory = "Studio" | "1B" | "2B" | "3B" | "Unknown";
 export type UnitTypeLegendCategory = Exclude<UnitTypeCategory, "Unknown">;
