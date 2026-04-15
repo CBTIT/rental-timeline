@@ -1,183 +1,116 @@
-# Lease Visualizer (Rental Timeline)
+# Rental Timeline — Lease Visualizer
 
-Interactive **lease timeline** and **3D floor-plan** viewer for multi-level residential inventory. Scrub dates to see which units are leased, explore **Levels** or **Combined** site context, switch **2D / 3D**, and use **charts** to filter units by **rent per SF** and **unit type**. Built for the **Fenway Kilmarnock** dataset; assets and JSON live under `public/`.
+Interactive 3D/2D leasing timeline for a multi-floor apartment building. Scrub a date slider to watch units color up as they're leased, switch floors, filter by rent/unit type, and view distribution charts.
 
----
-
-## Overview
-
-
-|                   |                                                                                                                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **What it does**  | Binds `lease_data.json` to Rhino-exported **3DM** unit geometry, drives occupancy and styling from the selected calendar day, and surfaces KPIs and distribution charts. |
-| **Primary views** | **Levels** (per-floor 3D/2D), **Combined** (whole site), **Table** (tabular lease data).                                                                                 |
-| **Stack**         | React 19, Vite 7, TypeScript, **React Three Fiber** + **three.js**, **@react-three/drei**.                                                                               |
-
+**Project:** Fenway Kilmarnock
 
 ---
 
-## Features
+## Tech Stack
 
-- **Timeline** — Day index mapped to calendar dates from the earliest lease in the dataset; slider in the HUD.
-- **Occupancy** — Units reflect leased vs available for the selected date; leased units pick up highlight colors.
-- **Color modes** — e.g. lease-date gradient vs **unit type** coloring (with affordable/unit-type palettes).
-- **3D / 2D** — Perspective vs orthographic cameras and appropriate controls (`CamerasAndControls`).
-- **Multi-floor** — Levels **L1–L8**; unit meshes and labels loaded from `public/floor_units/` and `public/unit_texts/`.
-- **Charts & filters** — Rent **$/SF** buckets and **unit type** bars; clicks add filters; filters **combine with AND** and appear as removable tags (mode bar and Sun/Time area). **Combined** mode can include floor lease distribution.
-- **Unit type totals** — Optional **Leased / Total** view using stable totals from `public/data/uniTypeCount.json`.
-- **Selection** — Click a unit for details; optional floor-plan overlay (`FloorPlanView`). Missed pointer clears selection.
-- **Lighting** — **Sun / Time** slider adjusts directional “sun” rig for shadows and fill.
-- **Themes** — **Light** and **dark** UI (persisted in `localStorage`).
-- **Data pipeline** — Lease JSON consumed at runtime; optional Excel conversion script under `public/scripts/`.
+| | |
+|---|---|
+| UI | React 19 + TypeScript |
+| Build | Vite 7 |
+| 3D rendering | Three.js via @react-three/fiber + @react-three/drei |
+| Geometry | Rhino `.3dm` files parsed at runtime via rhino3dm |
+| Data | Static JSON (`lease_data.json`, `floor_unitCount.json`) |
 
 ---
 
-## Architecture
+## Logic Flow
 
-### System context
+### 1. Data load
+On mount, `App.tsx` fetches `public/data/lease_data.json` — a flat object `Record<unitId, LeaseRow>`. It scans all `leaseStartDate` values to find the earliest and latest, establishing the timeline range.
 
-```mermaid
-flowchart LR
-  subgraph Browser["Browser"]
-    UI["React UI\n(HUD, charts, mode bar)"]
-    R3F["React Three Fiber\nCanvas"]
-    UI --> R3F
-  end
-  subgraph Static["public/"]
-    JSON["data/lease_data.json\n+ floor/unit counts"]
-    DM["*.3dm geometry\ncontext + units + labels"]
-  end
-  Browser --> JSON
-  R3F --> DM
+### 2. Timeline → current date
+A slider drives `currentDay` (integer offset from the first lease date). This maps to `currentDate` via `dateFromDayIndex`. At each position, a unit is considered **leased** if `leaseStartDate <= currentDate`.
+
+### 3. Geometry
+`LevelUnits` loads `public/floor_units/allUnits.3dm` (all unit meshes, module-level cache) and `public/unit_texts/level_N.3dm` (text labels per floor, cached per level). It traverses the Three.js scene graph, resolves each mesh name to a `unitId`, and applies a material based on the unit's lease state.
+
+### 4. Coloring
+Three modes:
+
+| Mode | Logic |
+|---|---|
+| **Lease Date** | Gradient buckets (3–7, user-adjustable) — earlier leases get warmer colors |
+| **Unit Type** | Per-category color: Studio / 1B / 2B / 3B / Affordable |
+| **Concession** | Color per `freeMonths` value |
+
+Materials are created by `createUnitMaterials()` and disposed when inputs change to avoid GPU leaks.
+
+### 5. Filtering
+Active filters (unit type, rent $/SF, concession) are ANDed. A leased unit only gets its lease color if it passes all filters — otherwise it renders as unleased. Filter tags appear in the UI and can be cleared individually.
+
+### 6. Views
+
+| `mode` | Description |
+|---|---|
+| `levels` | Single floor (L1–L8), level picker in HUD |
+| `combined` | Full building stacked in 3D |
+| `table` | Flat data table |
+
+`viewContext` toggles between `3D` (perspective + orbit) and `2D` (orthographic top-down).
+
+---
+
+## Component Map
+
+```
+App.tsx                     root state, Canvas, desktop layout
+├── MobileControls          all mobile UI: header, donut charts, bottom controls, modals
+├── HUD                     desktop sidebar: color picker, level selector, unit detail, timeline
+├── LevelUnits              Three.js scene — loads geometry, applies materials per lease state
+│   ├── leaseUtils.ts       getUnitVisualState, getUnitMaterial
+│   └── materials.ts        material factory + GPU disposal
+├── DataCharts/             desktop chart panels (rent $/SF, unit type, floor, concession)
+├── BaseMap                 satellite base map
+├── CamerasAndControls      perspective/orthographic cameras + orbit controls
+├── FloorPlanView           floor plan image overlay when a unit is selected
+├── ModeSelection           top nav: mode tabs, theme toggle, filter tags
+└── DataTable               table view
+
+utils/
+├── dateUtils.ts            parseLeaseDate, daysBetween, dateFromDayIndex
+├── leaseBuckets.ts         getBucketIndex — maps lease date → color bucket
+├── unitFilters.ts          UnitFilters type, unitMatchesFilters, rentPsfFilterLabel
+├── unitTypeCategory.ts     classifyUnitTypeCategory → Studio / 1B / 2B / 3B
+└── colorGradient.ts        generateGradient — interpolates N colors from a base hex
 ```
 
-
-
-### Component map (simplified)
-
-```mermaid
-flowchart TB
-  App["App.tsx\n(state: timeline, filters, theme, view)"]
-  App --> Canvas["<Canvas>"]
-  App --> HUD["HUD"]
-  App --> Charts["DataCharts"]
-  App --> Mode["ModeSelection"]
-  Canvas --> BaseMap["BaseMap"]
-  Canvas --> LevelUnits["LevelUnits\n(3DM units + materials)"]
-  Canvas --> Cameras["CamerasAndControls"]
-  AppProvider["AppProvider\n(context for shared lease/timeline)"]
-  AppProvider --- App
-```
-
-
-
-### Data flow
-
-```mermaid
-flowchart LR
-  LeaseJSON["lease_data.json"]
-  AppState["App state\ncurrentDay, unitData, unitFilters"]
-  LeasedIDs["leased unit IDs\nfor selected date"]
-  Filtered["filteredLeasedUnits\n(AND filters)"]
-  Three["LevelUnits\nvisibility + materials"]
-  LeaseJSON --> AppState
-  AppState --> LeasedIDs
-  LeasedIDs --> Filtered
-  Filtered --> Three
-  Charts["Chart bars\nsetUnitFilters"] --> AppState
-```
-
-
-
-### UI regions (conceptual)
-
-```mermaid
-flowchart TB
-  subgraph Layout["Viewport layout"]
-    TB["Top: ModeSelection\nLevels | Combined | Table · theme"]
-    L["Left: DataCharts\nKPI, rent PSF, unit type, optional floor %"]
-    C["Center: WebGL canvas\nBaseMap + LevelUnits"]
-    R["Right: HUD\ndate, colors, timeline, levels, 2D/3D"]
-    BL["Bottom-left: Sun/Time + active filter tags"]
-    Title["Title: Lease Visualizer / Fenway Kilmarnock"]
-  end
-  TB --- C
-  L --- C
-  C --- R
-  BL --- C
-  Title --- TB
-```
-
-
-
 ---
 
-## Project layout (high level)
-
-
-| Path                                                              | Role                                                                      |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `src/App.tsx`                                                     | Root UI, `Canvas`, chart/HUD wiring, theme, `unitFilters`, timeline state |
-| `src/components/LevelUnits/`                                      | Loads **3DM**, applies lease/material rules and filters                   |
-| `src/components/HUD/`                                             | Date, colors, level picker, timeline, view toggles                        |
-| `src/components/DataCharts/`                                      | KPI + sortable/filter charts                                              |
-| `src/utils/unitFilters.ts`                                        | Filter predicates (unit type, rent PSF)                                   |
-| `public/data/lease_data.json`                                     | Per-unit lease rows keyed by unit id                                      |
-| `public/data/*.json`                                              | Aggregates (e.g. unit counts by type/floor)                               |
-| `public/context.3dm`, `public/floor_units/`, `public/unit_texts/` | Site context and unit geometry/text layers                                |
-
-
----
-
-## Working with the project
-
-### Prerequisites
-
-- **Node.js** (LTS recommended)
-
-### Install
+## Running Locally
 
 ```bash
 npm install
+npm run dev       # http://localhost:5173
+npm run build     # production build
+npm run preview   # preview the build
 ```
-
-### Development
-
-```bash
-npm run dev
-```
-
-Open the URL Vite prints (often `http://localhost:5173/`; with a nested `base` it may include a path segment). Wait for the loading screen while **3DM** assets parse.
-
-### Production build
-
-```bash
-npm run build
-npm run preview
-```
-
-### Lint
-
-```bash
-npm run lint
-```
-
-### Updating lease data
-
-- Replace or regenerate `public/data/lease_data.json` (shape should match `LeaseRow` in `src/types/lease.ts`).
-- For spreadsheet-driven workflows, see `public/scripts/excel-to-json.ts` and run it in your own toolchain as needed.
 
 ---
 
-## Tech stack
+## Updating Lease Data
 
-- **Build:** Vite, TypeScript
-- **UI:** React 19
-- **3D:** three.js, @react-three/fiber, @react-three/drei
-- **Data:** `fetch` of static JSON; `read-excel-file` available for scripts
+Replace `public/data/lease_data.json`. Keys are unit IDs — the first digit must be the floor number (`"101"` = floor 1). Shape must match `LeaseRow` in `src/types/lease.ts`:
 
----
+```ts
+type LeaseRow = {
+  unitType: string;
+  description: string;
+  unitArea: number;
+  leaseStartDate: string;   // "YYYY-MM-DD" or "M/D/YYYY"
+  leaseEndDate: string;
+  leaseTerm: number;
+  rent: number;
+  psf: number;
+  freeMonths: number;
+  netRent: number;
+  leasingAssociate: string;
+  affordable: boolean;
+};
+```
 
-## License / data
-
-Project is **private** (`package.json`). Building geometry and lease records are **project-specific**; do not redistribute without permission.
+`public/data/floor_unitCount.json` holds total inventory per floor — used for KPI calculations. Update it if the unit mix changes.

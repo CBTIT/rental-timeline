@@ -34,6 +34,12 @@ function bucketForPSF(psf: number): BucketKey {
   return "1";
 }
 
+export function rentPsfFilterLabel(k: UnitFilters["rentPsf"]): string {
+  if (!k) return "";
+  if (k === "7p") return ">$7.0";
+  return `$${k}.x`;
+}
+
 export function unitMatchesFilters(
   row: LeaseData[string] | undefined,
   filters: UnitFilters,
