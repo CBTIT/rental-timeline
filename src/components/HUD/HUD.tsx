@@ -26,9 +26,6 @@ type HUDProps = {
   >;
   affordableColor: string;
   setAffordableColor: React.Dispatch<React.SetStateAction<string>>;
-  concessionKeys: string[];
-  concessionColors: Record<string, string>;
-  setConcessionColors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   bucketCount: number;
   setBucketCount: React.Dispatch<React.SetStateAction<number>>;
   level: string;
@@ -70,9 +67,6 @@ const HUD = ({
   setUnitTypeColors,
   affordableColor,
   setAffordableColor,
-  concessionKeys,
-  concessionColors,
-  setConcessionColors,
   bucketCount,
   setBucketCount,
   level,
@@ -98,9 +92,6 @@ const HUD = ({
   const setUnitTypeColor = (category: UnitTypeCategory, color: string) => {
     setUnitTypeColors((prev) => ({ ...prev, [category]: color }));
   };
-  const setConcessionColor = (key: string, color: string) => {
-    setConcessionColors((prev) => ({ ...prev, [key]: color }));
-  };
 
   return (
     <div className="HUD">
@@ -117,7 +108,6 @@ const HUD = ({
           >
             <option value="lease-date">Lease Date</option>
             <option value="unit-type">Unit Type</option>
-            <option value="concession">Concession</option>
           </select>
         </div>
 
@@ -196,36 +186,6 @@ const HUD = ({
           </div>
         )}
 
-        {colorMode === "concession" && (
-          <div className="unit-type-color-list">
-            {concessionKeys.length === 0 && (
-              <div className="unit-type-color-item">
-                <span className="unit-type-color-label">No concession values</span>
-              </div>
-            )}
-
-            {concessionKeys.map((key) => {
-              const label =
-                key === "Unknown"
-                  ? "Unknown"
-                  : key === "0"
-                    ? "No Concession"
-                    : `${key} ${key === "1" ? "month" : "months"}`;
-              const value = concessionColors[key] ?? "#888888";
-              return (
-                <label className="unit-type-color-item" key={key}>
-                  <span className="unit-type-color-label">{label}</span>
-                  <input
-                    type="color"
-                    value={value}
-                    onChange={(e) => setConcessionColor(key, e.target.value)}
-                    aria-label={`Select ${label} concession color`}
-                  />
-                </label>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* Time Slider - moved to top */}
@@ -287,14 +247,6 @@ const HUD = ({
           <div className="unit-detail-row">
             <div>Lease End</div>
             <div className="value">{selectedRow.leaseEndDate}</div>
-          </div>
-          <div className="unit-detail-row">
-            <div>Rent</div>
-            <div className="value">{selectedRow.rent}</div>
-          </div>
-          <div className="unit-detail-row">
-            <div>Free Months</div>
-            <div className="value">{selectedRow.freeMonths}</div>
           </div>
           <div className="unit-detail-row">
             <div>Leasing Associate</div>

@@ -162,22 +162,6 @@ const FloorPlanView = ({
                 </div>
                 <div className="fp-detail-row" role="row">
                   <span className="fp-detail-label" role="cell">
-                    Rent
-                  </span>
-                  <span className="fp-detail-value fp-detail-accent" role="cell">
-                    {unitRow?.rent != null ? `$${String(unitRow.rent)}` : "—"}
-                  </span>
-                </div>
-                <div className="fp-detail-row" role="row">
-                  <span className="fp-detail-label" role="cell">
-                    Free Months
-                  </span>
-                  <span className="fp-detail-value" role="cell">
-                    {unitRow?.freeMonths ?? "—"}
-                  </span>
-                </div>
-                <div className="fp-detail-row" role="row">
-                  <span className="fp-detail-label" role="cell">
                     Leasing Associate
                   </span>
                   <span className="fp-detail-value" role="cell">

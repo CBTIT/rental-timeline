@@ -18,12 +18,6 @@ const MOBILE_DONUT_PALETTE = [
   "#14b8a6",
 ] as const;
 
-function concessionLabel(key: string) {
-  if (key === "Unknown") return "Unknown";
-  if (key === "0") return "No Concession";
-  return `${key} ${key === "1" ? "month" : "months"}`;
-}
-
 type MobileControlsProps = {
   mode: string;
   setMode: React.Dispatch<React.SetStateAction<string>>;
@@ -50,11 +44,6 @@ type MobileControlsProps = {
   >;
   affordableColor: string;
   setAffordableColor: React.Dispatch<React.SetStateAction<string>>;
-  concessionKeys: string[];
-  concessionColors: Record<string, string>;
-  setConcessionColors: React.Dispatch<
-    React.SetStateAction<Record<string, string>>
-  >;
   unitFilters: UnitFilters;
   setUnitFilters: React.Dispatch<React.SetStateAction<UnitFilters>>;
   filterTags: Array<{ id: string; label: string; onClear: () => void }>;
@@ -91,9 +80,6 @@ export default function MobileControls({
   setUnitTypeColors,
   affordableColor,
   setAffordableColor,
-  concessionKeys,
-  concessionColors,
-  setConcessionColors,
   unitFilters,
   setUnitFilters,
   filterTags,
@@ -108,10 +94,9 @@ export default function MobileControls({
   const [showChartsPicker, setShowChartsPicker] = useState(false);
   const [showChartRent, setShowChartRent] = useState(false);
   const [showChartUnitType, setShowChartUnitType] = useState(true);
-  const [showChartConcession, setShowChartConcession] = useState(false);
   const [showChartLevel, setShowChartLevel] = useState(false);
   const [chartFilterKind, setChartFilterKind] = useState<
-    "rentPsf" | "unitType" | "concession" | null
+    "rentPsf" | "unitType" | null
   >(null);
 
   const levelFromUnitId = (unitId: string): string => {
@@ -210,22 +195,6 @@ export default function MobileControls({
       rentCounts[bucketForPSF(psf)] += 1;
     }
 
-    const concessionCounts = new Map<string, number>();
-    let leasedDenom = 0;
-    for (const unitId of filteredLeasedUnits) {
-      if (mode === "levels" && levelFromUnitId(unitId) !== level) continue;
-      leasedDenom += 1;
-      const row = unitData[unitId];
-      if (!row) continue;
-      const key =
-        typeof row.freeMonths === "number" && Number.isFinite(row.freeMonths)
-          ? String(row.freeMonths)
-          : row.freeMonths !== undefined && row.freeMonths !== null
-            ? "Unknown"
-            : "Unknown";
-      concessionCounts.set(key, (concessionCounts.get(key) ?? 0) + 1);
-    }
-
     const levelCounts: Record<string, number> = {};
     for (const unitId of filteredLeasedUnits) {
       const lvl = levelFromUnitId(unitId);
@@ -239,8 +208,6 @@ export default function MobileControls({
       unitTypeCounts,
       rentCounts,
       rentOrder,
-      concessionCounts,
-      leasedDenom,
       levelCounts,
     };
   }, [unitData, filteredLeasedUnits, mode, level]);
@@ -249,7 +216,6 @@ export default function MobileControls({
     switch (colorMode) {
       case "lease-date": return "Lease Date";
       case "unit-type": return "Unit Type";
-      case "concession": return "Concession";
       default: return "Color Mode";
     }
   }, [colorMode]);
@@ -303,30 +269,8 @@ export default function MobileControls({
       );
     }
 
-    const swatchKeys = concessionKeys.slice(0, 4);
-    const remaining = Math.max(0, concessionKeys.length - swatchKeys.length);
-    return (
-      <span className="mobile-color-mode-legend" aria-hidden="true">
-        {swatchKeys.map((k) => {
-          const short = k === "Unknown" ? "Unk" : k;
-          return (
-            <span key={`legend-concession-${k}`} className="mobile-color-mode-legend__pair">
-              <span
-                className="mobile-color-mode-legend__swatch"
-                style={{ backgroundColor: concessionColors[k] ?? "#888888" }}
-                title={concessionLabel(k)}
-                aria-hidden="true"
-              />
-              <span className="mobile-color-mode-legend__tinylabel">{short}</span>
-            </span>
-          );
-        })}
-        {remaining > 0 && (
-          <span className="mobile-color-mode-legend__more">+{remaining}</span>
-        )}
-      </span>
-    );
-  }, [colorMode, selectedLeaseColor, bucketCount, unitTypeColors, affordableColor, concessionKeys, concessionColors]);
+    return null;
+  }, [colorMode, selectedLeaseColor, bucketCount, unitTypeColors, affordableColor]);
 
   const renderDonut = (
     title: string,
@@ -500,21 +444,6 @@ export default function MobileControls({
                 () => setChartFilterKind("rentPsf"),
               )}
 
-            {mobileChartsData && showChartConcession &&
-              renderDonut(
-                "Concession",
-                Array.from(mobileChartsData.concessionCounts.entries())
-                  .sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0))
-                  .slice(0, 6)
-                  .map(([k, v], idx) => ({
-                    label: k,
-                    value: v,
-                    color: concessionColors[k] ?? MOBILE_DONUT_PALETTE[idx % MOBILE_DONUT_PALETTE.length],
-                  })),
-                undefined,
-                () => setChartFilterKind("concession"),
-              )}
-
             {mobileChartsData && showChartLevel && mode === "combined" &&
               renderDonut(
                 "Levels",
@@ -669,7 +598,7 @@ export default function MobileControls({
           <div className="mobile-color-mode-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-color-mode-sheet__title">Color mode</div>
             <div className="mobile-color-mode-sheet__options" role="radiogroup">
-              {(["lease-date", "unit-type", "concession"] as const).map((cm) => (
+              {(["lease-date", "unit-type"] as const).map((cm) => (
                 <button
                   key={`cm-${cm}`}
                   type="button"
@@ -677,7 +606,7 @@ export default function MobileControls({
                   onClick={() => setColorMode(cm)}
                   aria-checked={colorMode === cm}
                 >
-                  {cm === "lease-date" ? "Lease Date" : cm === "unit-type" ? "Unit Type" : "Concession"}
+                  {cm === "lease-date" ? "Lease Date" : "Unit Type"}
                 </button>
               ))}
             </div>
@@ -770,37 +699,6 @@ export default function MobileControls({
                 </div>
               )}
 
-              {colorMode === "concession" && (
-                <div className="mobile-color-mode-editor mobile-color-mode-editor--concession">
-                  <div className="mobile-color-mode-editor__scroll mobile-color-mode-editor__scroll--compact">
-                    {concessionKeys.length === 0 ? (
-                      <div className="mobile-color-mode-editor__hint">No concession values.</div>
-                    ) : (
-                      concessionKeys.map((k) => (
-                        <label
-                          key={`mobile-concession-${k}`}
-                          className="mobile-color-mode-editor__row mobile-color-mode-editor__row--label"
-                        >
-                          <span className="mobile-color-mode-editor__label">
-                            <span className="mobile-color-mode-editor__labelmain">
-                              {concessionLabel(k)}
-                            </span>
-                          </span>
-                          <input
-                            className="mobile-color-mode-editor__picker"
-                            type="color"
-                            value={concessionColors[k] ?? "#888888"}
-                            onChange={(e) =>
-                              setConcessionColors((prev) => ({ ...prev, [k]: e.target.value }))
-                            }
-                            aria-label={`Pick ${concessionLabel(k)} color`}
-                          />
-                        </label>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
 
             <button
@@ -844,15 +742,6 @@ export default function MobileControls({
                   aria-label="Toggle rent chart"
                 />
               </label>
-              <label className="mobile-color-mode-editor__row mobile-color-mode-editor__row--label">
-                <span className="mobile-color-mode-editor__label">Concession</span>
-                <input
-                  type="checkbox"
-                  checked={showChartConcession}
-                  onChange={(e) => setShowChartConcession(e.target.checked)}
-                  aria-label="Toggle concession chart"
-                />
-              </label>
               {mode === "combined" && (
                 <label className="mobile-color-mode-editor__row mobile-color-mode-editor__row--label">
                   <span className="mobile-color-mode-editor__label">Levels</span>
@@ -889,9 +778,7 @@ export default function MobileControls({
             <div className="mobile-color-mode-sheet__title">
               {chartFilterKind === "unitType"
                 ? "Unit Type filter"
-                : chartFilterKind === "rentPsf"
-                  ? "$/SF filter"
-                  : "Concession filter"}
+                : "$/SF filter"}
             </div>
 
             {chartFilterKind === "unitType" && (
@@ -946,35 +833,6 @@ export default function MobileControls({
                   className="mobile-color-mode-sheet__option"
                   aria-checked={unitFilters.rentPsf == null}
                   onClick={() => setUnitFilters((prev) => ({ ...prev, rentPsf: null }))}
-                >
-                  Clear
-                </button>
-              </div>
-            )}
-
-            {chartFilterKind === "concession" && (
-              <div className="mobile-color-mode-editor__scroll">
-                {concessionKeys.map((k) => (
-                  <button
-                    key={`filter-concession-${k}`}
-                    type="button"
-                    className="mobile-color-mode-sheet__option"
-                    aria-checked={unitFilters.concession === k}
-                    onClick={() =>
-                      setUnitFilters((prev) => ({
-                        ...prev,
-                        concession: prev.concession === k ? null : k,
-                      }))
-                    }
-                  >
-                    {concessionLabel(k)}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className="mobile-color-mode-sheet__option"
-                  aria-checked={unitFilters.concession == null}
-                  onClick={() => setUnitFilters((prev) => ({ ...prev, concession: null }))}
                 >
                   Clear
                 </button>

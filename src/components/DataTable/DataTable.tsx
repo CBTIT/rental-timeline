@@ -14,10 +14,6 @@ type SortKey =
   | "leaseTerm"
   | "leaseStartDate"
   | "leaseEndDate"
-  | "rent"
-  | "psf"
-  | "freeMonths"
-  | "netRent"
   | "associate"
   | "affordable";
 
@@ -100,12 +96,6 @@ export default function DataTable({ unitData }: Props) {
           const n = Number(unitId);
           return Number.isFinite(n) ? n : unitId;
         }
-        case "rent":
-          return parseMoneyLike(row.rent);
-        case "psf":
-          return parseMoneyLike(row.psf);
-        case "netRent":
-          return parseMoneyLike(row.netRent);
         case "associate":
           return row.leasingAssociate.trim().toLowerCase();
 
@@ -117,8 +107,6 @@ export default function DataTable({ unitData }: Props) {
           return parseNumberLike(row.unitArea);
         case "leaseTerm":
           return parseNumberLike(row.leaseTerm);
-        case "freeMonths":
-          return parseNumberLike(row.freeMonths);
 
         case "leaseStartDate":
           return parseLeaseDateLike(row.leaseStartDate);
@@ -220,36 +208,6 @@ export default function DataTable({ unitData }: Props) {
             <th
               className="sortable"
               role="button"
-              onClick={() => onHeaderClick("rent")}
-            >
-              Rent {sortIcon("rent")}
-            </th>
-
-            <th
-              className="sortable"
-              role="button"
-              onClick={() => onHeaderClick("psf")}
-            >
-              PSF {sortIcon("psf")}
-            </th>
-
-            <th
-              className="sortable"
-              role="button"
-              onClick={() => onHeaderClick("area")}
-            >
-              Free Months {sortIcon("area")}
-            </th>
-            <th
-              className="sortable"
-              role="button"
-              onClick={() => onHeaderClick("area")}
-            >
-              Net Rent {sortIcon("area")}
-            </th>
-            <th
-              className="sortable"
-              role="button"
               onClick={() => onHeaderClick("associate")}
             >
               Leasing Associate {sortIcon("rent")}
@@ -268,10 +226,6 @@ export default function DataTable({ unitData }: Props) {
               <td className="data">{dataRow.leaseStartDate}</td>
               <td className="data">{dataRow.leaseEndDate}</td>
               <td className="data">{dataRow.leaseTerm}</td>
-              <td className="data">{dataRow.rent}</td>
-              <td className="data">{dataRow.psf}</td>
-              <td className="data">{dataRow.freeMonths}</td>
-              <td className="data">{dataRow.netRent}</td>
               <td className="data">{dataRow.leasingAssociate}</td>
             </tr>
           ))}

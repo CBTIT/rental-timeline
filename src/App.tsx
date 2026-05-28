@@ -35,19 +35,6 @@ import { useCompactViewport } from "./hooks/useCompactViewport";
 import WebglContextStability from "./components/WebglContextStability/WebglContextStability";
 
 const DEFAULT_LEASE_COLOR = "#14b8a6";
-const DEFAULT_CONCESSION_PALETTE = [
-  "#6366f1", // indigo
-  "#0ea5e9", // sky
-  "#22c55e", // green
-  "#f97316", // orange
-  "#ec4899", // pink
-  "#f59e0b", // amber
-  "#14b8a6", // teal
-  "#8b5cf6", // violet
-  "#ef4444", // red
-  "#84cc16", // lime
-  "#06b6d4", // cyan
-] as const;
 
 function App() {
   const base = import.meta.env.BASE_URL;
@@ -62,9 +49,6 @@ function App() {
   const [affordableColor, setAffordableColor] = useState<string>(
     DEFAULT_AFFORDABLE_COLOR,
   );
-  const [concessionColors, setConcessionColors] = useState<Record<string, string>>(
-    {},
-  );
   const [unitFilters, setUnitFilters] = useState<UnitFilters>(DEFAULT_UNIT_FILTERS);
   const [bucketCount, setBucketCount] = useState<number>(3);
   const [showData, setShowData] = useState<boolean>(true);
@@ -72,8 +56,6 @@ function App() {
   const [showUnitTypeDistribution, setShowUnitTypeDistribution] =
     useState<boolean>(true);
   const [showLevelDistribution, setShowLevelDistribution] = useState<boolean>(true);
-  const [showConcessionDistribution, setShowConcessionDistribution] =
-    useState<boolean>(true);
   const [mode, setMode] = useState<string>("levels");
   const [unitData, setUnitData] = useState<LeaseData | null>(null);
   const [firstLease, setFirstLease] = useState<Date | null>(null);
@@ -168,49 +150,6 @@ function App() {
     );
   }, [leasedUnits, unitData, unitFilters]);
 
-  const concessionKeys = useMemo(() => {
-    if (!unitData) return [];
-    const numeric = new Set<number>();
-    let hasUnknown = false;
-
-    for (const row of Object.values(unitData)) {
-      const v = row?.freeMonths;
-      if (typeof v === "number" && Number.isFinite(v)) {
-        numeric.add(v);
-      } else if (v !== undefined && v !== null) {
-        hasUnknown = true;
-      }
-    }
-
-    const sorted = Array.from(numeric).sort((a, b) => a - b).map(String);
-    if (hasUnknown) sorted.push("Unknown");
-    return sorted;
-  }, [unitData]);
-
-  useEffect(() => {
-    if (!unitData) return;
-    if (concessionKeys.length === 0) return;
-
-    setConcessionColors((prev) => {
-      const next: Record<string, string> = {};
-
-      // Preserve existing overrides for keys that still exist.
-      for (const k of concessionKeys) {
-        const existing = prev[k];
-        if (existing) next[k] = existing;
-      }
-
-      // Fill missing keys with stable palette colors.
-      for (let i = 0; i < concessionKeys.length; i++) {
-        const k = concessionKeys[i];
-        if (next[k]) continue;
-        next[k] = DEFAULT_CONCESSION_PALETTE[i % DEFAULT_CONCESSION_PALETTE.length];
-      }
-
-      return next;
-    });
-  }, [unitData, concessionKeys]);
-
   useEffect(() => {
     if (selectedUnit !== null && filteredLeasedUnits.includes(selectedUnit)) {
       setShowFloorPlan(true);
@@ -243,19 +182,8 @@ function App() {
           })),
       });
     }
-    if (unitFilters.concession) {
-      tags.push({
-        id: "concession",
-        label: `Concession: ${unitFilters.concession}`,
-        onClear: () =>
-          setUnitFilters((prev) => ({
-            ...prev,
-            concession: null,
-          })),
-      });
-    }
     return tags;
-  }, [unitFilters.unitType, unitFilters.rentPsf, unitFilters.concession]);
+  }, [unitFilters.unitType, unitFilters.rentPsf]);
   useEffect(() => {
     fetch(base + "data/lease_data.json")
       .then((r) => r.json())
@@ -373,7 +301,7 @@ function App() {
               colorMode={colorMode}
               unitTypeColors={unitTypeColors}
               affordableColor={affordableColor}
-              concessionColors={concessionColors}
+              concessionColors={{}}
               unitFilters={unitFilters}
               firstLeaseDate={firstLease}
               totalDays={days}
@@ -417,9 +345,6 @@ function App() {
             setUnitTypeColors={setUnitTypeColors}
             affordableColor={affordableColor}
             setAffordableColor={setAffordableColor}
-            concessionKeys={concessionKeys}
-            concessionColors={concessionColors}
-            setConcessionColors={setConcessionColors}
             bucketCount={bucketCount}
             setBucketCount={setBucketCount}
             level={level}
@@ -440,7 +365,6 @@ function App() {
           showRentDistribution={showRentDistribution}
           showUnitTypeDistribution={showUnitTypeDistribution}
           showLevelDistribution={showLevelDistribution}
-          showConcessionDistribution={showConcessionDistribution}
           unitFilters={unitFilters}
           setUnitFilters={setUnitFilters}
         />
@@ -468,9 +392,6 @@ function App() {
           setUnitTypeColors={setUnitTypeColors}
           affordableColor={affordableColor}
           setAffordableColor={setAffordableColor}
-          concessionKeys={concessionKeys}
-          concessionColors={concessionColors}
-          setConcessionColors={setConcessionColors}
           unitFilters={unitFilters}
           setUnitFilters={setUnitFilters}
           filterTags={filterTags}
@@ -506,17 +427,6 @@ function App() {
                   />
                   <span className="mode-selection-filter-tag-text">
                     Unit type distribution
-                  </span>
-                </label>
-                <label className="mode-selection-filter-tag">
-                  <input
-                    type="checkbox"
-                    checked={showConcessionDistribution}
-                    onChange={(e) => setShowConcessionDistribution(e.target.checked)}
-                    aria-label="Toggle concession distribution"
-                  />
-                  <span className="mode-selection-filter-tag-text">
-                    Concession distribution
                   </span>
                 </label>
                 {mode === "combined" && (

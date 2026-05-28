@@ -5,7 +5,6 @@ import "./DataCharts.css";
 import SortedByFloorLeasePercent from "./SortedByFloorLeasePercent";
 import SortedByRentPSFPercent from "./SortedByRentPSFPercent";
 import SortedByUnitTypePercent from "./SortedByUnitTypePercent";
-import ConcessionDistribution from "./ConcessionDistribution";
 import type { UnitFilters } from "../../utils/unitFilters";
 
 type DataChartsType = {
@@ -17,7 +16,6 @@ type DataChartsType = {
   showRentDistribution: boolean;
   showUnitTypeDistribution: boolean;
   showLevelDistribution: boolean;
-  showConcessionDistribution: boolean;
   unitFilters: UnitFilters;
   setUnitFilters: React.Dispatch<React.SetStateAction<UnitFilters>>;
 };
@@ -31,7 +29,6 @@ const DataCharts = ({
   showRentDistribution,
   showUnitTypeDistribution,
   showLevelDistribution,
-  showConcessionDistribution,
   unitFilters,
   setUnitFilters,
 }: DataChartsType) => {
@@ -70,23 +67,6 @@ const DataCharts = ({
         )}
         {showLevelDistribution && mode === "combined" && (
           <SortedByFloorLeasePercent unitData={unitData} leasedUnits={leasedUnits} />
-        )}
-
-        {showConcessionDistribution && (
-          <ConcessionDistribution
-            unitData={unitData}
-            leasedUnits={leasedUnits}
-            mode={mode}
-            level={level}
-            selectedConcessionFilter={unitFilters.concession}
-            setSelectedConcessionFilter={(next) =>
-              setUnitFilters((prev) => ({
-                ...prev,
-                concession:
-                  typeof next === "function" ? next(prev.concession) : next,
-              }))
-            }
-          />
         )}
       </div>
     )
