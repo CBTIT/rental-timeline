@@ -23,14 +23,6 @@ function toggleDir(prev: SortDir) {
   return prev === "asc" ? "desc" : "asc";
 }
 
-function parseMoneyLike(v: unknown): number | null {
-  if (v == null) return null;
-  const s = String(v).replace(/,/g, "");
-  const cleaned = s.replace(/[^0-9.\-]/g, ""); // keep digits, dot, minus
-  if (!cleaned) return null;
-  const n = Number(cleaned);
-  return Number.isFinite(n) ? n : null;
-}
 function parseLeaseDateLike(v: unknown): number | null {
   if (!v) return null;
   const t = String(v).trim();
@@ -162,14 +154,14 @@ export default function DataTable({ unitData }: Props) {
               role="button"
               onClick={() => onHeaderClick("type")}
             >
-              Type {sortIcon("rent")}
+              Type {sortIcon("type")}
             </th>
             <th
               className="sortable"
               role="button"
               onClick={() => onHeaderClick("affordable")}
             >
-              Affordable {sortIcon("rent")}
+              Affordable {sortIcon("affordable")}
             </th>
             <th>Description</th>
 
@@ -210,7 +202,7 @@ export default function DataTable({ unitData }: Props) {
               role="button"
               onClick={() => onHeaderClick("associate")}
             >
-              Leasing Associate {sortIcon("rent")}
+              Leasing Associate {sortIcon("associate")}
             </th>
           </tr>
         </thead>
